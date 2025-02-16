@@ -18,10 +18,14 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-white">
       {/* Logo Animation */}
-      <div className={`fixed inset-0 flex items-center justify-center bg-white transition-opacity duration-1000 ${showContent ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
-        <h1 className="text-guro-blue text-6xl font-bold animate-scale-in">
-          GuroAI
-        </h1>
+      <div className={`fixed inset-0 flex items-center justify-center bg-[#69b2b4] transition-opacity duration-1000 ${showContent ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+        <div className="flex flex-col items-center animate-scale-in">
+          <img 
+            src="/lovable-uploads/9938721e-a69e-4d38-813a-54420314739a.png" 
+            alt="GuroAI Logo" 
+            className="w-40 h-40 mb-4"
+          />
+        </div>
       </div>
 
       {/* Main Content */}
