@@ -1,6 +1,5 @@
-
 import { useState, useEffect } from "react";
-import { BookOpen, CheckCircle, PenTool } from "lucide-react";
+import { BookOpen, CheckCircle, PenTool, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
@@ -10,7 +9,7 @@ const Index = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowContent(true);
-    }, 5000); // Changed to 5 seconds
+    }, 5000);
 
     return () => clearTimeout(timer);
   }, []);
@@ -107,6 +106,58 @@ const Index = () => {
             </Card>
           </div>
         </section>
+
+        {/* Testimonials Section */}
+        <section className="py-20 px-4 bg-gray-50">
+          <div className="max-w-6xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-bold text-guro-blue text-center mb-12">
+              What Teachers Are Saying
+            </h2>
+            <div className="grid md:grid-cols-3 gap-8">
+              <TestimonialCard 
+                quote="GuroAI's lesson plans are more tailored to my students' needs than any other AI tool I've used. And at this price point, it's an absolute steal!"
+                author="Sarah Chen"
+                role="High School Science Teacher"
+                rating={5}
+              />
+              <TestimonialCard 
+                quote="The quality of content is outstanding. I'm getting better results than with general AI tools, and it's specifically designed for education. Amazing value for money."
+                author="Michael Rodriguez"
+                role="Elementary School Teacher"
+                rating={5}
+              />
+              <TestimonialCard 
+                quote="Finally, an AI tool that truly understands education! The lesson plans are incredibly detailed and pedagogically sound. The affordable pricing makes it accessible to all teachers."
+                author="Emily Thompson"
+                role="Middle School Math Teacher"
+                rating={5}
+              />
+            </div>
+          </div>
+        </section>
+
+        {/* Reviews Section */}
+        <section className="py-20 px-4">
+          <div className="max-w-4xl mx-auto text-center">
+            <h2 className="text-3xl md:text-4xl font-bold text-guro-blue mb-12">
+              Why Teachers Love GuroAI
+            </h2>
+            <div className="space-y-8">
+              <ReviewCard 
+                title="Superior AI Understanding"
+                description="Unlike generic AI tools, GuroAI is specifically trained on educational content and teaching methodologies, resulting in more relevant and practical lesson plans."
+              />
+              <ReviewCard 
+                title="Affordable Excellence"
+                description="Premium quality lesson plans at a fraction of the cost of other platforms. We believe quality education tools should be accessible to all teachers."
+              />
+              <ReviewCard 
+                title="Latest AI Technology"
+                description="Our platform leverages the most advanced AI models to ensure you get cutting-edge lesson planning assistance that's continually improving."
+              />
+            </div>
+          </div>
+        </section>
       </div>
     </div>
   );
@@ -120,6 +171,36 @@ const FeatureCard = ({ icon, title, description }: {
   <Card className="p-6 text-center hover:shadow-lg transition-shadow duration-300">
     <div className="flex justify-center mb-4">{icon}</div>
     <h3 className="text-xl font-semibold text-guro-blue mb-2">{title}</h3>
+    <p className="text-gray-600">{description}</p>
+  </Card>
+);
+
+const TestimonialCard = ({ quote, author, role, rating }: {
+  quote: string;
+  author: string;
+  role: string;
+  rating: number;
+}) => (
+  <Card className="p-8 hover:shadow-lg transition-shadow duration-300">
+    <div className="flex gap-1 mb-4">
+      {[...Array(rating)].map((_, i) => (
+        <Star key={i} className="w-5 h-5 fill-guro-green text-guro-green" />
+      ))}
+    </div>
+    <p className="text-gray-600 italic mb-6">{quote}</p>
+    <div>
+      <p className="font-semibold text-guro-blue">{author}</p>
+      <p className="text-sm text-gray-500">{role}</p>
+    </div>
+  </Card>
+);
+
+const ReviewCard = ({ title, description }: {
+  title: string;
+  description: string;
+}) => (
+  <Card className="p-8 text-left hover:shadow-lg transition-shadow duration-300">
+    <h3 className="text-xl font-semibold text-guro-blue mb-4">{title}</h3>
     <p className="text-gray-600">{description}</p>
   </Card>
 );
