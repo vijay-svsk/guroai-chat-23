@@ -1,8 +1,12 @@
+
 import { useState, useEffect } from "react";
-import { BookOpen, CheckCircle, PenTool, Star } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
+import { LogoAnimation } from "@/components/home/LogoAnimation";
+import { HeroSection } from "@/components/home/HeroSection";
+import { FeaturesSection } from "@/components/home/FeaturesSection";
+import { PricingSection } from "@/components/home/PricingSection";
+import { TestimonialsSection } from "@/components/home/TestimonialsSection";
+import { ReviewsSection } from "@/components/home/ReviewsSection";
 
 const Index = () => {
   const [showContent, setShowContent] = useState(false);
@@ -22,200 +26,17 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Logo Animation */}
-      <div className={`fixed inset-0 flex items-center justify-center bg-[#0a1d2c] transition-opacity duration-1000 ${showContent ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
-        <div className="flex flex-col items-center animate-scale-in">
-          <img 
-            src="/lovable-uploads/6156f2f7-e911-43ea-be05-99f13995bd26.png" 
-            alt="GuroAI Logo" 
-            className="w-64 h-64 mb-4"
-          />
-        </div>
-      </div>
+      <LogoAnimation showContent={showContent} />
 
-      {/* Main Content */}
       <div className={`transition-opacity duration-1000 ${showContent ? 'opacity-100' : 'opacity-0'}`}>
-        {/* Hero Section */}
-        <section className="relative h-screen flex flex-col items-center justify-center space-y-8 px-4">
-          <div className="absolute inset-0 pointer-events-none overflow-hidden">
-            <div className="absolute top-20 left-20 w-64 h-64 bg-guro-green/10 rounded-full blur-3xl animate-float" />
-            <div className="absolute bottom-20 right-20 w-64 h-64 bg-guro-blue/10 rounded-full blur-3xl animate-float" style={{ animationDelay: "1s" }} />
-          </div>
-
-          <h1 className="text-5xl md:text-7xl font-bold text-guro-blue text-center animate-fade-in">
-            Teaching Made Easy with AI
-          </h1>
-          <p className="text-xl md:text-2xl text-gray-600 text-center max-w-2xl animate-fade-in" style={{ animationDelay: "0.2s" }}>
-            Generate personalized lesson plans in seconds with our AI-powered platform
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 animate-fade-in px-6 w-full sm:w-auto" style={{ animationDelay: "0.4s" }}>
-            <Button 
-              onClick={handleStartTrial}
-              className="bg-guro-blue hover:bg-guro-blue/90 text-white px-8 py-6 rounded-lg text-lg transition-all duration-300 hover:scale-105"
-            >
-              Start Free Trial
-            </Button>
-            <Button variant="outline" className="border-guro-blue text-guro-blue hover:bg-guro-blue/5 px-8 py-6 rounded-lg text-lg transition-all duration-300 hover:scale-105">
-              Learn More
-            </Button>
-          </div>
-        </section>
-
-        {/* Features Section */}
-        <section className="py-20 px-4 bg-gray-50">
-          <div className="max-w-6xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold text-guro-blue text-center mb-12">
-              Why Choose GuroAI?
-            </h2>
-            <div className="grid md:grid-cols-3 gap-8">
-              <FeatureCard 
-                icon={<BookOpen className="w-12 h-12 text-guro-blue" />}
-                title="Smart Lesson Planning"
-                description="AI-powered system that creates custom lesson plans based on your needs"
-              />
-              <FeatureCard 
-                icon={<PenTool className="w-12 h-12 text-guro-blue" />}
-                title="Customizable Templates"
-                description="Easily modify and adapt lesson plans to fit your teaching style"
-              />
-              <FeatureCard 
-                icon={<CheckCircle className="w-12 h-12 text-guro-blue" />}
-                title="Time-Saving Solution"
-                description="Create comprehensive lesson plans in minutes, not hours"
-              />
-            </div>
-          </div>
-        </section>
-
-        {/* Pricing Section */}
-        <section className="py-20 px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-3xl md:text-4xl font-bold text-guro-blue mb-12">
-              Simple, Transparent Pricing
-            </h2>
-            <Card className="p-8 shadow-lg hover:shadow-xl transition-shadow duration-300">
-              <div className="space-y-4">
-                <div className="text-guro-green font-semibold text-xl">
-                  Try GuroAI Free for 7 Days
-                </div>
-                <div className="text-4xl font-bold text-guro-blue">
-                  $4.99<span className="text-xl text-gray-500">/month</span>
-                </div>
-                <ul className="space-y-3 text-gray-600 mt-6">
-                  <li>✓ Unlimited Lesson Plans</li>
-                  <li>✓ All Subject Areas</li>
-                  <li>✓ Customizable Templates</li>
-                  <li>✓ Priority Support</li>
-                </ul>
-
-                <Button
-                  onClick={handleStartTrial}
-                  className="w-full bg-guro-blue hover:bg-guro-blue/90 text-white py-6 rounded-lg text-lg transition-all duration-300 hover:scale-105 mt-6"
-                >
-                  Start Your Free Trial
-                </Button>
-                <p className="text-sm text-center text-gray-500">No credit card required</p>
-              </div>
-            </Card>
-          </div>
-        </section>
-
-        {/* Testimonials Section */}
-        <section className="py-20 px-4 bg-gray-50">
-          <div className="max-w-6xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold text-guro-blue text-center mb-12">
-              What Teachers Are Saying
-            </h2>
-            <div className="grid md:grid-cols-3 gap-8">
-              <TestimonialCard 
-                quote="GuroAI's lesson plans are more tailored to my students' needs than any other AI tool I've used. And at this price point, it's an absolute steal!"
-                author="Sarah Chen"
-                role="High School Science Teacher"
-                rating={5}
-              />
-              <TestimonialCard 
-                quote="The quality of content is outstanding. I'm getting better results than with general AI tools, and it's specifically designed for education. Amazing value for money."
-                author="Michael Rodriguez"
-                role="Elementary School Teacher"
-                rating={5}
-              />
-              <TestimonialCard 
-                quote="Finally, an AI tool that truly understands education! The lesson plans are incredibly detailed and pedagogically sound. The affordable pricing makes it accessible to all teachers."
-                author="Emily Thompson"
-                role="Middle School Math Teacher"
-                rating={5}
-              />
-            </div>
-          </div>
-        </section>
-
-        {/* Reviews Section */}
-        <section className="py-20 px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-3xl md:text-4xl font-bold text-guro-blue mb-12">
-              Why Teachers Love GuroAI
-            </h2>
-            <div className="space-y-8">
-              <ReviewCard 
-                title="Superior AI Understanding"
-                description="Unlike generic AI tools, GuroAI is specifically trained on educational content and teaching methodologies, resulting in more relevant and practical lesson plans."
-              />
-              <ReviewCard 
-                title="Affordable Excellence"
-                description="Premium quality lesson plans at a fraction of the cost of other platforms. We believe quality education tools should be accessible to all teachers."
-              />
-              <ReviewCard 
-                title="Latest AI Technology"
-                description="Our platform leverages the most advanced AI models to ensure you get cutting-edge lesson planning assistance that's continually improving."
-              />
-            </div>
-          </div>
-        </section>
+        <HeroSection onStartTrial={handleStartTrial} />
+        <FeaturesSection />
+        <PricingSection onStartTrial={handleStartTrial} />
+        <TestimonialsSection />
+        <ReviewsSection />
       </div>
     </div>
   );
 };
-
-const FeatureCard = ({ icon, title, description }: { 
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-}) => (
-  <Card className="p-6 text-center hover:shadow-lg transition-shadow duration-300">
-    <div className="flex justify-center mb-4">{icon}</div>
-    <h3 className="text-xl font-semibold text-guro-blue mb-2">{title}</h3>
-    <p className="text-gray-600">{description}</p>
-  </Card>
-);
-
-const TestimonialCard = ({ quote, author, role, rating }: {
-  quote: string;
-  author: string;
-  role: string;
-  rating: number;
-}) => (
-  <Card className="p-8 hover:shadow-lg transition-shadow duration-300">
-    <div className="flex gap-1 mb-4">
-      {[...Array(rating)].map((_, i) => (
-        <Star key={i} className="w-5 h-5 fill-guro-green text-guro-green" />
-      ))}
-    </div>
-    <p className="text-gray-600 italic mb-6">{quote}</p>
-    <div>
-      <p className="font-semibold text-guro-blue">{author}</p>
-      <p className="text-sm text-gray-500">{role}</p>
-    </div>
-  </Card>
-);
-
-const ReviewCard = ({ title, description }: {
-  title: string;
-  description: string;
-}) => (
-  <Card className="p-8 text-left hover:shadow-lg transition-shadow duration-300">
-    <h3 className="text-xl font-semibold text-guro-blue mb-4">{title}</h3>
-    <p className="text-gray-600">{description}</p>
-  </Card>
-);
 
 export default Index;
