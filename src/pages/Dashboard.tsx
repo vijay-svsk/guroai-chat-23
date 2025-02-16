@@ -1,6 +1,5 @@
 
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -12,7 +11,6 @@ const Dashboard = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate();
   const { toast } = useToast();
 
   const handleCreateAccount = async (e: React.FormEvent) => {
@@ -61,9 +59,16 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-white shadow">
+      <header className="bg-[#0a1d2c]">
         <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-          <h1 className="text-3xl font-bold text-guro-blue">Welcome to GuroAI!</h1>
+          <div className="flex flex-col items-center">
+            <img 
+              src="/lovable-uploads/24e7e402-845e-4126-b717-af2167b4ef23.png" 
+              alt="GuroAI Logo" 
+              className="h-24 w-24 mb-4"
+            />
+            <h1 className="text-3xl font-bold text-white">Welcome to GuroAI!</h1>
+          </div>
         </div>
       </header>
 
