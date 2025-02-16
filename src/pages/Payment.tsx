@@ -1,57 +1,19 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { supabase } from "@/integrations/supabase/client";
-import { loadStripe } from "@stripe/stripe-js";
 import { useToast } from "@/components/ui/use-toast";
-const stripePromise = loadStripe('pk_test_51OvGwXCkWHGJBfSBB4k0XEuLUbdrkiXJlSkiaMEkLoWBKOPQf6FbYMDe3lrVAlWlrF7q0mXDZmdNDBK2DlaXYFCR00eN5qFPOa');
+
 const Payment = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate();
-  const {
-    toast
-  } = useToast();
+  const { toast } = useToast();
+
   const handleSubscription = async () => {
     try {
       setIsLoading(true);
-
-      // Get the current user
-      const {
-        data: {
-          user
-        }
-      } = await supabase.auth.getUser();
-      if (!user) {
-        toast({
-          variant: "destructive",
-          title: "Authentication required",
-          description: "Please sign in to start your free trial"
-        });
-        navigate("/auth");
-        return;
-      }
-
-      // Call our Stripe function to create a subscription
-      const response = await supabase.functions.invoke('create-subscription', {
-        body: {
-          email: user.email
-        }
-      });
-      if (response.error) throw new Error(response.error.message);
-      const {
-        sessionId
-      } = response.data;
-
-      // Load Stripe and redirect to checkout
-      const stripe = await stripePromise;
-      if (!stripe) throw new Error('Stripe failed to load');
-      const {
-        error
-      } = await stripe.redirectToCheckout({
-        sessionId
-      });
-      if (error) throw error;
+      // Redirect to Stripe subscription link
+      window.location.href = 'https://buy.stripe.com/bIY29h7YR1n63JK4gs';
     } catch (error) {
       console.error('Error:', error);
       toast({
@@ -63,7 +25,9 @@ const Payment = () => {
       setIsLoading(false);
     }
   };
-  return <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+
+  return (
+    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-guro-blue mb-4">
@@ -123,7 +87,11 @@ const Payment = () => {
             </ul>
 
             <div className="space-y-4 pt-6">
-              <Button onClick={handleSubscription} disabled={isLoading} className="w-full bg-guro-blue hover:bg-guro-blue/90 text-white py-6 text-lg">
+              <Button
+                onClick={handleSubscription}
+                disabled={isLoading}
+                className="w-full bg-guro-blue hover:bg-guro-blue/90 text-white py-6 text-lg"
+              >
                 {isLoading ? "Processing..." : "Start Free Trial"}
               </Button>
               <p className="text-sm text-center text-gray-500">
@@ -144,6 +112,8 @@ const Payment = () => {
           </p>
         </div>
       </div>
-    </div>;
+    </div>
+  );
 };
+
 export default Payment;
