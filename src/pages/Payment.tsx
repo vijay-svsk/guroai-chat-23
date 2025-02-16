@@ -1,6 +1,5 @@
 
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
@@ -12,8 +11,11 @@ const Payment = () => {
   const handleSubscription = async () => {
     try {
       setIsLoading(true);
-      // Redirect to Stripe subscription link
-      window.location.href = 'https://buy.stripe.com/bIY29h7YR1n63JK4gs';
+      // Redirect to Stripe subscription link with success redirect
+      const baseUrl = window.location.origin;
+      const successUrl = `${baseUrl}/register-after-payment`;
+      const stripeUrl = `https://buy.stripe.com/bIY29h7YR1n63JK4gs?success_url=${encodeURIComponent(successUrl)}`;
+      window.location.href = stripeUrl;
     } catch (error) {
       console.error('Error:', error);
       toast({
