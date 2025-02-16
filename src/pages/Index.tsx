@@ -10,7 +10,7 @@ const Index = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowContent(true);
-    }, 2000);
+    }, 5000); // Changed to 5 seconds
 
     return () => clearTimeout(timer);
   }, []);
@@ -18,12 +18,12 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-white">
       {/* Logo Animation */}
-      <div className={`fixed inset-0 flex items-center justify-center bg-[#69b2b4] transition-opacity duration-1000 ${showContent ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+      <div className={`fixed inset-0 flex items-center justify-center bg-[#0a1d2c] transition-opacity duration-1000 ${showContent ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
         <div className="flex flex-col items-center animate-scale-in">
           <img 
-            src="/lovable-uploads/9938721e-a69e-4d38-813a-54420314739a.png" 
+            src="/lovable-uploads/6156f2f7-e911-43ea-be05-99f13995bd26.png" 
             alt="GuroAI Logo" 
-            className="w-40 h-40 mb-4"
+            className="w-64 h-64 mb-4" // Increased size from w-40 h-40 to w-64 h-64
           />
         </div>
       </div>
