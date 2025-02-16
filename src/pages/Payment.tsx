@@ -137,7 +137,7 @@ const Payment = () => {
           <div className="flex justify-center space-x-8">
             <img alt="Visa" className="h-8" src="/lovable-uploads/afda616f-d25e-42ac-ac77-a8d7d67c6750.png" />
             <img alt="Mastercard" className="h-8" src="/lovable-uploads/4d8f87fa-3f3d-4a33-8914-c2a1d7ff8cc2.png" />
-            <img src="/paypal.svg" alt="PayPal" className="h-8" />
+            <img alt="PayPal" className="h-8" src="/lovable-uploads/347eba73-8f1f-4c36-83c9-4d70ce224517.png" />
           </div>
           <p className="text-sm text-gray-500">
             Secure payment processing by Stripe
