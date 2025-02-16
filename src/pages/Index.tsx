@@ -23,7 +23,7 @@ const Index = () => {
           <img 
             src="/lovable-uploads/6156f2f7-e911-43ea-be05-99f13995bd26.png" 
             alt="GuroAI Logo" 
-            className="w-64 h-64 mb-4" // Increased size from w-40 h-40 to w-64 h-64
+            className="w-64 h-64 mb-4"
           />
         </div>
       </div>
@@ -43,7 +43,7 @@ const Index = () => {
           <p className="text-xl md:text-2xl text-gray-600 text-center max-w-2xl animate-fade-in" style={{ animationDelay: "0.2s" }}>
             Generate personalized lesson plans in seconds with our AI-powered platform
           </p>
-          <div className="flex gap-4 animate-fade-in" style={{ animationDelay: "0.4s" }}>
+          <div className="flex flex-col sm:flex-row gap-4 animate-fade-in px-6 w-full sm:w-auto" style={{ animationDelay: "0.4s" }}>
             <Button className="bg-guro-blue hover:bg-guro-blue/90 text-white px-8 py-6 rounded-lg text-lg transition-all duration-300 hover:scale-105">
               Start Free Trial
             </Button>
