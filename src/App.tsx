@@ -2,7 +2,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Payment from "./pages/Payment";
-import RegisterAfterPayment from "./pages/RegisterAfterPayment";
+import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 import { Toaster } from "@/components/ui/toaster";
 
@@ -12,7 +12,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/payment" element={<Payment />} />
-        <Route path="/register-after-payment" element={<RegisterAfterPayment />} />
+        <Route path="/dashboard" element={<Dashboard />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       <Toaster />

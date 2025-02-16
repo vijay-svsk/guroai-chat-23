@@ -6,7 +6,7 @@ const Payment = () => {
   const handleSubscription = () => {
     // Get the base URL for the success redirect
     const baseUrl = window.location.origin;
-    const successUrl = `${baseUrl}/register-after-payment`;
+    const successUrl = `${baseUrl}/dashboard`;
     const stripeUrl = `https://buy.stripe.com/bIY29h7YR1n63JK4gs?success_url=${encodeURIComponent(successUrl)}`;
     window.location.href = stripeUrl;
   };
