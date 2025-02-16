@@ -1,31 +1,14 @@
 
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { useToast } from "@/components/ui/use-toast";
 
 const Payment = () => {
-  const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
-
-  const handleSubscription = async () => {
-    try {
-      setIsLoading(true);
-      // Redirect to Stripe subscription link with success redirect
-      const baseUrl = window.location.origin;
-      const successUrl = `${baseUrl}/register-after-payment`;
-      const stripeUrl = `https://buy.stripe.com/bIY29h7YR1n63JK4gs?success_url=${encodeURIComponent(successUrl)}`;
-      window.location.href = stripeUrl;
-    } catch (error) {
-      console.error('Error:', error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Something went wrong. Please try again later."
-      });
-    } finally {
-      setIsLoading(false);
-    }
+  const handleSubscription = () => {
+    // Get the base URL for the success redirect
+    const baseUrl = window.location.origin;
+    const successUrl = `${baseUrl}/register-after-payment`;
+    const stripeUrl = `https://buy.stripe.com/bIY29h7YR1n63JK4gs?success_url=${encodeURIComponent(successUrl)}`;
+    window.location.href = stripeUrl;
   };
 
   return (
@@ -91,10 +74,9 @@ const Payment = () => {
             <div className="space-y-4 pt-6">
               <Button
                 onClick={handleSubscription}
-                disabled={isLoading}
                 className="w-full bg-guro-blue hover:bg-guro-blue/90 text-white py-6 text-lg"
               >
-                {isLoading ? "Processing..." : "Start Free Trial"}
+                Start Free Trial
               </Button>
               <p className="text-sm text-center text-gray-500">
                 Cancel anytime during your trial. No obligation.
