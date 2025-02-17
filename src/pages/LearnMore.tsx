@@ -55,37 +55,58 @@ const LearnMore = () => {
             <div className="grid md:grid-cols-2 gap-6">
               <div>
                 <ul className="space-y-4">
-                  <li className="flex items-start">
-                    <span className="font-semibold text-guro-blue mr-2">1. Elicit:</span>
-                    Assess prior knowledge and misconceptions
+                  <li className="flex items-start space-x-3">
+                    <div className="min-w-[24px]">1.</div>
+                    <div>
+                      <span className="font-semibold text-guro-blue">Elicit: </span>
+                      Assess prior knowledge and misconceptions
+                    </div>
                   </li>
-                  <li className="flex items-start">
-                    <span className="font-semibold text-guro-blue mr-2">2. Engage:</span>
-                    Capture students' interest and curiosity
+                  <li className="flex items-start space-x-3">
+                    <div className="min-w-[24px]">2.</div>
+                    <div>
+                      <span className="font-semibold text-guro-blue">Engage: </span>
+                      Capture students' interest and curiosity
+                    </div>
                   </li>
-                  <li className="flex items-start">
-                    <span className="font-semibold text-guro-blue mr-2">3. Explore:</span>
-                    Hands-on experiences and discovery
+                  <li className="flex items-start space-x-3">
+                    <div className="min-w-[24px]">3.</div>
+                    <div>
+                      <span className="font-semibold text-guro-blue">Explore: </span>
+                      Hands-on experiences and discovery
+                    </div>
                   </li>
-                  <li className="flex items-start">
-                    <span className="font-semibold text-guro-blue mr-2">4. Explain:</span>
-                    Connect concepts and share understanding
+                  <li className="flex items-start space-x-3">
+                    <div className="min-w-[24px]">4.</div>
+                    <div>
+                      <span className="font-semibold text-guro-blue">Explain: </span>
+                      Connect concepts and share understanding
+                    </div>
                   </li>
                 </ul>
               </div>
               <div>
                 <ul className="space-y-4">
-                  <li className="flex items-start">
-                    <span className="font-semibold text-guro-blue mr-2">5. Elaborate:</span>
-                    Apply learning to new situations
+                  <li className="flex items-start space-x-3">
+                    <div className="min-w-[24px]">5.</div>
+                    <div>
+                      <span className="font-semibold text-guro-blue">Elaborate: </span>
+                      Apply learning to new situations
+                    </div>
                   </li>
-                  <li className="flex items-start">
-                    <span className="font-semibold text-guro-blue mr-2">6. Evaluate:</span>
-                    Assess understanding and progress
+                  <li className="flex items-start space-x-3">
+                    <div className="min-w-[24px]">6.</div>
+                    <div>
+                      <span className="font-semibold text-guro-blue">Evaluate: </span>
+                      Assess understanding and progress
+                    </div>
                   </li>
-                  <li className="flex items-start">
-                    <span className="font-semibold text-guro-blue mr-2">7. Extend:</span>
-                    Connect learning to real-world applications
+                  <li className="flex items-start space-x-3">
+                    <div className="min-w-[24px]">7.</div>
+                    <div>
+                      <span className="font-semibold text-guro-blue">Extend: </span>
+                      Connect learning to real-world applications
+                    </div>
                   </li>
                 </ul>
               </div>
@@ -98,25 +119,37 @@ const LearnMore = () => {
             <div className="grid md:grid-cols-2 gap-6">
               <div>
                 <ul className="space-y-4">
-                  <li className="flex items-start">
-                    <span className="font-semibold text-guro-blue mr-2">1. Activity:</span>
-                    Engage students in meaningful learning experiences
+                  <li className="flex items-start space-x-3">
+                    <div className="min-w-[24px]">1.</div>
+                    <div>
+                      <span className="font-semibold text-guro-blue">Activity: </span>
+                      Engage students in meaningful learning experiences
+                    </div>
                   </li>
-                  <li className="flex items-start">
-                    <span className="font-semibold text-guro-blue mr-2">2. Analysis:</span>
-                    Process and reflect on the learning experience
+                  <li className="flex items-start space-x-3">
+                    <div className="min-w-[24px]">2.</div>
+                    <div>
+                      <span className="font-semibold text-guro-blue">Analysis: </span>
+                      Process and reflect on the learning experience
+                    </div>
                   </li>
                 </ul>
               </div>
               <div>
                 <ul className="space-y-4">
-                  <li className="flex items-start">
-                    <span className="font-semibold text-guro-blue mr-2">3. Abstraction:</span>
-                    Draw conclusions and form generalizations
+                  <li className="flex items-start space-x-3">
+                    <div className="min-w-[24px]">3.</div>
+                    <div>
+                      <span className="font-semibold text-guro-blue">Abstraction: </span>
+                      Draw conclusions and form generalizations
+                    </div>
                   </li>
-                  <li className="flex items-start">
-                    <span className="font-semibold text-guro-blue mr-2">4. Application:</span>
-                    Apply learning to new situations and contexts
+                  <li className="flex items-start space-x-3">
+                    <div className="min-w-[24px]">4.</div>
+                    <div>
+                      <span className="font-semibold text-guro-blue">Application: </span>
+                      Apply learning to new situations and contexts
+                    </div>
                   </li>
                 </ul>
               </div>
@@ -139,6 +172,14 @@ const LearnMore = () => {
             <Card className="p-6">
               <h3 className="text-xl font-semibold mb-4">Higher Order Thinking Skills (HOTS)</h3>
               <p className="text-gray-600">Develop assessment questions that promote critical thinking, analysis, and problem-solving skills.</p>
+            </Card>
+            <Card className="p-6">
+              <h3 className="text-xl font-semibold mb-4">Classroom Observation Excellence</h3>
+              <p className="text-gray-600">
+                Prepare confidently for Classroom Observations (CO) with your School Head and Master Teacher. 
+                Our AI-powered lesson plans are designed to help you achieve 6 to 7 points in your Classroom Observation Tool (COT) rating, 
+                ensuring exceptional teaching performance and professional growth.
+              </p>
             </Card>
           </div>
         </section>
