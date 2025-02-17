@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -6,7 +5,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, Download, RefreshCw, Edit } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-
 interface FormData {
   subject: string;
   gradeLevel: string;
@@ -14,20 +12,19 @@ interface FormData {
   language: string;
   method: "7es" | "4as";
 }
-
 const LessonPlanAI = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [response, setResponse] = useState<string>("");
   const [isEditing, setIsEditing] = useState(false);
   const location = useLocation();
   const formData = location.state as FormData;
-  const { toast } = useToast();
-
+  const {
+    toast
+  } = useToast();
   const generatePrompt = (data: FormData) => {
     if (data.method === "4as") {
       return `Create a detailed lesson plan using the 4As method (Activity, Analysis, Abstraction, Application) for ${data.subject} at ${data.gradeLevel} level, focusing on the topic: ${data.topic}. The lesson should be conducted in ${data.language}. Please provide a comprehensive breakdown of each stage with specific activities and instructions.`;
     }
-
     return `Create a full lesson plan for ${data.subject} at ${data.gradeLevel} level, focusing on the topic: ${data.topic}, to be conducted in ${data.language}. The response should have 5,000 words. Only generate what is asked.
 
 A. Content Standard
@@ -81,74 +78,66 @@ Instruction: Provide an instruction and 10 multiple-choice questions related to 
 V. ASSIGNMENT
 Instruction: Create 2 assignment questions that reinforce the lesson.`;
   };
-
   const cleanResponse = (text: string) => {
-    return text
-      .replace(/[#*]/g, '')
-      .replace(/\n\s*\n/g, '\n\n')
-      .trim();
+    return text.replace(/[#*]/g, '').replace(/\n\s*\n/g, '\n\n').trim();
   };
-
   const generateLessonPlan = async () => {
     if (!formData) return;
-    
     setIsLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke('generate-lesson-plan', {
-        body: { prompt: generatePrompt(formData) }
+      const {
+        data,
+        error
+      } = await supabase.functions.invoke('generate-lesson-plan', {
+        body: {
+          prompt: generatePrompt(formData)
+        }
       });
-
       if (error) throw error;
-      
       setResponse(cleanResponse(data.generatedText));
       toast({
         title: "Success!",
         description: "Your lesson plan has been generated.",
-        duration: 3000,
+        duration: 3000
       });
     } catch (error) {
       console.error("Error generating lesson plan:", error);
       toast({
         title: "Error",
         description: "Failed to generate lesson plan. Please try again.",
-        duration: 3000,
+        duration: 3000
       });
     } finally {
       setIsLoading(false);
     }
   };
-
   useEffect(() => {
     generateLessonPlan();
   }, [formData]);
-
   const handleDownload = () => {
     const element = document.createElement("a");
-    const file = new Blob([response], {type: 'text/plain'});
+    const file = new Blob([response], {
+      type: 'text/plain'
+    });
     element.href = URL.createObjectURL(file);
     element.download = `lesson_plan_${formData.subject.toLowerCase()}_${formData.method}.txt`;
     document.body.appendChild(element);
     element.click();
     document.body.removeChild(element);
-    
     toast({
       title: "Downloaded!",
       description: "Your lesson plan has been downloaded.",
-      duration: 3000,
+      duration: 3000
     });
   };
-
   const handleRegenerateClick = () => {
     generateLessonPlan();
   };
-
   const toggleEdit = () => {
     setIsEditing(!isEditing);
   };
-
   if (!formData) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+    return <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <Card className="w-full max-w-2xl">
           <CardContent className="p-6">
             <p className="text-center text-gray-600">
@@ -156,23 +145,16 @@ Instruction: Create 2 assignment questions that reinforce the lesson.`;
             </p>
           </CardContent>
         </Card>
-      </div>
-    );
+      </div>;
   }
-
-  return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+  return <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         <Card className="bg-white shadow-xl">
           <CardHeader className="space-y-2">
             <CardTitle className="flex justify-between items-start">
               <div className="flex flex-col items-start">
                 <div className="flex items-center gap-2">
-                  <img 
-                    src="/guro-logo.png" 
-                    alt="GuroAI Logo" 
-                    className="h-8 w-auto"
-                  />
+                  <img alt="GuroAI Logo" className="h-8 w-auto" src="/lovable-uploads/455a23fe-17a6-4eba-92d1-fc732a28b3e7.png" />
                   <span className="text-[#0a1d2c] text-2xl font-bold">
                     GuroAI
                   </span>
@@ -182,68 +164,32 @@ Instruction: Create 2 assignment questions that reinforce the lesson.`;
                 </p>
               </div>
               <div className="flex gap-2">
-                {isLoading ? (
-                  <Loader2 className="w-6 h-6 animate-spin" />
-                ) : (
-                  <>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={handleRegenerateClick}
-                      disabled={isLoading}
-                      className="h-10 w-10"
-                    >
+                {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : <>
+                    <Button variant="outline" size="icon" onClick={handleRegenerateClick} disabled={isLoading} className="h-10 w-10">
                       <RefreshCw className="h-4 w-4" />
                     </Button>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={toggleEdit}
-                      disabled={isLoading}
-                      className="h-10 w-10"
-                    >
+                    <Button variant="outline" size="icon" onClick={toggleEdit} disabled={isLoading} className="h-10 w-10">
                       <Edit className="h-4 w-4" />
                     </Button>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={handleDownload}
-                      disabled={isLoading || !response}
-                      className="h-10 w-10"
-                    >
+                    <Button variant="outline" size="icon" onClick={handleDownload} disabled={isLoading || !response} className="h-10 w-10">
                       <Download className="h-4 w-4" />
                     </Button>
-                  </>
-                )}
+                  </>}
               </div>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
-            {isLoading ? (
-              <div className="text-center py-12">
+            {isLoading ? <div className="text-center py-12">
                 <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4" />
                 <p className="text-gray-600">Generating your lesson plan...</p>
-              </div>
-            ) : (
-              <div className="bg-white border rounded-md p-4">
-                {isEditing ? (
-                  <textarea
-                    value={response}
-                    onChange={(e) => setResponse(cleanResponse(e.target.value))}
-                    className="w-full h-[500px] p-4 border rounded-md font-mono text-sm"
-                  />
-                ) : (
-                  <pre className="whitespace-pre-wrap font-sans text-gray-800">
+              </div> : <div className="bg-white border rounded-md p-4">
+                {isEditing ? <textarea value={response} onChange={e => setResponse(cleanResponse(e.target.value))} className="w-full h-[500px] p-4 border rounded-md font-mono text-sm" /> : <pre className="whitespace-pre-wrap font-sans text-gray-800">
                     {response}
-                  </pre>
-                )}
-              </div>
-            )}
+                  </pre>}
+              </div>}
           </CardContent>
         </Card>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default LessonPlanAI;
