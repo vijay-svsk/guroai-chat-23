@@ -1,10 +1,10 @@
-
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, Download, RefreshCw, Edit } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface FormData {
   subject: string;
@@ -38,53 +38,13 @@ const LessonPlanAI = () => {
     
     setIsLoading(true);
     try {
-      // For now, we'll simulate AI response with a timeout
-      // This should be replaced with actual AI API integration
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      const sampleResponse = `
-        Lesson Plan for ${formData.subject}
-        Grade Level: ${formData.gradeLevel}
-        Topic: ${formData.topic}
-        Language: ${formData.language}
-        Method: ${formData.method.toUpperCase()}
+      const { data, error } = await supabase.functions.invoke('generate-lesson-plan', {
+        body: { prompt: generatePrompt(formData) }
+      });
 
-        ${formData.method === "7es" ? `
-        1. Elicit:
-        - Begin by asking students about their prior knowledge...
-        
-        2. Engage:
-        - Present a real-world problem related to ${formData.topic}...
-        
-        3. Explore:
-        - Students work in groups to investigate...
-        
-        4. Explain:
-        - Facilitate class discussion about findings...
-        
-        5. Elaborate:
-        - Connect concepts to new situations...
-        
-        6. Evaluate:
-        - Assess understanding through...
-        
-        7. Extend:
-        - Provide additional challenges...
-        ` : `
-        1. Activity:
-        - Start with a hands-on activity about ${formData.topic}...
-        
-        2. Analysis:
-        - Guide students to analyze their observations...
-        
-        3. Abstraction:
-        - Help students form general concepts...
-        
-        4. Application:
-        - Students apply their learning to new situations...
-        `}
-      `;
+      if (error) throw error;
       
-      setResponse(sampleResponse);
+      setResponse(data.generatedText);
       toast({
         title: "Success!",
         description: "Your lesson plan has been generated.",
