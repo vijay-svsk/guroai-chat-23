@@ -10,6 +10,7 @@ export const LogoAnimation = ({ showContent }: LogoAnimationProps) => (
         src="/lovable-uploads/6156f2f7-e911-43ea-be05-99f13995bd26.png" 
         alt="GuroAI Logo" 
         className="w-64 h-64 mb-4"
+        loading="eager"
       />
     </div>
   </div>
