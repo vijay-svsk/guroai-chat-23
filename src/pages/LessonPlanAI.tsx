@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -82,6 +81,13 @@ V. ASSIGNMENT
 Instruction: Create 2 assignment questions that reinforce the lesson.`;
   };
 
+  const cleanResponse = (text: string) => {
+    return text
+      .replace(/[#*]/g, '')
+      .replace(/\n\s*\n/g, '\n\n')
+      .trim();
+  };
+
   const generateLessonPlan = async () => {
     if (!formData) return;
     
@@ -93,7 +99,7 @@ Instruction: Create 2 assignment questions that reinforce the lesson.`;
 
       if (error) throw error;
       
-      setResponse(data.generatedText);
+      setResponse(cleanResponse(data.generatedText));
       toast({
         title: "Success!",
         description: "Your lesson plan has been generated.",
@@ -208,7 +214,7 @@ Instruction: Create 2 assignment questions that reinforce the lesson.`;
                 {isEditing ? (
                   <textarea
                     value={response}
-                    onChange={(e) => setResponse(e.target.value)}
+                    onChange={(e) => setResponse(cleanResponse(e.target.value))}
                     className="w-full h-[500px] p-4 border rounded-md font-mono text-sm"
                   />
                 ) : (
