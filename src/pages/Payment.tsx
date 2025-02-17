@@ -1,12 +1,32 @@
 
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
 
 const Payment = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    // Check if the URL contains a success parameter
+    const searchParams = new URLSearchParams(location.search);
+    if (searchParams.get('success') === 'true') {
+      toast({
+        title: "Subscription Success!",
+        description: "Welcome to GuroAI Premium!",
+        duration: 5000,
+      });
+      navigate('/dashboard');
+    }
+  }, [location, navigate, toast]);
+
   const handleSubscription = () => {
     // Get the base URL for the success redirect
     const baseUrl = window.location.origin;
-    const successUrl = `${baseUrl}/dashboard`;
+    const successUrl = `${baseUrl}/payment?success=true`;
     const stripeUrl = `https://buy.stripe.com/bIY29h7YR1n63JK4gs?success_url=${encodeURIComponent(successUrl)}`;
     window.location.href = stripeUrl;
   };
