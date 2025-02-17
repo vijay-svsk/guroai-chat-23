@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -163,9 +164,23 @@ Instruction: Create 2 assignment questions that reinforce the lesson.`;
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         <Card className="bg-white shadow-xl">
-          <CardHeader>
-            <CardTitle className="text-2xl font-semibold text-guro-blue flex justify-between items-center">
-              <span>AI Lesson Plan Generator</span>
+          <CardHeader className="space-y-2">
+            <CardTitle className="flex justify-between items-start">
+              <div className="flex flex-col items-start">
+                <div className="flex items-center gap-2">
+                  <img 
+                    src="/guro-logo.png" 
+                    alt="GuroAI Logo" 
+                    className="h-8 w-auto"
+                  />
+                  <span className="text-[#0a1d2c] text-2xl font-bold">
+                    GuroAI
+                  </span>
+                </div>
+                <p className="text-sm text-[#0a1d2c] mt-1 font-normal">
+                  Empowering educators, simplifying teaching—GuroAI, your partner in effortless lesson planning.
+                </p>
+              </div>
               <div className="flex gap-2">
                 {isLoading ? (
                   <Loader2 className="w-6 h-6 animate-spin" />
