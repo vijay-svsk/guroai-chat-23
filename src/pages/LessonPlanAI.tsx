@@ -3,7 +3,8 @@ import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2 } from "lucide-react";
+import { Loader2, Download, RefreshCw, Edit } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface FormData {
   subject: string;
@@ -16,8 +17,10 @@ interface FormData {
 const LessonPlanAI = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [response, setResponse] = useState<string>("");
+  const [isEditing, setIsEditing] = useState(false);
   const location = useLocation();
   const formData = location.state as FormData;
+  const { toast } = useToast();
 
   const generatePrompt = (data: FormData) => {
     const methodDescription = data.method === "7es" 
@@ -30,68 +33,102 @@ const LessonPlanAI = () => {
     activities and instructions.`;
   };
 
-  useEffect(() => {
-    const generateLessonPlan = async () => {
-      if (!formData) return;
-      
-      setIsLoading(true);
-      try {
-        // For now, we'll simulate AI response with a timeout
-        // This should be replaced with actual AI API integration
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        const sampleResponse = `
-          Lesson Plan for ${formData.subject}
-          Grade Level: ${formData.gradeLevel}
-          Topic: ${formData.topic}
-          Language: ${formData.language}
-          Method: ${formData.method.toUpperCase()}
+  const generateLessonPlan = async () => {
+    if (!formData) return;
+    
+    setIsLoading(true);
+    try {
+      // For now, we'll simulate AI response with a timeout
+      // This should be replaced with actual AI API integration
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      const sampleResponse = `
+        Lesson Plan for ${formData.subject}
+        Grade Level: ${formData.gradeLevel}
+        Topic: ${formData.topic}
+        Language: ${formData.language}
+        Method: ${formData.method.toUpperCase()}
 
-          ${formData.method === "7es" ? `
-          1. Elicit:
-          - Begin by asking students about their prior knowledge...
-          
-          2. Engage:
-          - Present a real-world problem related to ${formData.topic}...
-          
-          3. Explore:
-          - Students work in groups to investigate...
-          
-          4. Explain:
-          - Facilitate class discussion about findings...
-          
-          5. Elaborate:
-          - Connect concepts to new situations...
-          
-          6. Evaluate:
-          - Assess understanding through...
-          
-          7. Extend:
-          - Provide additional challenges...
-          ` : `
-          1. Activity:
-          - Start with a hands-on activity about ${formData.topic}...
-          
-          2. Analysis:
-          - Guide students to analyze their observations...
-          
-          3. Abstraction:
-          - Help students form general concepts...
-          
-          4. Application:
-          - Students apply their learning to new situations...
-          `}
-        `;
+        ${formData.method === "7es" ? `
+        1. Elicit:
+        - Begin by asking students about their prior knowledge...
         
-        setResponse(sampleResponse);
-      } catch (error) {
-        console.error("Error generating lesson plan:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+        2. Engage:
+        - Present a real-world problem related to ${formData.topic}...
+        
+        3. Explore:
+        - Students work in groups to investigate...
+        
+        4. Explain:
+        - Facilitate class discussion about findings...
+        
+        5. Elaborate:
+        - Connect concepts to new situations...
+        
+        6. Evaluate:
+        - Assess understanding through...
+        
+        7. Extend:
+        - Provide additional challenges...
+        ` : `
+        1. Activity:
+        - Start with a hands-on activity about ${formData.topic}...
+        
+        2. Analysis:
+        - Guide students to analyze their observations...
+        
+        3. Abstraction:
+        - Help students form general concepts...
+        
+        4. Application:
+        - Students apply their learning to new situations...
+        `}
+      `;
+      
+      setResponse(sampleResponse);
+      toast({
+        title: "Success!",
+        description: "Your lesson plan has been generated.",
+        duration: 3000,
+      });
+    } catch (error) {
+      console.error("Error generating lesson plan:", error);
+      toast({
+        title: "Error",
+        description: "Failed to generate lesson plan. Please try again.",
+        duration: 3000,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
+  useEffect(() => {
     generateLessonPlan();
   }, [formData]);
+
+  const handleDownload = () => {
+    const element = document.createElement("a");
+    const file = new Blob([response], {type: 'text/plain'});
+    element.href = URL.createObjectURL(file);
+    element.download = `lesson_plan_${formData.subject.toLowerCase()}_${formData.method}.txt`;
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+    
+    toast({
+      title: "Downloaded!",
+      description: "Your lesson plan has been downloaded.",
+      duration: 3000,
+    });
+  };
+
+  const handleRegenerateClick = () => {
+    generateLessonPlan();
+  };
+
+  const toggleEdit = () => {
+    setIsEditing(!isEditing);
+  };
 
   if (!formData) {
     return (
@@ -113,8 +150,42 @@ const LessonPlanAI = () => {
         <Card className="bg-white shadow-xl">
           <CardHeader>
             <CardTitle className="text-2xl font-semibold text-guro-blue flex justify-between items-center">
-              AI Lesson Plan Generator
-              {isLoading && <Loader2 className="w-6 h-6 animate-spin" />}
+              <span>AI Lesson Plan Generator</span>
+              <div className="flex gap-2">
+                {isLoading ? (
+                  <Loader2 className="w-6 h-6 animate-spin" />
+                ) : (
+                  <>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={handleRegenerateClick}
+                      disabled={isLoading}
+                      className="h-10 w-10"
+                    >
+                      <RefreshCw className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={toggleEdit}
+                      disabled={isLoading}
+                      className="h-10 w-10"
+                    >
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={handleDownload}
+                      disabled={isLoading || !response}
+                      className="h-10 w-10"
+                    >
+                      <Download className="h-4 w-4" />
+                    </Button>
+                  </>
+                )}
+              </div>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -130,9 +201,17 @@ const LessonPlanAI = () => {
               </div>
             ) : (
               <div className="bg-white border rounded-md p-4">
-                <pre className="whitespace-pre-wrap font-sans text-gray-800">
-                  {response}
-                </pre>
+                {isEditing ? (
+                  <textarea
+                    value={response}
+                    onChange={(e) => setResponse(e.target.value)}
+                    className="w-full h-[500px] p-4 border rounded-md font-mono text-sm"
+                  />
+                ) : (
+                  <pre className="whitespace-pre-wrap font-sans text-gray-800">
+                    {response}
+                  </pre>
+                )}
               </div>
             )}
           </CardContent>
