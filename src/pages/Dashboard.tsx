@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import ReactConfetti from "react-confetti";
-import { GraduationCap, BookOpen, Languages, BookType, Award, LogOut } from "lucide-react";
+import { GraduationCap, BookOpen, Languages, BookType, Award, LogOut, Settings } from "lucide-react";
 
 const Dashboard = () => {
   const [email, setEmail] = useState("");
@@ -14,7 +15,8 @@ const Dashboard = () => {
     subject: "",
     gradeLevel: "",
     topic: "",
-    language: ""
+    language: "",
+    customInstructions: ""
   });
   const [showConfetti, setShowConfetti] = useState(true);
   const { toast } = useToast();
@@ -48,7 +50,7 @@ const Dashboard = () => {
     if (!formData.subject || !formData.gradeLevel || !formData.topic || !formData.language) {
       toast({
         title: "Missing Information",
-        description: "Please fill in all fields before generating a lesson plan.",
+        description: "Please fill in all required fields before generating a lesson plan.",
         duration: 3000
       });
       return;
@@ -123,6 +125,17 @@ const Dashboard = () => {
                 <div className="flex items-center space-x-4">
                   <Languages className="text-guro-blue w-6 h-6" />
                   <Input name="language" placeholder="Language Used (e.g., English, Filipino)" value={formData.language} onChange={handleInputChange} className="flex-1" />
+                </div>
+
+                <div className="flex items-center space-x-4">
+                  <Settings className="text-guro-blue w-6 h-6" />
+                  <Input 
+                    name="customInstructions" 
+                    placeholder="Custom Instructions (e.g., Include more group activities, Focus on visual learning)" 
+                    value={formData.customInstructions} 
+                    onChange={handleInputChange} 
+                    className="flex-1"
+                  />
                 </div>
               </div>
 
