@@ -27,9 +27,7 @@ const LessonPlanAI = () => {
       return `Create a detailed lesson plan using the 4As method (Activity, Analysis, Abstraction, Application) for ${data.subject} at ${data.gradeLevel} level, focusing on the topic: ${data.topic}. The lesson should be conducted in ${data.language}. Please provide a comprehensive breakdown of each stage with specific activities and instructions.`;
     }
 
-    return `Create a full lesson plan for ${data.subject} at ${data.gradeLevel} level, focusing on the topic: ${data.topic}, to be conducted in ${data.language}. Create a 2-column table with the following elements in Column 1 and place all responses in Column 2. The response should have 3,400 words. Only generate what is asked. Format as a table with Column 1 containing the prompts and Column 2 containing your generated responses.
-
-Column 1 should contain:
+    return `Create a full lesson plan for ${data.subject} at ${data.gradeLevel} level, focusing on the topic: ${data.topic}, to be conducted in ${data.language}. Create a 2-column table with the following elements and place all responses in the second column. The response should have 3,400 words. Only generate what is asked. Format as a table with your generated responses in the second column.
 
 A. Content Standard
 B. Performance Standard
@@ -81,7 +79,7 @@ Instruction: Provide an instruction and 10 multiple-choice questions related to 
 V. ASSIGNMENT
 Instruction: Create 2 assignment questions that reinforce the lesson.
 
-Please ensure all responses are placed in Column 2 of the table, maintaining clear formatting and organization.`;
+Please ensure all responses are placed in the second column of the table, maintaining clear formatting and organization.`;
   };
 
   const generateLessonPlan = async () => {
