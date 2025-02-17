@@ -5,6 +5,7 @@ import Payment from "./pages/Payment";
 import Dashboard from "./pages/Dashboard";
 import LearnMore from "./pages/LearnMore";
 import NotFound from "./pages/NotFound";
+import LessonPlanAI from "./pages/LessonPlanAI";
 import { Toaster } from "@/components/ui/toaster";
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
         <Route path="/payment" element={<Payment />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/learn-more" element={<LearnMore />} />
+        <Route path="/lesson-plan-ai" element={<LessonPlanAI />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       <Toaster />
