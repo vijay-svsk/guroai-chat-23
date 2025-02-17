@@ -15,7 +15,7 @@ const Index = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowContent(true);
-    }, 3000); // Changed from 5000 to 3000 milliseconds
+    }, 5000); // Changed from 3000 back to 5000 milliseconds
 
     return () => clearTimeout(timer);
   }, []);
