@@ -66,7 +66,7 @@ const Dashboard = () => {
                 <p className="text-sm text-gray-300">{email}</p>
               </div>
             </div>
-            <Button variant="outline" onClick={handleLogout} className="border-white text-slate-900 bg-green-500 hover:bg-green-400">
+            <Button variant="outline" onClick={handleLogout} className="border-white text-slate-900 bg-green-400 hover:bg-green-300">
               <LogOut className="w-4 h-4 mr-2" />
               <span>Logout</span>
             </Button>
