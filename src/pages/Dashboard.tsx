@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import ReactConfetti from "react-confetti";
 import { GraduationCap, BookOpen, Languages, BookType, Award, LogOut } from "lucide-react";
+
 const Dashboard = () => {
   const [email, setEmail] = useState("");
   const [formData, setFormData] = useState({
@@ -15,36 +17,31 @@ const Dashboard = () => {
     language: ""
   });
   const [showConfetti, setShowConfetti] = useState(true);
-  const {
-    toast
-  } = useToast();
+  const { toast } = useToast();
+
   useEffect(() => {
     const getUser = async () => {
-      const {
-        data: {
-          user
-        }
-      } = await supabase.auth.getUser();
+      const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         setEmail(user.email || "");
       }
     };
     getUser();
   }, []);
+
   const handleLogout = async () => {
     await supabase.auth.signOut();
     window.location.reload();
   };
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const {
-      name,
-      value
-    } = e.target;
+    const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
       [name]: value
     }));
   };
+
   const handleMethodSelect = (method: "7es" | "4as") => {
     toast({
       title: "Teaching Method Selected",
@@ -52,6 +49,7 @@ const Dashboard = () => {
       duration: 3000
     });
   };
+
   return <div className="min-h-screen bg-gray-50">
       {showConfetti && <ReactConfetti recycle={false} numberOfPieces={200} onConfettiComplete={() => setShowConfetti(false)} />}
 
@@ -123,8 +121,10 @@ const Dashboard = () => {
                   <Button onClick={() => handleMethodSelect("7es")} className="h-auto p-6 bg-guro-blue hover:bg-guro-blue/90 flex flex-col items-center space-y-2 px-[24px]">
                     <Award className="w-8 h-8" />
                     <span className="text-lg font-semibold">7Es Method</span>
-                    <span className="opacity-90 text-sm">Elicit, Engage, Explore, Explain, 
-Elaborate, Evaluate, Extend</span>
+                    <div className="opacity-90 text-sm text-center">
+                      <div>Elicit, Engage, Explore, Explain</div>
+                      <div>Elaborate, Evaluate, Extend</div>
+                    </div>
                   </Button>
 
                   <Button onClick={() => handleMethodSelect("4as")} variant="secondary" className="h-auto p-6 flex flex-col items-center space-y-2">
@@ -142,4 +142,5 @@ Elaborate, Evaluate, Extend</span>
       </main>
     </div>;
 };
+
 export default Dashboard;
