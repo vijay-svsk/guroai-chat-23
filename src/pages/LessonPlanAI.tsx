@@ -27,7 +27,7 @@ const LessonPlanAI = () => {
       return `Create a detailed lesson plan using the 4As method (Activity, Analysis, Abstraction, Application) for ${data.subject} at ${data.gradeLevel} level, focusing on the topic: ${data.topic}. The lesson should be conducted in ${data.language}. Please provide a comprehensive breakdown of each stage with specific activities and instructions.`;
     }
 
-    return `Create a full lesson plan for ${data.subject} at ${data.gradeLevel} level, focusing on the topic: ${data.topic}, to be conducted in ${data.language}. Create a 2-column table with the following elements and place all responses in the second column. The response should have 3,400 words. Only generate what is asked. Format as a table with your generated responses in the second column.
+    return `Create a full lesson plan for ${data.subject} at ${data.gradeLevel} level, focusing on the topic: ${data.topic}, to be conducted in ${data.language}. The response should have 5,000 words. Only generate what is asked.
 
 A. Content Standard
 B. Performance Standard
@@ -53,6 +53,7 @@ Instruction: Provide a search prompt for a Google image related to the new lesso
 
 B. PRESENTING EXAMPLES/INSTANCES OF THE NEW LESSON
 Instruction: In reviewing the previous lesson, ensure it connects to the new lesson. The motivation section should have images or clear prompts for what to include. When presenting examples, integrate a concept from another subject.
+Example: Word problem.
 
 C. DISCUSSING NEW CONCEPT AND PRACTICING NEW SKILLS #1
 Instruction: Provide an instruction and 5 multiple-choice questions with 3 options each.
@@ -62,9 +63,9 @@ Instruction: Provide an instruction and 5 multiple-choice questions with 3 optio
 
 E. DEVELOPING MASTERY (LEADS TO FORMATIVE ASSESSMENT)
 Instruction: Create a rubric for a group activity. Divide the class into 3 groups:
-1. Group 1 will perform a role-play
-2. Group 2 will give a report
-3. Group 3 will sing a song related to the lesson
+1. Group 1 will perform a role-play.
+2. Group 2 will give a report.
+3. Group 3 will sing a song related to the lesson.
 Provide clear, concise instructions (1-2 sentences) for each group. For the song, create a short rhyming song about the lesson using a popular kids' tune.
 
 F. FINDING PRACTICAL APPLICATION OF CONCEPTS AND SKILLS IN DAILY LIVING
@@ -78,8 +79,7 @@ Instruction: Provide an instruction and 10 multiple-choice questions related to 
 
 V. ASSIGNMENT
 Instruction: Create 2 assignment questions that reinforce the lesson.
-
-Please ensure all responses are placed in the second column of the table, maintaining clear formatting and organization.`;
+`;
   };
 
   const generateLessonPlan = async () => {
@@ -152,7 +152,6 @@ Please ensure all responses are placed in the second column of the table, mainta
       </div>
     );
   }
-
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
@@ -180,7 +179,7 @@ Please ensure all responses are placed in the second column of the table, mainta
                       onClick={toggleEdit}
                       disabled={isLoading}
                       className="h-10 w-10"
-                    >
+                      >
                       <Edit className="h-4 w-4" />
                     </Button>
                     <Button
@@ -189,7 +188,7 @@ Please ensure all responses are placed in the second column of the table, mainta
                       onClick={handleDownload}
                       disabled={isLoading || !response}
                       className="h-10 w-10"
-                    >
+                      >
                       <Download className="h-4 w-4" />
                     </Button>
                   </>
@@ -215,7 +214,7 @@ Please ensure all responses are placed in the second column of the table, mainta
                     value={response}
                     onChange={(e) => setResponse(e.target.value)}
                     className="w-full h-[500px] p-4 border rounded-md font-mono text-sm"
-                  />
+                    />
                 ) : (
                   <pre className="whitespace-pre-wrap font-sans text-gray-800">
                     {response}
