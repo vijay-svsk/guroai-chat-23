@@ -154,7 +154,12 @@ Instruction: Create 2 assignment questions that reinforce the lesson.`;
             <CardTitle className="flex justify-between items-start">
               <div className="flex flex-col items-start">
                 <div className="flex items-center gap-2">
-                  <img alt="GuroAI Logo" className="h-8 w-auto" src="/lovable-uploads/455a23fe-17a6-4eba-92d1-fc732a28b3e7.png" />
+                  <img 
+                    src="/lovable-uploads/455a23fe-17a6-4eba-92d1-fc732a28b3e7.png" 
+                    alt="GuroAI Logo" 
+                    className="h-12 w-auto"
+                    loading="eager"
+                  />
                   <span className="text-[#0a1d2c] text-2xl font-bold">
                     GuroAI
                   </span>
