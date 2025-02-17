@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -78,8 +79,7 @@ IV. EVALUATION
 Instruction: Provide an instruction and 10 multiple-choice questions related to the lesson with clear instructions.
 
 V. ASSIGNMENT
-Instruction: Create 2 assignment questions that reinforce the lesson.
-`;
+Instruction: Create 2 assignment questions that reinforce the lesson.`;
   };
 
   const generateLessonPlan = async () => {
@@ -152,6 +152,7 @@ Instruction: Create 2 assignment questions that reinforce the lesson.
       </div>
     );
   }
+
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
@@ -179,7 +180,7 @@ Instruction: Create 2 assignment questions that reinforce the lesson.
                       onClick={toggleEdit}
                       disabled={isLoading}
                       className="h-10 w-10"
-                      >
+                    >
                       <Edit className="h-4 w-4" />
                     </Button>
                     <Button
@@ -188,7 +189,7 @@ Instruction: Create 2 assignment questions that reinforce the lesson.
                       onClick={handleDownload}
                       disabled={isLoading || !response}
                       className="h-10 w-10"
-                      >
+                    >
                       <Download className="h-4 w-4" />
                     </Button>
                   </>
@@ -197,11 +198,6 @@ Instruction: Create 2 assignment questions that reinforce the lesson.
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
-            <div className="bg-gray-50 p-4 rounded-md">
-              <h3 className="font-medium mb-2">Generated Prompt:</h3>
-              <p className="text-gray-600">{generatePrompt(formData)}</p>
-            </div>
-            
             {isLoading ? (
               <div className="text-center py-12">
                 <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4" />
@@ -214,7 +210,7 @@ Instruction: Create 2 assignment questions that reinforce the lesson.
                     value={response}
                     onChange={(e) => setResponse(e.target.value)}
                     className="w-full h-[500px] p-4 border rounded-md font-mono text-sm"
-                    />
+                  />
                 ) : (
                   <pre className="whitespace-pre-wrap font-sans text-gray-800">
                     {response}
