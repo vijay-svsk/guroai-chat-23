@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -33,7 +32,7 @@ const Dashboard = () => {
   }, []);
 
   const handleMyAccount = () => {
-    navigate("/auth");
+    navigate("/my-account"); // Changed from "/auth" to "/my-account"
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
