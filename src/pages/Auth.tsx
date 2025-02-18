@@ -41,11 +41,21 @@ const Auth = () => {
         });
 
         if (error) {
-          toast({
-            title: "Login Error",
-            description: error.message,
-            variant: "destructive",
-          });
+          // Check if the error is due to unconfirmed email
+          if (error.message.includes("Email not confirmed") || 
+              error.message.includes("email_not_confirmed")) {
+            toast({
+              title: "Email Not Confirmed",
+              description: "Please check your email for a confirmation link before logging in. If you haven't received the email, you can sign up again to receive a new confirmation link.",
+              duration: 6000,
+            });
+          } else {
+            toast({
+              title: "Login Error",
+              description: error.message,
+              variant: "destructive",
+            });
+          }
           setLoading(false);
           return;
         }
@@ -78,8 +88,8 @@ const Auth = () => {
         setShowConfetti(true);
         toast({
           title: "Success!",
-          description: "Account created successfully. You can now log in.",
-          duration: 3000,
+          description: "Please check your email for a confirmation link. Once confirmed, you can log in.",
+          duration: 6000,
         });
         setIsLogin(true);
       }
