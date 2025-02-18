@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -38,11 +37,7 @@ const Dashboard = () => {
   };
 
   const handleMyAccount = () => {
-    toast({
-      title: "Coming Soon",
-      description: "My Account feature is coming soon!",
-      duration: 3000
-    });
+    navigate("/auth");
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
