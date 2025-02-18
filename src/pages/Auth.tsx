@@ -7,7 +7,8 @@ import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import ReactConfetti from "react-confetti";
-import { Lock, Mail } from "lucide-react";
+import { Lock, Mail, Facebook, Search, Windows } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -18,6 +19,25 @@ const Auth = () => {
   const [showConfetti, setShowConfetti] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  const handleSocialAuth = async (provider: 'google' | 'facebook' | 'azure') => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: `${window.location.origin}/dashboard`
+        }
+      });
+
+      if (error) throw error;
+    } catch (error: any) {
+      toast({
+        title: "Authentication Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -175,6 +195,44 @@ const Auth = () => {
                   ? "Sign In"
                   : "Create Account"}
               </Button>
+
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <Separator className="w-full" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-background px-2 text-muted-foreground">
+                    Or continue with
+                  </span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-3">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => handleSocialAuth('google')}
+                  className="w-full"
+                >
+                  <Search className="h-4 w-4" />
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => handleSocialAuth('facebook')}
+                  className="w-full"
+                >
+                  <Facebook className="h-4 w-4" />
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => handleSocialAuth('azure')}
+                  className="w-full"
+                >
+                  <Windows className="h-4 w-4" />
+                </Button>
+              </div>
             </form>
 
             <div className="mt-4 text-center">
