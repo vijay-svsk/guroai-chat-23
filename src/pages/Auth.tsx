@@ -70,7 +70,8 @@ const Auth = () => {
           navigate("/dashboard");
         }
       } else {
-        const { error } = await supabase.auth.signUp({
+        // Sign up flow
+        const { error, data } = await supabase.auth.signUp({
           email,
           password,
         });
@@ -85,13 +86,25 @@ const Auth = () => {
           return;
         }
 
-        setShowConfetti(true);
-        toast({
-          title: "Success!",
-          description: "Please check your email for a confirmation link. Once confirmed, you can log in.",
-          duration: 6000,
-        });
-        setIsLogin(true);
+        // If signup is successful and email confirmation is disabled, auto-login
+        if (data.user && !data.session) {
+          setShowConfetti(true);
+          toast({
+            title: "Success!",
+            description: "Please check your email for a confirmation link. Once confirmed, you can log in.",
+            duration: 6000,
+          });
+          setIsLogin(true); // Switch to login view
+        } else if (data.user && data.session) {
+          // If email confirmation is disabled and we got a session
+          setShowConfetti(true);
+          toast({
+            title: "Success!",
+            description: "Account created successfully. Redirecting to dashboard...",
+            duration: 3000,
+          });
+          navigate("/dashboard");
+        }
       }
     } catch (error: any) {
       toast({
