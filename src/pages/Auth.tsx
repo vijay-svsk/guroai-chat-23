@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -40,21 +41,11 @@ const Auth = () => {
         });
 
         if (error) {
-          // Check if the error is due to unconfirmed email
-          if (error.message.includes("Email not confirmed") || 
-              error.message.includes("email_not_confirmed")) {
-            toast({
-              title: "Email Not Confirmed",
-              description: "Please check your email for a confirmation link before logging in. If you haven't received the email, you can sign up again to receive a new confirmation link.",
-              duration: 6000,
-            });
-          } else {
-            toast({
-              title: "Login Error",
-              description: error.message,
-              variant: "destructive",
-            });
-          }
+          toast({
+            title: "Login Error",
+            description: error.message,
+            variant: "destructive",
+          });
           setLoading(false);
           return;
         }
@@ -85,21 +76,12 @@ const Auth = () => {
           return;
         }
 
-        // If signup is successful and email confirmation is disabled, auto-login
-        if (data.user && !data.session) {
+        // If signup is successful, show success message and redirect to dashboard
+        if (data.user) {
           setShowConfetti(true);
           toast({
-            title: "Success!",
-            description: "Please check your email for a confirmation link. Once confirmed, you can log in.",
-            duration: 6000,
-          });
-          setIsLogin(true); // Switch to login view
-        } else if (data.user && data.session) {
-          // If email confirmation is disabled and we got a session
-          setShowConfetti(true);
-          toast({
-            title: "Success!",
-            description: "Account created successfully. Redirecting to dashboard...",
+            title: "Welcome to GuroAI!",
+            description: "Your account has been created successfully.",
             duration: 3000,
           });
           navigate("/dashboard");
