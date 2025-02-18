@@ -8,6 +8,7 @@ import LearnMore from "./pages/LearnMore";
 import NotFound from "./pages/NotFound";
 import LessonPlanAI from "./pages/LessonPlanAI";
 import Auth from "./pages/Auth";
+import MyAccount from "./pages/MyAccount";
 import { Toaster } from "@/components/ui/toaster";
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
           <Route path="/learn-more" element={<LearnMore />} />
           <Route path="/lesson-plan-ai" element={<LessonPlanAI />} />
           <Route path="/auth" element={<Auth />} />
+          <Route path="/my-account" element={<MyAccount />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         <Toaster />
