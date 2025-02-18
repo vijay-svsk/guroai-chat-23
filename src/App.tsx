@@ -1,4 +1,5 @@
 
+import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Payment from "./pages/Payment";
@@ -10,17 +11,19 @@ import { Toaster } from "@/components/ui/toaster";
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Index />} />
-        <Route path="/payment" element={<Payment />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/learn-more" element={<LearnMore />} />
-        <Route path="/lesson-plan-ai" element={<LessonPlanAI />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-      <Toaster />
-    </Router>
+    <React.StrictMode>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/payment" element={<Payment />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/learn-more" element={<LearnMore />} />
+          <Route path="/lesson-plan-ai" element={<LessonPlanAI />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+        <Toaster />
+      </Router>
+    </React.StrictMode>
   );
 }
 
