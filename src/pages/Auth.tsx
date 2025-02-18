@@ -41,11 +41,13 @@ const Auth = () => {
         });
 
         if (error) {
-          if (error.message.includes("Email not confirmed")) {
+          // Check if the error is due to unconfirmed email
+          if (error.message.includes("Email not confirmed") || 
+              (error as any)?.body?.includes("email_not_confirmed")) {
             toast({
               title: "Email Not Confirmed",
-              description: "Please check your email for a confirmation link before logging in.",
-              duration: 5000,
+              description: "Please check your email for a confirmation link before logging in. If you haven't received the email, you can sign up again to receive a new confirmation link.",
+              duration: 6000,
             });
           } else {
             toast({
