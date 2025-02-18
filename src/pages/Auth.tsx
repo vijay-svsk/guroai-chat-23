@@ -39,7 +39,22 @@ const Auth = () => {
           password,
         });
 
-        if (error) throw error;
+        if (error) {
+          if (error.message.includes("Email not confirmed")) {
+            toast({
+              title: "Email Not Confirmed",
+              description: "Please check your email for a confirmation link before logging in.",
+              duration: 5000,
+            });
+          } else {
+            toast({
+              title: "Login Error",
+              description: error.message,
+              variant: "destructive",
+            });
+          }
+          return;
+        }
 
         navigate("/dashboard");
       } else {
@@ -48,12 +63,20 @@ const Auth = () => {
           password,
         });
 
-        if (error) throw error;
+        if (error) {
+          toast({
+            title: "Sign Up Error",
+            description: error.message,
+            variant: "destructive",
+          });
+          return;
+        }
 
         setShowConfetti(true);
         toast({
           title: "Success!",
-          description: "Account created successfully. You can now log in.",
+          description: "Please check your email for a confirmation link. Once confirmed, you can log in.",
+          duration: 6000,
         });
         setIsLogin(true);
       }
