@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2, Download, RefreshCw, Edit, FileText } from "lucide-react";
+import { Loader2, Download, RefreshCw, Edit, FileText, Save } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -19,6 +19,7 @@ const LessonPlanAI = () => {
   const [response, setResponse] = useState<string>("");
   const [isEditing, setIsEditing] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const formData = location.state as FormData;
   const { toast } = useToast();
 
@@ -118,6 +119,51 @@ Instruction: Create 2 assignment questions that reinforce the lesson.`;
   useEffect(() => {
     generateLessonPlan();
   }, [formData]);
+
+  const handleSaveLessonPlan = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast({
+          title: "Error",
+          description: "Please log in to save lesson plans.",
+          variant: "destructive",
+          duration: 3000
+        });
+        return;
+      }
+
+      const { error } = await supabase
+        .from('lesson_plans')
+        .insert({
+          user_id: user.id,
+          content: response,
+          subject: formData.subject,
+          grade_level: formData.gradeLevel,
+          topic: formData.topic,
+          language: formData.language,
+          method: formData.method
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Success!",
+        description: "Lesson plan saved successfully.",
+        duration: 3000
+      });
+      navigate('/my-account');
+    } catch (error) {
+      console.error("Error saving lesson plan:", error);
+      toast({
+        title: "Error",
+        description: "Failed to save lesson plan. Please try again.",
+        variant: "destructive",
+        duration: 3000
+      });
+    }
+  };
 
   const handleDownload = () => {
     const element = document.createElement("a");
@@ -252,11 +298,20 @@ Instruction: Create 2 assignment questions that reinforce the lesson.`;
                     </pre>
                   )}
                 </div>
-                <div className="flex justify-end gap-4">
+                <div className="flex flex-col gap-4">
+                  <Button
+                    onClick={handleSaveLessonPlan}
+                    disabled={isLoading || !response}
+                    className="w-full sm:w-auto flex items-center gap-2"
+                    variant="secondary"
+                  >
+                    <Save className="h-4 w-4" />
+                    Save this Lesson Plan
+                  </Button>
                   <Button
                     onClick={handleDownload}
                     disabled={isLoading || !response}
-                    className="flex items-center gap-2"
+                    className="w-full sm:w-auto flex items-center gap-2"
                   >
                     <Download className="h-4 w-4" />
                     Download as TXT
@@ -264,7 +319,7 @@ Instruction: Create 2 assignment questions that reinforce the lesson.`;
                   <Button
                     onClick={handleDownloadDocx}
                     disabled={isLoading || !response}
-                    className="flex items-center gap-2"
+                    className="w-full sm:w-auto flex items-center gap-2"
                   >
                     <FileText className="h-4 w-4" />
                     Download as DOCX
