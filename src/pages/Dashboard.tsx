@@ -5,22 +5,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import ReactConfetti from "react-confetti";
-import { GraduationCap, BookOpen, Languages, BookType, Award, LogOut, Settings, History } from "lucide-react";
-
-interface LessonPlan {
-  id: string;
-  created_at: string;
-  subject: string;
-  topic: string;
-  content: string;
-  method: string;
-}
+import { GraduationCap, BookOpen, Languages, BookType, Award, LogOut, Settings } from "lucide-react";
 
 const Dashboard = () => {
   const [email, setEmail] = useState("");
-  const [previousLessonPlans, setPreviousLessonPlans] = useState<LessonPlan[]>([]);
   const [formData, setFormData] = useState({
     subject: "",
     gradeLevel: "",
@@ -31,35 +21,16 @@ const Dashboard = () => {
   const [showConfetti, setShowConfetti] = useState(true);
   const { toast } = useToast();
   const navigate = useNavigate();
-  const location = useLocation();
 
   useEffect(() => {
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         setEmail(user.email || "");
-        // Fetch previous lesson plans
-        const { data: lessonPlans, error } = await supabase
-          .from('lesson_plans')
-          .select('*')
-          .order('created_at', { ascending: false });
-
-        if (!error && lessonPlans) {
-          setPreviousLessonPlans(lessonPlans);
-        }
       }
     };
     getUser();
-
-    // Show welcome toast for new paid users
-    if (location.state?.fromPayment) {
-      toast({
-        title: "Welcome to GuroAI Premium!",
-        description: "Thank you for subscribing. Let's create some amazing lesson plans!",
-        duration: 5000,
-      });
-    }
-  }, [location.state, toast]);
+  }, []);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -75,6 +46,7 @@ const Dashboard = () => {
   };
 
   const handleMethodSelect = (method: "7es" | "4as") => {
+    // Validate form data
     if (!formData.subject || !formData.gradeLevel || !formData.topic || !formData.language) {
       toast({
         title: "Missing Information",
@@ -84,19 +56,11 @@ const Dashboard = () => {
       return;
     }
 
+    // Navigate to AI page with form data
     navigate("/lesson-plan-ai", {
       state: {
         ...formData,
         method
-      }
-    });
-  };
-
-  const viewPreviousLessonPlan = (lessonPlan: LessonPlan) => {
-    navigate("/lesson-plan-ai", {
-      state: {
-        ...lessonPlan,
-        isExisting: true
       }
     });
   };
@@ -126,42 +90,9 @@ const Dashboard = () => {
       {/* Main content */}
       <main className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-3xl mx-auto space-y-8">
-          {/* Previous Lesson Plans Section */}
-          {previousLessonPlans.length > 0 && (
-            <Card className="bg-white shadow-xl">
-              <CardHeader>
-                <CardTitle className="text-2xl font-semibold text-guro-blue flex items-center gap-2">
-                  <History className="w-6 h-6" />
-                  Previous Lesson Plans
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {previousLessonPlans.map((plan) => (
-                    <div
-                      key={plan.id}
-                      className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 cursor-pointer"
-                      onClick={() => viewPreviousLessonPlan(plan)}
-                    >
-                      <div>
-                        <h3 className="font-medium">{plan.subject}: {plan.topic}</h3>
-                        <p className="text-sm text-gray-500">
-                          Created on {new Date(plan.created_at).toLocaleDateString()}
-                        </p>
-                      </div>
-                      <Button variant="ghost" size="sm">
-                        View Plan
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
           <div className="text-center">
             <h1 className="text-4xl font-bold text-guro-blue mb-4">
-              Create New Lesson Plan
+              Let's Personalize Your Experience
             </h1>
             <p className="text-xl text-gray-600">
               Help us understand your teaching needs
@@ -244,5 +175,4 @@ const Dashboard = () => {
       </main>
     </div>;
 };
-
 export default Dashboard;
