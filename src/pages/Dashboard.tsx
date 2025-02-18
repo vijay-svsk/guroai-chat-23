@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import ReactConfetti from "react-confetti";
-import { GraduationCap, BookOpen, Languages, BookType, Award, LogOut, Settings, User } from "lucide-react";
+import { GraduationCap, BookOpen, Languages, BookType, Award, Settings, User } from "lucide-react";
 
 const Dashboard = () => {
   const [email, setEmail] = useState("");
@@ -30,11 +31,6 @@ const Dashboard = () => {
     };
     getUser();
   }, []);
-
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    window.location.reload();
-  };
 
   const handleMyAccount = () => {
     navigate("/auth");
@@ -84,10 +80,6 @@ const Dashboard = () => {
               <Button variant="secondary" onClick={handleMyAccount} className="border-white text-slate-900 bg-green-400 hover:bg-green-300">
                 <User className="w-4 h-4 mr-2" />
                 <span>My Account</span>
-              </Button>
-              <Button variant="outline" onClick={handleLogout} className="border-white text-slate-900 bg-green-400 hover:bg-green-300">
-                <LogOut className="w-4 h-4 mr-2" />
-                <span>Logout</span>
               </Button>
             </div>
           </div>
