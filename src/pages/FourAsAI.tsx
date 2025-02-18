@@ -27,13 +27,13 @@ const FourAsAI = () => {
     return `Create a comprehensive 12,000-word lesson plan for ${data.subject} at ${data.gradeLevel} level, focusing on the topic: ${data.topic}. The lesson should be conducted in ${data.language}. Please follow this exact structure:
 
 I. LEARNING OBJECTIVES
-- Content Standards
-- Performance Standards
-- Learning Competencies/Code
-- Objectives
-  - Knowledge
-  - Skills
-  - Attitude
+Content Standards
+Performance Standards
+Learning Competencies/Code
+Objectives
+Knowledge
+Skills
+Attitude
 
 II. CONTENT
 A. References
@@ -46,43 +46,30 @@ C. Supplies, Equipment, Tools, etc.
 
 IV. PROCEDURES
 A. Review/Introductory Activity
-- Provide a search prompt for a Google image related to the topic
-- Ask 3 specific questions about that image
+Provide a search prompt for a Google image related to the topic, then ask 3 questions about that image.
 
 B. Activity/Motivation
-- Provide 3 motivating questions that will transition to the new lesson
+Give 3 motivating questions that will transition to the new lesson.
 
 C. Analysis
-- Present examples of the new lesson where the concepts are clarified
-- Provide a clear introduction to the lesson
+Present examples of the new lesson where the concepts are clarified. This is an introduction to the lesson.
 
 D. Abstraction
-- Provide 2 paragraph discussion about the lesson
-- Include 5 Higher Order Thinking Skills (HOTS) questions
+Give 2 paragraph discussion about the lesson and give 5 HOTS questions.
 
 E. Valuing
-- Finding Practical Applications of Concepts and Skills in Daily Living
+Finding Practical Applications of Concepts and Skills in Daily Living
 
 F. Generalization
-- Provide an instruction and 5 multiple-choice questions showing practical applications in daily life
+Write 3 generalization questions to help the class summarize what they learned.
 
 G. Assessment
-- Provide an instruction and 10 multiple-choice questions aligned with the lesson objectives
-- Ensure questions directly relate to the lesson content
+Provide an instruction and 10 multiple-choice questions that show how the lesson can be applied in daily life. The instructions must be based on your given objectives and make a question about the lesson.
 
 H. Assignment
-- Create 2 assignment questions that reinforce the lesson
+Create 2 assignment questions that reinforce the lesson.
 
 III. REMARKS
-
-V. REFLECTIONS
-A. No. of learners who learned 80% on the formative assessment
-B. No. of learners who require additional activities for remediation
-C. Did the remedial lessons work? No. of learners who have caught up with the lesson
-D. No. of learners who continue to require remediation
-E. Which of my teaching strategies worked well? Why did these work?
-F. What difficulties did I encounter which my principal or supervisor can help me solve?
-G. What innovation or localized materials did I use/discover which I wish to share with other teachers?
 
 Please provide a detailed response following this structure exactly, emphasizing practical examples and clear instructions throughout the lesson plan.`;
   };
