@@ -9,12 +9,19 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
     const { content } = await req.json();
+
+    if (!content) {
+      throw new Error('Content is required');
+    }
+
+    console.log('Received content length:', content.length);
 
     // Create a new document
     const doc = new Document({
@@ -24,7 +31,7 @@ serve(async (req) => {
           new Paragraph({
             children: [
               new TextRun({
-                text: line,
+                text: line || ' ', // Handle empty lines
                 size: 24, // 12pt font
               }),
             ],
@@ -33,11 +40,15 @@ serve(async (req) => {
       }],
     });
 
+    console.log('Document created successfully');
+
     // Generate the docx file
     const buffer = await Packer.toBuffer(doc);
+    console.log('Buffer generated, size:', buffer.byteLength);
 
     // Convert buffer to base64
     const base64 = btoa(String.fromCharCode(...new Uint8Array(buffer)));
+    console.log('Base64 conversion complete');
 
     return new Response(
       JSON.stringify({ docxBase64: base64 }),
