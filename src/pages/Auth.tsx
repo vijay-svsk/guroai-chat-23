@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -134,12 +133,10 @@ const Auth = () => {
             className="mx-auto h-16 w-16 rounded-md"
           />
           <h2 className="mt-6 text-3xl font-bold text-gray-900">
-            {isLogin ? "Welcome back!" : "Create your account"}
+            Welcome to GuroAI
           </h2>
           <p className="mt-2 text-sm text-gray-600">
-            {isLogin
-              ? "Sign in to your account"
-              : "Start your journey with GuroAI"}
+            With GuroAI, teaching becomes stress-free—crafting lesson plans with ease, so you can focus on inspiring minds.
           </p>
         </div>
 
