@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import ReactConfetti from "react-confetti";
-import { Lock, Mail, Facebook, Search, Windows } from "lucide-react";
+import { Lock, Mail, Facebook, Search, Microsoft } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 
 const Auth = () => {
@@ -230,7 +230,7 @@ const Auth = () => {
                   onClick={() => handleSocialAuth('azure')}
                   className="w-full"
                 >
-                  <Windows className="h-4 w-4" />
+                  <Microsoft className="h-4 w-4" />
                 </Button>
               </div>
             </form>
