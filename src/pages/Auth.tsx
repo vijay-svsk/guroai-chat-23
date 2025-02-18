@@ -30,11 +30,12 @@ const Auth = () => {
           description: "Passwords do not match",
           variant: "destructive",
         });
+        setLoading(false);
         return;
       }
 
       if (isLogin) {
-        const { error } = await supabase.auth.signInWithPassword({
+        const { error, data } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
@@ -53,10 +54,19 @@ const Auth = () => {
               variant: "destructive",
             });
           }
+          setLoading(false);
           return;
         }
 
-        navigate("/dashboard");
+        // If login is successful (no error), navigate to dashboard
+        if (data.user) {
+          toast({
+            title: "Welcome back!",
+            description: "Successfully logged in",
+            duration: 3000,
+          });
+          navigate("/dashboard");
+        }
       } else {
         const { error } = await supabase.auth.signUp({
           email,
@@ -69,6 +79,7 @@ const Auth = () => {
             description: error.message,
             variant: "destructive",
           });
+          setLoading(false);
           return;
         }
 
