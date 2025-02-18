@@ -79,7 +79,7 @@ const Dashboard = () => {
             <Button 
               variant="secondary" 
               onClick={handleMyAccount} 
-              className="border-white text-slate-900 bg-green-400 hover:bg-green-300 w-full sm:w-auto"
+              className="border-white text-slate-900 bg-green-400 hover:bg-green-300 w-full sm:w-fit"
             >
               <User className="w-4 h-4 mr-2" />
               <span>My Account</span>
