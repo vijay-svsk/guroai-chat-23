@@ -303,7 +303,6 @@ Instruction: Create 2 assignment questions that reinforce the lesson.`;
                     onClick={handleSaveLessonPlan}
                     disabled={isLoading || !response}
                     className="w-full sm:w-auto flex items-center gap-2"
-                    variant="secondary"
                   >
                     <Save className="h-4 w-4" />
                     Save this Lesson Plan
