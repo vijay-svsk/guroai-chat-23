@@ -7,6 +7,7 @@ import Dashboard from "./pages/Dashboard";
 import LearnMore from "./pages/LearnMore";
 import NotFound from "./pages/NotFound";
 import LessonPlanAI from "./pages/LessonPlanAI";
+import FourAsAI from "./pages/FourAsAI";
 import Auth from "./pages/Auth";
 import MyAccount from "./pages/MyAccount";
 import { Toaster } from "@/components/ui/toaster";
@@ -21,6 +22,7 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/learn-more" element={<LearnMore />} />
           <Route path="/lesson-plan-ai" element={<LessonPlanAI />} />
+          <Route path="/four-as-ai" element={<FourAsAI />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/my-account" element={<MyAccount />} />
           <Route path="*" element={<NotFound />} />

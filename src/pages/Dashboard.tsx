@@ -53,12 +53,21 @@ const Dashboard = () => {
       return;
     }
 
-    navigate("/lesson-plan-ai", {
-      state: {
-        ...formData,
-        method
-      }
-    });
+    if (method === "4as") {
+      navigate("/four-as-ai", {
+        state: {
+          ...formData,
+          method
+        }
+      });
+    } else {
+      navigate("/lesson-plan-ai", {
+        state: {
+          ...formData,
+          method
+        }
+      });
+    }
   };
 
   return <div className="min-h-screen bg-gray-50">
