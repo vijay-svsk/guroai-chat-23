@@ -68,7 +68,7 @@ const Dashboard = () => {
       {/* Header with user account info */}
       <header className="bg-[#0a1d2c] text-white">
         <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center">
+          <div className="flex flex-col space-y-4">
             <div className="flex items-center space-x-4">
               <img src="/lovable-uploads/24e7e402-845e-4126-b717-af2167b4ef23.png" alt="GuroAI Logo" className="h-12 w-12 rounded-md" loading="eager" />
               <div>
@@ -76,12 +76,14 @@ const Dashboard = () => {
                 <p className="text-sm text-gray-300">{email}</p>
               </div>
             </div>
-            <div className="flex items-center space-x-2">
-              <Button variant="secondary" onClick={handleMyAccount} className="border-white text-slate-900 bg-green-400 hover:bg-green-300">
-                <User className="w-4 h-4 mr-2" />
-                <span>My Account</span>
-              </Button>
-            </div>
+            <Button 
+              variant="secondary" 
+              onClick={handleMyAccount} 
+              className="border-white text-slate-900 bg-green-400 hover:bg-green-300 w-full sm:w-auto"
+            >
+              <User className="w-4 h-4 mr-2" />
+              <span>My Account</span>
+            </Button>
           </div>
         </div>
       </header>
