@@ -20,15 +20,17 @@ const Payment = () => {
         duration: 5000,
       });
       navigate('/dashboard');
+    } else if (searchParams.get('canceled') === 'true') {
+      toast({
+        title: "Subscription Canceled",
+        description: "You can try again whenever you're ready.",
+        duration: 5000,
+      });
     }
   }, [location, navigate, toast]);
 
   const handleSubscription = () => {
-    // Get the base URL for the success redirect
-    const baseUrl = window.location.origin;
-    const successUrl = `${baseUrl}/payment?success=true`;
-    const stripeUrl = `https://buy.stripe.com/bIY29h7YR1n63JK4gs?success_url=${encodeURIComponent(successUrl)}`;
-    window.location.href = stripeUrl;
+    window.location.href = 'https://buy.stripe.com/bIY29h7YR1n63JK4gs';
   };
 
   return (
