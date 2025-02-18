@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import ReactConfetti from "react-confetti";
-import { GraduationCap, BookOpen, Languages, BookType, Award, LogOut, Settings } from "lucide-react";
+import { GraduationCap, BookOpen, Languages, BookType, Award, LogOut, Settings, User } from "lucide-react";
 
 const Dashboard = () => {
   const [email, setEmail] = useState("");
@@ -37,6 +37,14 @@ const Dashboard = () => {
     window.location.reload();
   };
 
+  const handleMyAccount = () => {
+    toast({
+      title: "Coming Soon",
+      description: "My Account feature is coming soon!",
+      duration: 3000
+    });
+  };
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -46,7 +54,6 @@ const Dashboard = () => {
   };
 
   const handleMethodSelect = (method: "7es" | "4as") => {
-    // Validate form data
     if (!formData.subject || !formData.gradeLevel || !formData.topic || !formData.language) {
       toast({
         title: "Missing Information",
@@ -56,7 +63,6 @@ const Dashboard = () => {
       return;
     }
 
-    // Navigate to AI page with form data
     navigate("/lesson-plan-ai", {
       state: {
         ...formData,
@@ -79,10 +85,16 @@ const Dashboard = () => {
                 <p className="text-sm text-gray-300">{email}</p>
               </div>
             </div>
-            <Button variant="outline" onClick={handleLogout} className="border-white text-slate-900 bg-green-400 hover:bg-green-300">
-              <LogOut className="w-4 h-4 mr-2" />
-              <span>Logout</span>
-            </Button>
+            <div className="flex items-center space-x-2">
+              <Button variant="secondary" onClick={handleMyAccount} className="border-white text-slate-900 bg-green-400 hover:bg-green-300">
+                <User className="w-4 h-4 mr-2" />
+                <span>My Account</span>
+              </Button>
+              <Button variant="outline" onClick={handleLogout} className="border-white text-slate-900 bg-green-400 hover:bg-green-300">
+                <LogOut className="w-4 h-4 mr-2" />
+                <span>Logout</span>
+              </Button>
+            </div>
           </div>
         </div>
       </header>
