@@ -20,7 +20,7 @@ const Payment = () => {
       const { error } = await supabase
         .from('subscriptions')
         .update({
-          status: 'active',
+          status: 'active' as const,
           start_date: new Date().toISOString(),
           end_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
         })
@@ -33,6 +33,7 @@ const Payment = () => {
           description: "Failed to update subscription status",
           variant: "destructive",
         });
+        navigate('/payment-failed');
         return;
       }
 
@@ -54,6 +55,7 @@ const Payment = () => {
         description: "You can try again whenever you're ready.",
         duration: 5000,
       });
+      navigate('/payment-failed');
     }
   }, [location, navigate, toast]);
 
