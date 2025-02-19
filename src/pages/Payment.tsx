@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const Payment = () => {
   const navigate = useNavigate();
@@ -11,15 +12,42 @@ const Payment = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Check if the URL contains a success parameter
-    const searchParams = new URLSearchParams(location.search);
-    if (searchParams.get('success') === 'true') {
+    const handlePaymentSuccess = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      // Update subscription status
+      const { error } = await supabase
+        .from('subscriptions')
+        .update({
+          status: 'active',
+          start_date: new Date().toISOString(),
+          end_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+        })
+        .eq('user_id', user.id);
+
+      if (error) {
+        console.error('Error updating subscription:', error);
+        toast({
+          title: "Error",
+          description: "Failed to update subscription status",
+          variant: "destructive",
+        });
+        return;
+      }
+
       toast({
         title: "Subscription Success!",
         description: "Welcome to GuroAI Premium!",
         duration: 5000,
       });
       navigate('/dashboard');
+    };
+
+    // Check if the URL contains a success parameter
+    const searchParams = new URLSearchParams(location.search);
+    if (searchParams.get('success') === 'true') {
+      handlePaymentSuccess();
     } else if (searchParams.get('canceled') === 'true') {
       toast({
         title: "Subscription Canceled",

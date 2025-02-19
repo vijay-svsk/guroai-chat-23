@@ -50,8 +50,29 @@ const Auth = () => {
           return;
         }
 
-        // If login is successful (no error), navigate to dashboard
+        // If login is successful, check subscription status
         if (data.user) {
+          const { data: subscription, error: subError } = await supabase
+            .from('subscriptions')
+            .select('*')
+            .eq('user_id', data.user.id)
+            .single();
+
+          if (subError) {
+            console.error('Error checking subscription:', subError);
+          }
+
+          // If no active subscription, redirect to payment
+          if (!subscription || subscription.status !== 'active' || new Date(subscription.end_date) <= new Date()) {
+            toast({
+              title: "Subscription Required",
+              description: "Please subscribe to access GuroAI",
+              duration: 3000,
+            });
+            navigate("/payment");
+            return;
+          }
+
           toast({
             title: "Welcome back!",
             description: "Successfully logged in",
@@ -76,15 +97,30 @@ const Auth = () => {
           return;
         }
 
-        // If signup is successful, show success message and redirect to dashboard
+        // If signup is successful, create subscription record and redirect to payment
         if (data.user) {
+          const { error: subError } = await supabase
+            .from('subscriptions')
+            .insert([
+              {
+                user_id: data.user.id,
+                status: 'expired',
+                start_date: new Date().toISOString(),
+                end_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+              }
+            ]);
+
+          if (subError) {
+            console.error('Error creating subscription:', subError);
+          }
+
           setShowConfetti(true);
           toast({
             title: "Welcome to GuroAI!",
-            description: "Your account has been created successfully.",
+            description: "Please complete your subscription to continue.",
             duration: 3000,
           });
-          navigate("/dashboard");
+          navigate("/payment");
         }
       }
     } catch (error: any) {
