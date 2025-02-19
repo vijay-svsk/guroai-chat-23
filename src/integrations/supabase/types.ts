@@ -74,6 +74,7 @@ export type Database = {
           start_date: string | null
           status: Database["public"]["Enums"]["subscription_status"]
           stripe_subscription_id: string | null
+          trial_end: string | null
           updated_at: string | null
           user_id: string
         }
@@ -84,6 +85,7 @@ export type Database = {
           start_date?: string | null
           status?: Database["public"]["Enums"]["subscription_status"]
           stripe_subscription_id?: string | null
+          trial_end?: string | null
           updated_at?: string | null
           user_id: string
         }
@@ -94,6 +96,7 @@ export type Database = {
           start_date?: string | null
           status?: Database["public"]["Enums"]["subscription_status"]
           stripe_subscription_id?: string | null
+          trial_end?: string | null
           updated_at?: string | null
           user_id?: string
         }
