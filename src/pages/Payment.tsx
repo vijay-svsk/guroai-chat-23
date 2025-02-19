@@ -16,12 +16,17 @@ const Payment = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
+      // Calculate trial end date (7 days from now)
+      const trialEndDate = new Date();
+      trialEndDate.setDate(trialEndDate.getDate() + 7);
+
       // Update subscription status
       const { error } = await supabase
         .from('subscriptions')
         .update({
           status: 'active' as const,
           start_date: new Date().toISOString(),
+          trial_end: trialEndDate.toISOString(),
           end_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
         })
         .eq('user_id', user.id);
@@ -38,8 +43,8 @@ const Payment = () => {
       }
 
       toast({
-        title: "Subscription Success!",
-        description: "Welcome to GuroAI Premium!",
+        title: "Free Trial Started!",
+        description: "Welcome to GuroAI Premium! Your 7-day free trial has begun.",
         duration: 5000,
       });
       navigate('/dashboard');

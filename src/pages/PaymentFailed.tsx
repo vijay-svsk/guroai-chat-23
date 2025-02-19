@@ -21,16 +21,23 @@ const PaymentFailed = () => {
           <div className="flex flex-col items-center">
             <AlertCircle className="h-16 w-16 text-red-500 mb-4" />
             <h2 className="mt-2 text-3xl font-bold text-gray-900">
-              Payment Failed
+              Subscription Required
             </h2>
             <p className="mt-2 text-gray-600">
-              We were unable to process your payment. Please try again later.
+              Your trial period has ended or payment was declined. To continue using GuroAI and access your saved lesson plans, please update your payment information.
             </p>
           </div>
           <div className="mt-8">
             <Button
-              onClick={() => navigate("/")}
+              onClick={() => navigate("/payment")}
               className="w-full bg-guro-blue hover:bg-guro-blue/90 text-white py-6 text-lg"
+            >
+              Update Payment Method
+            </Button>
+            <Button
+              onClick={() => navigate("/")}
+              variant="ghost"
+              className="w-full mt-4"
             >
               Return to Homepage
             </Button>
