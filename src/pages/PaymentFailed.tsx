@@ -7,16 +7,16 @@ const PaymentFailed = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col px-4 sm:px-6 lg:px-8">
-      <div className="flex justify-center pt-8">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      <div className="flex justify-center bg-[#0a1d2c] py-8">
         <img 
           src="/lovable-uploads/6156f2f7-e911-43ea-be05-99f13995bd26.png" 
           alt="GuroAI Logo" 
-          className="h-16 w-auto"
+          className="h-24 w-auto"
           loading="eager"
         />
       </div>
-      <div className="flex-1 flex items-center justify-center">
+      <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full space-y-8 text-center">
           <div className="flex flex-col items-center">
             <AlertCircle className="h-16 w-16 text-red-500 mb-4" />
