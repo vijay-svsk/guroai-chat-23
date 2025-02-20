@@ -36,6 +36,12 @@ export const HeroSection = ({ onStartTrial }: HeroSectionProps) => {
         >
           Learn More
         </Button>
+        <Button 
+          onClick={() => navigate('/auth')}
+          className="bg-[#94DEA5] hover:bg-[#94DEA5]/90 text-guro-blue px-8 py-6 rounded-lg text-lg transition-all duration-300 hover:scale-105 sm:order-none order-last"
+        >
+          Account Login
+        </Button>
       </div>
     </section>
   );
