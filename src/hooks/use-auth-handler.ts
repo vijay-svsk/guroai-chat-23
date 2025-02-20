@@ -30,6 +30,7 @@ export const useAuthHandler = () => {
       }
 
       if (isLogin) {
+        // Handle existing user login
         const { error, data } = await supabase.auth.signInWithPassword({
           email,
           password,
@@ -46,15 +47,43 @@ export const useAuthHandler = () => {
         }
 
         if (data.user) {
-          setShowConfetti(true);
-          toast({
-            title: "Welcome back!",
-            description: "Successfully logged in",
-            duration: 3000,
-          });
-          navigate("/dashboard");
+          // Check if user has an active subscription
+          const { data: subscription, error: subError } = await supabase
+            .from('subscriptions')
+            .select('*')
+            .eq('user_id', data.user.id)
+            .single();
+
+          if (subError) {
+            console.error('Error checking subscription:', subError);
+            toast({
+              title: "Error",
+              description: "Unable to verify subscription status",
+              variant: "destructive",
+            });
+            setLoading(false);
+            return;
+          }
+
+          if (subscription?.status === 'active') {
+            setShowConfetti(true);
+            toast({
+              title: "Welcome back!",
+              description: "Successfully logged in",
+              duration: 3000,
+            });
+            navigate("/dashboard");
+          } else {
+            toast({
+              title: "Subscription Required",
+              description: "Please complete your subscription to access the dashboard",
+              duration: 5000,
+            });
+            navigate("/payment");
+          }
         }
       } else {
+        // Handle new user signup
         const { error: signUpError, data } = await supabase.auth.signUp({
           email,
           password,
@@ -74,10 +103,11 @@ export const useAuthHandler = () => {
           setShowConfetti(true);
           toast({
             title: "Account Created",
-            description: "Welcome to GuroAI!",
+            description: "Please complete your subscription to access GuroAI!",
             duration: 3000,
           });
-          navigate("/dashboard");
+          // Redirect new users to payment page
+          navigate("/payment");
         }
       }
     } catch (error: any) {
