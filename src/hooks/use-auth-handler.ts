@@ -34,7 +34,6 @@ export const useAuthHandler = () => {
         const { user } = await loginUser(email, password);
         
         if (user) {
-          // Check device authorization
           const isDeviceAuthorized = await checkDeviceAuthorization(user.id);
           if (!isDeviceAuthorized) {
             navigate('/device-restricted');
@@ -61,18 +60,17 @@ export const useAuthHandler = () => {
           }
         }
       } else {
+        // For signup, redirect to login page after successful registration
         const { user } = await signUpUser(email, password);
 
         if (user) {
           await createInitialSubscription(user.id);
-          
-          setShowConfetti(true);
           toast({
             title: "Account Created",
-            description: "Please complete your subscription to access GuroAI!",
+            description: "Please sign in with your new account",
             duration: 3000,
           });
-          navigate("/payment");
+          navigate("/newuseraccountlogin");
         }
       }
     } catch (error: any) {

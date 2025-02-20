@@ -3,6 +3,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Lock, Mail } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface AuthFormProps {
   isLogin: boolean;
@@ -30,17 +33,50 @@ export const AuthForm = ({
   onToggleMode,
 }: AuthFormProps) => {
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const [signingUp, setSigningUp] = useState(false);
 
-  const handleToggle = () => {
-    if (isLogin) {
-      navigate('/signup-new-account');
-    } else {
-      onToggleMode();
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (password !== confirmPassword) {
+      toast({
+        title: "Error",
+        description: "Passwords do not match",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setSigningUp(true);
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+      });
+
+      if (error) throw error;
+
+      if (data) {
+        toast({
+          title: "Success!",
+          description: "Account created successfully. Please sign in to continue.",
+          duration: 5000,
+        });
+        navigate("/newuseraccountlogin");
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setSigningUp(false);
     }
   };
 
   return (
-    <form onSubmit={onSubmit} className="space-y-6">
+    <form onSubmit={isLogin ? onSubmit : handleSignUp} className="space-y-6">
       <div>
         <div className="flex items-center space-x-2">
           <Mail className="w-5 h-5 text-gray-500" />
@@ -85,15 +121,15 @@ export const AuthForm = ({
       <Button
         type="submit"
         className="w-full bg-guro-blue hover:bg-guro-blue/90"
-        disabled={loading}
+        disabled={loading || signingUp}
       >
-        {loading ? "Loading..." : isLogin ? "Sign In" : "Create Account"}
+        {loading || signingUp ? "Processing..." : isLogin ? "Sign In" : "Create Account"}
       </Button>
 
       <div className="mt-4 text-center">
         <button
           type="button"
-          onClick={handleToggle}
+          onClick={onToggleMode}
           className="text-sm text-guro-blue hover:underline"
         >
           {isLogin

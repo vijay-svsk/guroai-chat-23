@@ -50,7 +50,7 @@ const Auth = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle>{isLogin ? "Sign In" : "Sign Up"}</CardTitle>
+            <CardTitle>{isLogin ? "Sign In" : "Create Account"}</CardTitle>
           </CardHeader>
           <CardContent>
             <AuthForm
