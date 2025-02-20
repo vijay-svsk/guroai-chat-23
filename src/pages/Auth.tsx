@@ -28,19 +28,7 @@ const Auth = () => {
   useEffect(() => {
     const checkAuth = async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        return;
-      }
-
-      const { data: subscription } = await supabase
-        .from('subscriptions')
-        .select('*')
-        .eq('user_id', user.id)
-        .single();
-
-      if (!subscription || subscription.status !== 'active') {
-        navigate('/payment');
-      } else {
+      if (user) {
         navigate('/dashboard');
       }
     };

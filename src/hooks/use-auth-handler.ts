@@ -46,26 +46,6 @@ export const useAuthHandler = () => {
         }
 
         if (data.user) {
-          const { data: subscription, error: subError } = await supabase
-            .from('subscriptions')
-            .select('*')
-            .eq('user_id', data.user.id)
-            .single();
-
-          if (subError) {
-            console.error('Error checking subscription:', subError);
-          }
-
-          if (!subscription || subscription.status !== 'active' || new Date(subscription.end_date) <= new Date()) {
-            toast({
-              title: "Subscription Required",
-              description: "Please subscribe to access GuroAI",
-              duration: 3000,
-            });
-            navigate("/payment");
-            return;
-          }
-
           setShowConfetti(true);
           toast({
             title: "Welcome back!",
