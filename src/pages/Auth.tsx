@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -21,20 +22,19 @@ const Auth = () => {
   useEffect(() => {
     const checkAuth = async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        navigate('/payment');
-        return;
-      }
+      if (user) {
+        // Only check subscription after user is authenticated
+        const { data: subscription } = await supabase
+          .from('subscriptions')
+          .select('*')
+          .eq('user_id', user.id)
+          .single();
 
-      // Check if user has an active subscription
-      const { data: subscription } = await supabase
-        .from('subscriptions')
-        .select('*')
-        .eq('user_id', user.id)
-        .single();
-
-      if (!subscription || subscription.status !== 'active') {
-        navigate('/payment');
+        if (!subscription || subscription.status !== 'active') {
+          navigate('/payment');
+        } else {
+          navigate('/dashboard');
+        }
       }
     };
 
@@ -95,6 +95,7 @@ const Auth = () => {
             return;
           }
 
+          setShowConfetti(true);
           toast({
             title: "Welcome back!",
             description: "Successfully logged in",
@@ -103,13 +104,30 @@ const Auth = () => {
           navigate("/dashboard");
         }
       } else {
-        // Sign up is not allowed directly - redirect to payment
-        toast({
-          title: "Payment Required",
-          description: "Please subscribe to create an account",
-          duration: 3000,
+        // Allow sign up directly
+        const { error: signUpError, data } = await supabase.auth.signUp({
+          email,
+          password,
         });
-        navigate("/payment");
+
+        if (signUpError) {
+          toast({
+            title: "Sign Up Error",
+            description: signUpError.message,
+            variant: "destructive",
+          });
+          setLoading(false);
+          return;
+        }
+
+        if (data.user) {
+          toast({
+            title: "Account Created",
+            description: "Please proceed to subscribe",
+            duration: 3000,
+          });
+          navigate("/payment");
+        }
       }
     } catch (error: any) {
       toast({
