@@ -6,7 +6,7 @@ export const checkSubscriptionStatus = async (userId: string) => {
     .from('subscriptions')
     .select('*')
     .eq('user_id', userId)
-    .single();
+    .maybeSingle();
 
   if (error) {
     console.error('Error checking subscription:', error);

@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -20,7 +21,7 @@ export const HeroSection = ({ onStartTrial }: HeroSectionProps) => {
         .from('subscriptions')
         .select('*')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.error('Error checking subscription:', error);
