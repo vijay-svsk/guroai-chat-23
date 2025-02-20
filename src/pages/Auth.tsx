@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,6 +17,29 @@ const Auth = () => {
   const [showConfetti, setShowConfetti] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        navigate('/payment');
+        return;
+      }
+
+      // Check if user has an active subscription
+      const { data: subscription } = await supabase
+        .from('subscriptions')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+
+      if (!subscription || subscription.status !== 'active') {
+        navigate('/payment');
+      }
+    };
+
+    checkAuth();
+  }, [navigate]);
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -81,47 +103,13 @@ const Auth = () => {
           navigate("/dashboard");
         }
       } else {
-        // Sign up flow
-        const { error, data } = await supabase.auth.signUp({
-          email,
-          password,
+        // Sign up is not allowed directly - redirect to payment
+        toast({
+          title: "Payment Required",
+          description: "Please subscribe to create an account",
+          duration: 3000,
         });
-
-        if (error) {
-          toast({
-            title: "Sign Up Error",
-            description: error.message,
-            variant: "destructive",
-          });
-          setLoading(false);
-          return;
-        }
-
-        // If signup is successful, create subscription record and redirect to payment
-        if (data.user) {
-          const { error: subError } = await supabase
-            .from('subscriptions')
-            .insert([
-              {
-                user_id: data.user.id,
-                status: 'expired',
-                start_date: new Date().toISOString(),
-                end_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-              }
-            ]);
-
-          if (subError) {
-            console.error('Error creating subscription:', subError);
-          }
-
-          setShowConfetti(true);
-          toast({
-            title: "Welcome to GuroAI!",
-            description: "Please complete your subscription to continue.",
-            duration: 3000,
-          });
-          navigate("/payment");
-        }
+        navigate("/payment");
       }
     } catch (error: any) {
       toast({
