@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -23,18 +22,7 @@ const Auth = () => {
     const checkAuth = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
-        // Only check subscription after user is authenticated
-        const { data: subscription } = await supabase
-          .from('subscriptions')
-          .select('*')
-          .eq('user_id', user.id)
-          .single();
-
-        if (!subscription || subscription.status !== 'active') {
-          navigate('/payment');
-        } else {
-          navigate('/dashboard');
-        }
+        navigate('/dashboard');
       }
     };
 
@@ -72,29 +60,7 @@ const Auth = () => {
           return;
         }
 
-        // If login is successful, check subscription status
         if (data.user) {
-          const { data: subscription, error: subError } = await supabase
-            .from('subscriptions')
-            .select('*')
-            .eq('user_id', data.user.id)
-            .single();
-
-          if (subError) {
-            console.error('Error checking subscription:', subError);
-          }
-
-          // If no active subscription, redirect to payment
-          if (!subscription || subscription.status !== 'active' || new Date(subscription.end_date) <= new Date()) {
-            toast({
-              title: "Subscription Required",
-              description: "Please subscribe to access GuroAI",
-              duration: 3000,
-            });
-            navigate("/payment");
-            return;
-          }
-
           setShowConfetti(true);
           toast({
             title: "Welcome back!",
@@ -123,10 +89,10 @@ const Auth = () => {
         if (data.user) {
           toast({
             title: "Account Created",
-            description: "Please proceed to subscribe",
+            description: "Welcome to GuroAI",
             duration: 3000,
           });
-          navigate("/payment");
+          navigate("/dashboard");
         }
       }
     } catch (error: any) {
