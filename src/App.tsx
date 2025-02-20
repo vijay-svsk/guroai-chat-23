@@ -12,6 +12,7 @@ import FourAsAI from "./pages/FourAsAI";
 import Auth from "./pages/Auth";
 import SignUpNewAccount from "./pages/SignUpNewAccount";
 import MyAccount from "./pages/MyAccount";
+import DeviceRestricted from "./pages/DeviceRestricted";
 import { Toaster } from "@/components/ui/toaster";
 
 function App() {
@@ -29,6 +30,7 @@ function App() {
           <Route path="/auth" element={<Auth />} />
           <Route path="/signup-new-account" element={<SignUpNewAccount />} />
           <Route path="/my-account" element={<MyAccount />} />
+          <Route path="/device-restricted" element={<DeviceRestricted />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         <Toaster />

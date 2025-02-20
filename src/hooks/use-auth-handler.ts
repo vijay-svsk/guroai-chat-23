@@ -29,6 +29,38 @@ export const useAuthHandler = () => {
     return subscription?.status === 'active';
   };
 
+  const getDeviceId = () => {
+    // Get or create a unique device identifier
+    let deviceId = localStorage.getItem('device_id');
+    if (!deviceId) {
+      deviceId = crypto.randomUUID();
+      localStorage.setItem('device_id', deviceId);
+    }
+    return deviceId;
+  };
+
+  const checkDeviceAuthorization = async (userId: string) => {
+    const currentDeviceId = getDeviceId();
+    const { data, error } = await supabase
+      .from('user_devices')
+      .select('device_id')
+      .eq('user_id', userId)
+      .single();
+
+    if (error) {
+      // If no device record exists, create one
+      if (error.code === 'PGRST116') {
+        await supabase
+          .from('user_devices')
+          .insert({ user_id: userId, device_id: currentDeviceId });
+        return true;
+      }
+      throw error;
+    }
+
+    return data.device_id === currentDeviceId;
+  };
+
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -63,6 +95,13 @@ export const useAuthHandler = () => {
 
         if (data.user) {
           try {
+            // Check device authorization
+            const isDeviceAuthorized = await checkDeviceAuthorization(data.user.id);
+            if (!isDeviceAuthorized) {
+              navigate('/device-restricted');
+              return;
+            }
+
             const hasActiveSubscription = await checkSubscriptionStatus(data.user.id);
 
             if (hasActiveSubscription) {
@@ -113,13 +152,21 @@ export const useAuthHandler = () => {
             .from('subscriptions')
             .insert({
               user_id: data.user.id,
-              status: 'expired', // Using 'expired' instead of 'pending' to match the allowed types
+              status: 'expired',
               start_date: new Date().toISOString(),
             });
 
           if (subscriptionError) {
             console.error('Error creating subscription record:', subscriptionError);
           }
+
+          // Register the device
+          await supabase
+            .from('user_devices')
+            .insert({
+              user_id: data.user.id,
+              device_id: getDeviceId(),
+            });
 
           setShowConfetti(true);
           toast({
