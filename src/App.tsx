@@ -13,6 +13,7 @@ import Auth from "./pages/Auth";
 import SignUpNewAccount from "./pages/SignUpNewAccount";
 import MyAccount from "./pages/MyAccount";
 import DeviceRestricted from "./pages/DeviceRestricted";
+import NewUserAccountLogin from "./pages/NewUserAccountLogin";
 import { Toaster } from "@/components/ui/toaster";
 
 function App() {
@@ -31,6 +32,7 @@ function App() {
           <Route path="/signup-new-account" element={<SignUpNewAccount />} />
           <Route path="/my-account" element={<MyAccount />} />
           <Route path="/device-restricted" element={<DeviceRestricted />} />
+          <Route path="/newuseraccountlogin" element={<NewUserAccountLogin />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         <Toaster />
