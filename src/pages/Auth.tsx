@@ -1,23 +1,29 @@
 
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
 import ReactConfetti from "react-confetti";
-import { Lock, Mail } from "lucide-react";
+import { AuthForm } from "@/components/auth/AuthForm";
+import { AuthHeader } from "@/components/auth/AuthHeader";
+import { useAuthHandler } from "@/hooks/use-auth-handler";
 
 const Auth = () => {
-  const [isLogin, setIsLogin] = useState(true);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [showConfetti, setShowConfetti] = useState(false);
   const navigate = useNavigate();
-  const { toast } = useToast();
+  const {
+    isLogin,
+    email,
+    password,
+    confirmPassword,
+    loading,
+    showConfetti,
+    setIsLogin,
+    setEmail,
+    setPassword,
+    setConfirmPassword,
+    setShowConfetti,
+    handleAuth,
+  } = useAuthHandler();
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -26,7 +32,6 @@ const Auth = () => {
         return;
       }
 
-      // Check if user has an active subscription
       const { data: subscription } = await supabase
         .from('subscriptions')
         .select('*')
@@ -43,106 +48,6 @@ const Auth = () => {
     checkAuth();
   }, [navigate]);
 
-  const handleAuth = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-
-    try {
-      if (!isLogin && password !== confirmPassword) {
-        toast({
-          title: "Error",
-          description: "Passwords do not match",
-          variant: "destructive",
-        });
-        setLoading(false);
-        return;
-      }
-
-      if (isLogin) {
-        const { error, data } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-
-        if (error) {
-          toast({
-            title: "Login Error",
-            description: error.message,
-            variant: "destructive",
-          });
-          setLoading(false);
-          return;
-        }
-
-        // If login is successful, check subscription status
-        if (data.user) {
-          const { data: subscription, error: subError } = await supabase
-            .from('subscriptions')
-            .select('*')
-            .eq('user_id', data.user.id)
-            .single();
-
-          if (subError) {
-            console.error('Error checking subscription:', subError);
-          }
-
-          // If no active subscription, redirect to payment
-          if (!subscription || subscription.status !== 'active' || new Date(subscription.end_date) <= new Date()) {
-            toast({
-              title: "Subscription Required",
-              description: "Please subscribe to access GuroAI",
-              duration: 3000,
-            });
-            navigate("/payment");
-            return;
-          }
-
-          setShowConfetti(true);
-          toast({
-            title: "Welcome back!",
-            description: "Successfully logged in",
-            duration: 3000,
-          });
-          navigate("/dashboard");
-        }
-      } else {
-        // Sign up flow
-        const { error: signUpError, data } = await supabase.auth.signUp({
-          email,
-          password,
-        });
-
-        if (signUpError) {
-          toast({
-            title: "Sign Up Error",
-            description: signUpError.message,
-            variant: "destructive",
-          });
-          setLoading(false);
-          return;
-        }
-
-        if (data.user) {
-          setShowConfetti(true);
-          toast({
-            title: "Account Created",
-            description: "Welcome to GuroAI!",
-            duration: 3000,
-          });
-          navigate("/dashboard");
-        }
-      }
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       {showConfetti && (
@@ -153,91 +58,25 @@ const Auth = () => {
         />
       )}
       <div className="max-w-md w-full space-y-8">
-        <div className="text-center">
-          <img
-            src="/lovable-uploads/24e7e402-845e-4126-b717-af2167b4ef23.png"
-            alt="GuroAI Logo"
-            className="mx-auto h-16 w-16 rounded-md"
-          />
-          <h2 className="mt-6 text-3xl font-bold text-gray-900">
-            Welcome to GuroAI
-          </h2>
-          <p className="mt-2 text-sm text-gray-600">
-            With GuroAI, teaching becomes stress-free—crafting lesson plans with ease, so you can focus on inspiring minds.
-          </p>
-        </div>
+        <AuthHeader />
 
         <Card>
           <CardHeader>
             <CardTitle>{isLogin ? "Sign In" : "Sign Up"}</CardTitle>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleAuth} className="space-y-6">
-              <div>
-                <div className="flex items-center space-x-2">
-                  <Mail className="w-5 h-5 text-gray-500" />
-                  <Input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Email address"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div>
-                <div className="flex items-center space-x-2">
-                  <Lock className="w-5 h-5 text-gray-500" />
-                  <Input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Password"
-                    required
-                  />
-                </div>
-              </div>
-
-              {!isLogin && (
-                <div>
-                  <div className="flex items-center space-x-2">
-                    <Lock className="w-5 h-5 text-gray-500" />
-                    <Input
-                      type="password"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      placeholder="Confirm password"
-                      required
-                    />
-                  </div>
-                </div>
-              )}
-
-              <Button
-                type="submit"
-                className="w-full bg-guro-blue hover:bg-guro-blue/90"
-                disabled={loading}
-              >
-                {loading
-                  ? "Loading..."
-                  : isLogin
-                  ? "Sign In"
-                  : "Create Account"}
-              </Button>
-            </form>
-
-            <div className="mt-4 text-center">
-              <button
-                type="button"
-                onClick={() => setIsLogin(!isLogin)}
-                className="text-sm text-guro-blue hover:underline"
-              >
-                {isLogin
-                  ? "Don't have an account? Sign up"
-                  : "Already have an account? Sign in"}
-              </button>
-            </div>
+            <AuthForm
+              isLogin={isLogin}
+              email={email}
+              password={password}
+              confirmPassword={confirmPassword}
+              loading={loading}
+              onEmailChange={(e) => setEmail(e.target.value)}
+              onPasswordChange={(e) => setPassword(e.target.value)}
+              onConfirmPasswordChange={(e) => setConfirmPassword(e.target.value)}
+              onSubmit={handleAuth}
+              onToggleMode={() => setIsLogin(!isLogin)}
+            />
           </CardContent>
         </Card>
       </div>
