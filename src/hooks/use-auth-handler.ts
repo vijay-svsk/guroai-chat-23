@@ -14,6 +14,21 @@ export const useAuthHandler = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  const checkSubscriptionStatus = async (userId: string) => {
+    const { data: subscription, error } = await supabase
+      .from('subscriptions')
+      .select('*')
+      .eq('user_id', userId)
+      .single();
+
+    if (error) {
+      console.error('Error checking subscription:', error);
+      throw new Error('Unable to verify subscription status');
+    }
+
+    return subscription?.status === 'active';
+  };
+
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -47,39 +62,32 @@ export const useAuthHandler = () => {
         }
 
         if (data.user) {
-          // Check if user has an active subscription
-          const { data: subscription, error: subError } = await supabase
-            .from('subscriptions')
-            .select('*')
-            .eq('user_id', data.user.id)
-            .single();
+          try {
+            const hasActiveSubscription = await checkSubscriptionStatus(data.user.id);
 
-          if (subError) {
-            console.error('Error checking subscription:', subError);
+            if (hasActiveSubscription) {
+              setShowConfetti(true);
+              toast({
+                title: "Welcome back!",
+                description: "Successfully logged in",
+                duration: 3000,
+              });
+              navigate("/dashboard");
+            } else {
+              toast({
+                title: "Subscription Required",
+                description: "Please complete your subscription to access the dashboard",
+                duration: 5000,
+              });
+              navigate("/payment");
+            }
+          } catch (error) {
             toast({
               title: "Error",
               description: "Unable to verify subscription status",
               variant: "destructive",
             });
             setLoading(false);
-            return;
-          }
-
-          if (subscription?.status === 'active') {
-            setShowConfetti(true);
-            toast({
-              title: "Welcome back!",
-              description: "Successfully logged in",
-              duration: 3000,
-            });
-            navigate("/dashboard");
-          } else {
-            toast({
-              title: "Subscription Required",
-              description: "Please complete your subscription to access the dashboard",
-              duration: 5000,
-            });
-            navigate("/payment");
           }
         }
       } else {
@@ -99,14 +107,29 @@ export const useAuthHandler = () => {
           return;
         }
 
+        // Create an initial subscription record with 'pending' status
         if (data.user) {
+          const { error: subscriptionError } = await supabase
+            .from('subscriptions')
+            .insert([
+              {
+                user_id: data.user.id,
+                status: 'pending',
+                start_date: new Date().toISOString(),
+              }
+            ]);
+
+          if (subscriptionError) {
+            console.error('Error creating subscription record:', subscriptionError);
+          }
+
           setShowConfetti(true);
           toast({
             title: "Account Created",
             description: "Please complete your subscription to access GuroAI!",
             duration: 3000,
           });
-          // Redirect new users to payment page
+          // Always redirect new users to payment page
           navigate("/payment");
         }
       }
