@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -22,7 +23,6 @@ const Auth = () => {
     const checkAuth = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        navigate('/payment');
         return;
       }
 
@@ -35,6 +35,8 @@ const Auth = () => {
 
       if (!subscription || subscription.status !== 'active') {
         navigate('/payment');
+      } else {
+        navigate('/dashboard');
       }
     };
 
@@ -95,6 +97,7 @@ const Auth = () => {
             return;
           }
 
+          setShowConfetti(true);
           toast({
             title: "Welcome back!",
             description: "Successfully logged in",
@@ -103,13 +106,31 @@ const Auth = () => {
           navigate("/dashboard");
         }
       } else {
-        // Sign up is not allowed directly - redirect to payment
-        toast({
-          title: "Payment Required",
-          description: "Please subscribe to create an account",
-          duration: 3000,
+        // Sign up flow
+        const { error: signUpError, data } = await supabase.auth.signUp({
+          email,
+          password,
         });
-        navigate("/payment");
+
+        if (signUpError) {
+          toast({
+            title: "Sign Up Error",
+            description: signUpError.message,
+            variant: "destructive",
+          });
+          setLoading(false);
+          return;
+        }
+
+        if (data.user) {
+          setShowConfetti(true);
+          toast({
+            title: "Account Created",
+            description: "Welcome to GuroAI!",
+            duration: 3000,
+          });
+          navigate("/dashboard");
+        }
       }
     } catch (error: any) {
       toast({
