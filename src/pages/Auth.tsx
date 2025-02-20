@@ -21,8 +21,20 @@ const Auth = () => {
   useEffect(() => {
     const checkAuth = async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        navigate('/dashboard');
+      if (!user) {
+        navigate('/payment');
+        return;
+      }
+
+      // Check if user has an active subscription
+      const { data: subscription } = await supabase
+        .from('subscriptions')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+
+      if (!subscription || subscription.status !== 'active') {
+        navigate('/payment');
       }
     };
 
@@ -60,8 +72,29 @@ const Auth = () => {
           return;
         }
 
+        // If login is successful, check subscription status
         if (data.user) {
-          setShowConfetti(true);
+          const { data: subscription, error: subError } = await supabase
+            .from('subscriptions')
+            .select('*')
+            .eq('user_id', data.user.id)
+            .single();
+
+          if (subError) {
+            console.error('Error checking subscription:', subError);
+          }
+
+          // If no active subscription, redirect to payment
+          if (!subscription || subscription.status !== 'active' || new Date(subscription.end_date) <= new Date()) {
+            toast({
+              title: "Subscription Required",
+              description: "Please subscribe to access GuroAI",
+              duration: 3000,
+            });
+            navigate("/payment");
+            return;
+          }
+
           toast({
             title: "Welcome back!",
             description: "Successfully logged in",
@@ -70,30 +103,13 @@ const Auth = () => {
           navigate("/dashboard");
         }
       } else {
-        // Allow sign up directly
-        const { error: signUpError, data } = await supabase.auth.signUp({
-          email,
-          password,
+        // Sign up is not allowed directly - redirect to payment
+        toast({
+          title: "Payment Required",
+          description: "Please subscribe to create an account",
+          duration: 3000,
         });
-
-        if (signUpError) {
-          toast({
-            title: "Sign Up Error",
-            description: signUpError.message,
-            variant: "destructive",
-          });
-          setLoading(false);
-          return;
-        }
-
-        if (data.user) {
-          toast({
-            title: "Account Created",
-            description: "Welcome to GuroAI",
-            duration: 3000,
-          });
-          navigate("/dashboard");
-        }
+        navigate("/payment");
       }
     } catch (error: any) {
       toast({

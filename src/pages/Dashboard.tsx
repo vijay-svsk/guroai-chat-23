@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -29,10 +28,10 @@ const Dashboard = () => {
       if (!user) {
         toast({
           title: "Authentication Required",
-          description: "Please sign in to access GuroAI",
+          description: "Please subscribe to access GuroAI",
           duration: 3000,
         });
-        navigate('/auth');
+        navigate('/payment');
         return;
       }
 
@@ -45,12 +44,7 @@ const Dashboard = () => {
         .eq('user_id', user.id)
         .single();
 
-      if (error || !subscription || subscription.status !== 'active') {
-        toast({
-          title: "Subscription Required",
-          description: "Please subscribe to continue using GuroAI",
-          duration: 3000,
-        });
+      if (error || !subscription) {
         navigate('/payment');
         return;
       }
@@ -59,7 +53,10 @@ const Dashboard = () => {
       const trialEnd = subscription.trial_end ? new Date(subscription.trial_end) : null;
       const endDate = new Date(subscription.end_date);
 
-      if (trialEnd && now > trialEnd && now > endDate) {
+      if (
+        subscription.status !== 'active' || 
+        (trialEnd && now > trialEnd && now > endDate)
+      ) {
         toast({
           title: "Subscription Required",
           description: "Your subscription has expired. Please renew to continue using GuroAI.",
@@ -226,5 +223,4 @@ const Dashboard = () => {
       </main>
     </div>;
 };
-
 export default Dashboard;
