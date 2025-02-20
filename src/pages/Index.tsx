@@ -17,30 +17,36 @@ const Index = () => {
 
   useEffect(() => {
     const checkAuthAndSubscription = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (user) {
-        // Check if user has an active subscription
-        const { data: subscription, error } = await supabase
-          .from('subscriptions')
-          .select('*')
-          .eq('user_id', user.id)
-          .single();
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        if (user) {
+          // Check if user has an active subscription
+          const { data: subscription, error } = await supabase
+            .from('subscriptions')
+            .select('*')
+            .eq('user_id', user.id)
+            .single();
 
-        if (error) {
-          console.error('Error checking subscription:', error);
-          return;
+          if (error) {
+            console.error('Error checking subscription:', error);
+            setShowContent(true);
+            return;
+          }
+
+          if (subscription?.status === 'active') {
+            // User is authenticated and has active subscription - redirect to dashboard
+            navigate('/dashboard');
+            return;
+          }
         }
 
-        if (subscription?.status === 'active') {
-          // User is authenticated and has active subscription - redirect to dashboard
-          navigate('/dashboard');
-          return;
-        }
+        // Show content for new users or users without active subscription
+        setTimeout(() => setShowContent(true), 500); // Reduced timeout to 500ms
+      } catch (error) {
+        console.error('Error in auth check:', error);
+        setShowContent(true);
       }
-
-      // Show content for new users or users without active subscription
-      setShowContent(true);
     };
 
     checkAuthAndSubscription();
@@ -54,7 +60,7 @@ const Index = () => {
     <div className="min-h-screen bg-white">
       <LogoAnimation showContent={showContent} />
 
-      <div className={`transition-opacity duration-1000 ${showContent ? 'opacity-100' : 'opacity-0'}`}>
+      <div className={`transition-opacity duration-500 ${showContent ? 'opacity-100' : 'opacity-0'}`}>
         <HeroSection onStartTrial={handleStartTrial} />
         <FeaturesSection />
         <PricingSection onStartTrial={handleStartTrial} />
