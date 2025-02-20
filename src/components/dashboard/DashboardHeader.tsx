@@ -17,7 +17,7 @@ export const DashboardHeader = ({ email, onMyAccount }: DashboardHeaderProps) =>
   const handleLogout = async () => {
     try {
       await supabase.auth.signOut();
-      navigate('/index');
+      navigate('/'); // Changed from '/index' to '/'
       toast({
         title: "Logged out successfully",
         description: "See you next time!",
