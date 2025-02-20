@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Mail, Lock } from "lucide-react";
+import { Mail, Lock, ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -28,33 +28,17 @@ const NewUserAccountLogin = () => {
       if (error) throw error;
 
       if (user) {
-        // Check if user has an active subscription
-        const { data: subscription, error: subscriptionError } = await supabase
-          .from('subscriptions')
-          .select('*')
-          .eq('user_id', user.id)
-          .maybeSingle();
-
-        if (subscriptionError) {
-          console.error('Error checking subscription:', subscriptionError);
-          throw subscriptionError;
-        }
-
-        if (subscription?.status === 'active') {
-          toast({
-            title: "Welcome back!",
-            description: "Successfully logged in",
-            duration: 3000,
-          });
-          navigate("/dashboard");
-        } else {
-          navigate("/dashboard");
-        }
+        toast({
+          title: "Welcome back!",
+          description: "Successfully logged in",
+          duration: 3000,
+        });
+        navigate("/dashboard");
       }
     } catch (error: any) {
       toast({
         title: "Error",
-        description: error.message,
+        description: error.message || "Invalid login credentials",
         variant: "destructive",
       });
     } finally {
@@ -63,7 +47,18 @@ const NewUserAccountLogin = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="absolute top-4 left-4">
+        <Button
+          variant="outline"
+          onClick={() => navigate('/')}
+          className="flex items-center gap-2"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back to Homepage
+        </Button>
+      </div>
+      
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
           <h2 className="text-3xl font-bold text-guro-blue">Welcome Back!</h2>
