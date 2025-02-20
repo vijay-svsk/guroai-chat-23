@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Lock, Mail } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface AuthFormProps {
   isLogin: boolean;
@@ -28,6 +29,16 @@ export const AuthForm = ({
   onSubmit,
   onToggleMode,
 }: AuthFormProps) => {
+  const navigate = useNavigate();
+
+  const handleToggle = () => {
+    if (isLogin) {
+      navigate('/signup-new-account');
+    } else {
+      onToggleMode();
+    }
+  };
+
   return (
     <form onSubmit={onSubmit} className="space-y-6">
       <div>
@@ -82,7 +93,7 @@ export const AuthForm = ({
       <div className="mt-4 text-center">
         <button
           type="button"
-          onClick={onToggleMode}
+          onClick={handleToggle}
           className="text-sm text-guro-blue hover:underline"
         >
           {isLogin
