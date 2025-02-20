@@ -7,18 +7,44 @@ import { FeaturesSection } from "@/components/home/FeaturesSection";
 import { PricingSection } from "@/components/home/PricingSection";
 import { TestimonialsSection } from "@/components/home/TestimonialsSection";
 import { ReviewsSection } from "@/components/home/ReviewsSection";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const Index = () => {
   const [showContent, setShowContent] = useState(false);
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowContent(true);
-    }, 5000); // Changed from 3000 back to 5000 milliseconds
+    const checkAuthAndSubscription = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (user) {
+        // Check if user has an active subscription
+        const { data: subscription, error } = await supabase
+          .from('subscriptions')
+          .select('*')
+          .eq('user_id', user.id)
+          .single();
 
-    return () => clearTimeout(timer);
-  }, []);
+        if (error) {
+          console.error('Error checking subscription:', error);
+          return;
+        }
+
+        if (subscription?.status === 'active') {
+          // User is authenticated and has active subscription - redirect to dashboard
+          navigate('/dashboard');
+          return;
+        }
+      }
+
+      // Show content for new users or users without active subscription
+      setShowContent(true);
+    };
+
+    checkAuthAndSubscription();
+  }, [navigate]);
 
   const handleStartTrial = () => {
     navigate("/payment");
