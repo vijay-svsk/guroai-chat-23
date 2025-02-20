@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { loginUser, signUpUser } from "@/services/auth-service";
-import { checkSubscriptionStatus, createInitialSubscription } from "@/services/subscription-service";
+import { createInitialSubscription } from "@/services/subscription-service";
 import { checkDeviceAuthorization } from "@/utils/device-utils";
 
 export const useAuthHandler = () => {
@@ -40,37 +40,27 @@ export const useAuthHandler = () => {
             return;
           }
 
-          const hasActiveSubscription = await checkSubscriptionStatus(user.id);
-
-          if (hasActiveSubscription) {
-            setShowConfetti(true);
-            toast({
-              title: "Welcome back!",
-              description: "Successfully logged in",
-              duration: 3000,
-            });
-            navigate("/dashboard");
-          } else {
-            toast({
-              title: "Subscription Required",
-              description: "Please complete your subscription to access the dashboard",
-              duration: 5000,
-            });
-            navigate("/payment");
-          }
+          setShowConfetti(true);
+          toast({
+            title: "Welcome back!",
+            description: "Successfully logged in",
+            duration: 3000,
+          });
+          navigate("/dashboard");
         }
       } else {
-        // For signup, redirect to login page after successful registration
+        // For signup, create subscription and redirect to dashboard
         const { user } = await signUpUser(email, password);
 
         if (user) {
           await createInitialSubscription(user.id);
+          setShowConfetti(true);
           toast({
-            title: "Account Created",
-            description: "Please sign in with your new account",
+            title: "Welcome to GuroAI!",
+            description: "Your account has been created successfully.",
             duration: 3000,
           });
-          navigate("/newuseraccountlogin");
+          navigate("/dashboard");
         }
       }
     } catch (error: any) {

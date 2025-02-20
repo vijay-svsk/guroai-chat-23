@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
@@ -39,26 +38,18 @@ const Dashboard = () => {
 
       setEmail(user.email || "");
 
-      // Check subscription status
+      // Check subscription status but only show warning
       try {
         const hasActiveSubscription = await checkSubscriptionStatus(user.id);
         if (!hasActiveSubscription) {
           toast({
-            title: "Subscription Expired",
-            description: "Your monthly subscription has expired. Please renew to continue using GuroAI.",
+            title: "Subscription Notice",
+            description: "Your subscription has expired. Some features may be limited.",
             duration: 5000,
           });
-          navigate('/payment');
-          return;
         }
       } catch (error) {
         console.error('Error checking subscription:', error);
-        toast({
-          title: "Error",
-          description: "Unable to verify subscription status",
-          variant: "destructive",
-        });
-        navigate('/auth');
       }
     };
 
