@@ -10,6 +10,7 @@ import NotFound from "./pages/NotFound";
 import LessonPlanAI from "./pages/LessonPlanAI";
 import FourAsAI from "./pages/FourAsAI";
 import Auth from "./pages/Auth";
+import SignUpNewAccount from "./pages/SignUpNewAccount";
 import MyAccount from "./pages/MyAccount";
 import { Toaster } from "@/components/ui/toaster";
 
@@ -26,6 +27,7 @@ function App() {
           <Route path="/lesson-plan-ai" element={<LessonPlanAI />} />
           <Route path="/four-as-ai" element={<FourAsAI />} />
           <Route path="/auth" element={<Auth />} />
+          <Route path="/signup-new-account" element={<SignUpNewAccount />} />
           <Route path="/my-account" element={<MyAccount />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

@@ -1,41 +1,23 @@
 
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { supabase } from "@/integrations/supabase/client";
-import ReactConfetti from "react-confetti";
 import { AuthForm } from "@/components/auth/AuthForm";
 import { AuthHeader } from "@/components/auth/AuthHeader";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuthHandler } from "@/hooks/use-auth-handler";
-import { Button } from "@/components/ui/button";
+import ReactConfetti from "react-confetti";
 
-const Auth = () => {
-  const navigate = useNavigate();
+const SignUpNewAccount = () => {
   const {
-    isLogin,
     email,
     password,
     confirmPassword,
     loading,
     showConfetti,
-    setIsLogin,
     setEmail,
     setPassword,
     setConfirmPassword,
     setShowConfetti,
     handleAuth,
   } = useAuthHandler();
-
-  useEffect(() => {
-    const checkAuth = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        navigate('/dashboard');
-      }
-    };
-
-    checkAuth();
-  }, [navigate]);
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -51,11 +33,11 @@ const Auth = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle>{isLogin ? "Sign In" : "Sign Up"}</CardTitle>
+            <CardTitle>Create New Account</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent>
             <AuthForm
-              isLogin={isLogin}
+              isLogin={false}
               email={email}
               password={password}
               confirmPassword={confirmPassword}
@@ -64,18 +46,8 @@ const Auth = () => {
               onPasswordChange={(e) => setPassword(e.target.value)}
               onConfirmPasswordChange={(e) => setConfirmPassword(e.target.value)}
               onSubmit={handleAuth}
-              onToggleMode={() => setIsLogin(!isLogin)}
+              onToggleMode={() => {}}
             />
-            
-            <div className="text-center">
-              <Button
-                variant="secondary"
-                className="w-full bg-[#94DEA5] hover:bg-[#94DEA5]/90 text-white"
-                onClick={() => navigate('/signup-new-account')}
-              >
-                Don't have an account? Sign up
-              </Button>
-            </div>
           </CardContent>
         </Card>
       </div>
@@ -83,4 +55,4 @@ const Auth = () => {
   );
 };
 
-export default Auth;
+export default SignUpNewAccount;
