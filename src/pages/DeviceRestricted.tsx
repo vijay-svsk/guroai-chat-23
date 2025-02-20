@@ -21,10 +21,10 @@ const DeviceRestricted = () => {
         <CardContent className="space-y-6">
           <div className="text-center space-y-4">
             <p className="text-gray-600">
-              For security reasons, your GuroAI account can only be accessed from one device.
+              For security reasons, your GuroAI account can only be accessed from up to three devices.
             </p>
             <p className="text-gray-600">
-              You are currently trying to access your account from a different device than the one originally registered.
+              You are currently trying to access your account from a new device, but you have already reached the maximum number of allowed devices.
             </p>
           </div>
           
@@ -32,9 +32,9 @@ const DeviceRestricted = () => {
             <div className="bg-gray-50 p-4 rounded-lg">
               <h3 className="font-semibold text-gray-700 mb-2">What does this mean?</h3>
               <ul className="text-sm text-gray-600 space-y-2">
-                <li>• Each GuroAI account is limited to one device</li>
+                <li>• Each GuroAI account is limited to three devices</li>
                 <li>• This helps protect your account and data</li>
-                <li>• You'll need to use your registered device to access your account</li>
+                <li>• You'll need to use one of your registered devices to access your account</li>
               </ul>
             </div>
             

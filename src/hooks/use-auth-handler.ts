@@ -41,24 +41,37 @@ export const useAuthHandler = () => {
 
   const checkDeviceAuthorization = async (userId: string) => {
     const currentDeviceId = getDeviceId();
-    const { data, error } = await supabase
+    
+    // Check if this device is already registered
+    const { data: existingDevice } = await supabase
       .from('user_devices')
       .select('device_id')
       .eq('user_id', userId)
+      .eq('device_id', currentDeviceId)
       .single();
 
-    if (error) {
-      // If no device record exists, create one
-      if (error.code === 'PGRST116') {
-        await supabase
-          .from('user_devices')
-          .insert({ user_id: userId, device_id: currentDeviceId });
-        return true;
-      }
-      throw error;
+    if (existingDevice) {
+      return true;
     }
 
-    return data.device_id === currentDeviceId;
+    // Count existing devices
+    const { data: devices } = await supabase
+      .from('user_devices')
+      .select('device_id')
+      .eq('user_id', userId);
+
+    // If user has less than 3 devices, register this one
+    if (devices && devices.length < 3) {
+      await supabase
+        .from('user_devices')
+        .insert({
+          user_id: userId,
+          device_id: currentDeviceId
+        });
+      return true;
+    }
+
+    return false;
   };
 
   const handleAuth = async (e: React.FormEvent) => {
