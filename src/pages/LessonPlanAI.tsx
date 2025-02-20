@@ -23,6 +23,69 @@ const LessonPlanAI = () => {
   const formData = location.state as FormData;
   const { toast } = useToast();
 
+  useEffect(() => {
+    const checkAuthAndSubscription = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast({
+          title: "Authentication Required",
+          description: "Please subscribe to access GuroAI",
+          duration: 3000,
+        });
+        navigate('/payment');
+        return;
+      }
+
+      // Check subscription status
+      const { data: subscription, error } = await supabase
+        .from('subscriptions')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+
+      if (error || !subscription) {
+        toast({
+          title: "Subscription Required",
+          description: "Please subscribe to access GuroAI",
+          duration: 3000,
+        });
+        navigate('/payment');
+        return;
+      }
+
+      const now = new Date();
+      const trialEnd = subscription.trial_end ? new Date(subscription.trial_end) : null;
+      const endDate = new Date(subscription.end_date);
+
+      if (
+        subscription.status !== 'active' || 
+        (trialEnd && now > trialEnd && now > endDate)
+      ) {
+        toast({
+          title: "Subscription Required",
+          description: "Your subscription has expired. Please renew to continue using GuroAI.",
+          duration: 3000,
+        });
+        navigate('/payment');
+        return;
+      }
+
+      // Check if formData exists
+      if (!formData) {
+        toast({
+          title: "Invalid Access",
+          description: "Please start from the dashboard",
+          duration: 3000,
+        });
+        navigate('/dashboard');
+        return;
+      }
+    };
+
+    checkAuthAndSubscription();
+  }, [navigate, toast, formData]);
+
   const generatePrompt = (data: FormData) => {
     if (data.method === "4as") {
       return `Create a detailed lesson plan using the 4As method (Activity, Analysis, Abstraction, Application) for ${data.subject} at ${data.gradeLevel} level, focusing on the topic: ${data.topic}. The lesson should be conducted in ${data.language}. Please provide a comprehensive breakdown of each stage with specific activities and instructions.`;

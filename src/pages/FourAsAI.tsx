@@ -23,6 +23,69 @@ const FourAsAI = () => {
   const formData = location.state as FormData;
   const { toast } = useToast();
 
+  useEffect(() => {
+    const checkAuthAndSubscription = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast({
+          title: "Authentication Required",
+          description: "Please subscribe to access GuroAI",
+          duration: 3000,
+        });
+        navigate('/payment');
+        return;
+      }
+
+      // Check subscription status
+      const { data: subscription, error } = await supabase
+        .from('subscriptions')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+
+      if (error || !subscription) {
+        toast({
+          title: "Subscription Required",
+          description: "Please subscribe to access GuroAI",
+          duration: 3000,
+        });
+        navigate('/payment');
+        return;
+      }
+
+      const now = new Date();
+      const trialEnd = subscription.trial_end ? new Date(subscription.trial_end) : null;
+      const endDate = new Date(subscription.end_date);
+
+      if (
+        subscription.status !== 'active' || 
+        (trialEnd && now > trialEnd && now > endDate)
+      ) {
+        toast({
+          title: "Subscription Required",
+          description: "Your subscription has expired. Please renew to continue using GuroAI.",
+          duration: 3000,
+        });
+        navigate('/payment');
+        return;
+      }
+
+      // Check if formData exists
+      if (!formData) {
+        toast({
+          title: "Invalid Access",
+          description: "Please start from the dashboard",
+          duration: 3000,
+        });
+        navigate('/dashboard');
+        return;
+      }
+    };
+
+    checkAuthAndSubscription();
+  }, [navigate, toast, formData]);
+
   const generatePrompt = (data: FormData) => {
     return `Create a comprehensive 12,000-word lesson plan for ${data.subject} at ${data.gradeLevel} level, focusing on the topic: ${data.topic}. The lesson should be conducted in ${data.language}. Please follow this exact structure:
 
@@ -181,14 +244,14 @@ Please provide a detailed response following this structure exactly, emphasizing
         body: { content: response }
       });
 
-      if (error) throw error;
-
       const element = document.createElement("a");
       element.href = `data:application/vnd.openxmlformats-officedocument.wordprocessingml.document;base64,${data.docxBase64}`;
       element.download = `4as_lesson_plan_${formData.subject.toLowerCase()}.docx`;
       document.body.appendChild(element);
       element.click();
       document.body.removeChild(element);
+
+      if (error) throw error;
 
       toast({
         title: "Downloaded!",
@@ -260,6 +323,30 @@ Please provide a detailed response following this structure exactly, emphasizing
                     </Button>
                     <Button variant="outline" size="icon" onClick={toggleEdit} disabled={isLoading} className="h-10 w-10">
                       <Edit className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      onClick={handleDownload}
+                      disabled={isLoading || !response}
+                      className="w-full sm:w-auto flex items-center gap-2"
+                    >
+                      <Download className="h-4 w-4" />
+                      Download as TXT
+                    </Button>
+                    <Button
+                      onClick={handleDownloadDocx}
+                      disabled={isLoading || !response}
+                      className="w-full sm:w-auto flex items-center gap-2"
+                    >
+                      <FileText className="h-4 w-4" />
+                      Download as DOCX
+                    </Button>
+                    <Button
+                      onClick={handleSaveLessonPlan}
+                      disabled={isLoading || !response}
+                      className="w-full sm:w-auto flex items-center gap-2"
+                    >
+                      <Save className="h-4 w-4" />
+                      Save this Lesson Plan
                     </Button>
                   </>
                 )}
