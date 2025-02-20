@@ -107,17 +107,15 @@ export const useAuthHandler = () => {
           return;
         }
 
-        // Create an initial subscription record with 'pending' status
+        // Create an initial subscription record with 'expired' status
         if (data.user) {
           const { error: subscriptionError } = await supabase
             .from('subscriptions')
-            .insert([
-              {
-                user_id: data.user.id,
-                status: 'pending',
-                start_date: new Date().toISOString(),
-              }
-            ]);
+            .insert({
+              user_id: data.user.id,
+              status: 'expired', // Using 'expired' instead of 'pending' to match the allowed types
+              start_date: new Date().toISOString(),
+            });
 
           if (subscriptionError) {
             console.error('Error creating subscription record:', subscriptionError);
