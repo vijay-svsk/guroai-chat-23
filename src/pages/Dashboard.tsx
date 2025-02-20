@@ -8,6 +8,7 @@ import ReactConfetti from "react-confetti";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { TeachingPreferencesForm } from "@/components/dashboard/TeachingPreferencesForm";
 import { TeachingMethodSelection } from "@/components/dashboard/TeachingMethodSelection";
+import { checkSubscriptionStatus } from "@/services/subscription-service";
 
 const Dashboard = () => {
   const [email, setEmail] = useState("");
@@ -37,6 +38,28 @@ const Dashboard = () => {
       }
 
       setEmail(user.email || "");
+
+      // Check subscription status
+      try {
+        const hasActiveSubscription = await checkSubscriptionStatus(user.id);
+        if (!hasActiveSubscription) {
+          toast({
+            title: "Subscription Expired",
+            description: "Your monthly subscription has expired. Please renew to continue using GuroAI.",
+            duration: 5000,
+          });
+          navigate('/payment');
+          return;
+        }
+      } catch (error) {
+        console.error('Error checking subscription:', error);
+        toast({
+          title: "Error",
+          description: "Unable to verify subscription status",
+          variant: "destructive",
+        });
+        navigate('/auth');
+      }
     };
 
     checkAuth();
