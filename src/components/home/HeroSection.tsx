@@ -29,19 +29,21 @@ export const HeroSection = ({ onStartTrial }: HeroSectionProps) => {
         >
           Start Free Trial
         </Button>
-        <Button 
-          onClick={() => navigate('/learn-more')}
-          variant="outline" 
-          className="border-guro-blue text-guro-blue hover:bg-guro-blue/5 px-8 py-6 rounded-lg text-lg transition-all duration-300 hover:scale-105"
-        >
-          Learn More
-        </Button>
-        <Button 
-          onClick={() => navigate('/auth')}
-          className="bg-[#94DEA5] hover:bg-[#94DEA5]/90 text-guro-blue px-8 py-6 rounded-lg text-lg transition-all duration-300 hover:scale-105 sm:order-none order-last"
-        >
-          Account Login
-        </Button>
+        <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+          <Button 
+            onClick={() => navigate('/learn-more')}
+            variant="outline" 
+            className="border-guro-blue text-guro-blue hover:bg-guro-blue/5 px-8 py-6 rounded-lg text-lg transition-all duration-300 hover:scale-105"
+          >
+            Learn More
+          </Button>
+          <Button 
+            onClick={() => navigate('/auth')}
+            className="bg-[#94DEA5] hover:bg-[#94DEA5]/90 text-guro-blue px-8 py-6 rounded-lg text-lg transition-all duration-300 hover:scale-105"
+          >
+            Account Login
+          </Button>
+        </div>
       </div>
     </section>
   );
