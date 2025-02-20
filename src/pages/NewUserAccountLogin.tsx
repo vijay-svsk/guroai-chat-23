@@ -48,17 +48,6 @@ const NewUserAccountLogin = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="absolute top-4 left-4">
-        <Button
-          variant="outline"
-          onClick={() => navigate('/')}
-          className="flex items-center gap-2"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Back to Homepage
-        </Button>
-      </div>
-      
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
           <h2 className="text-3xl font-bold text-guro-blue">Welcome Back!</h2>
@@ -107,6 +96,15 @@ const NewUserAccountLogin = () => {
             </form>
           </CardContent>
         </Card>
+
+        <Button
+          variant="outline"
+          onClick={() => navigate('/')}
+          className="w-full flex items-center justify-center gap-2"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back to Homepage
+        </Button>
       </div>
     </div>
   );
