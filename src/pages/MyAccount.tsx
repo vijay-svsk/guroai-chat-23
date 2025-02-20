@@ -170,21 +170,9 @@ const MyAccount = () => {
               <div className="text-center py-8">Loading lesson plans...</div>
             ) : selectedPlan ? (
               <div className="space-y-6">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="text-xl font-semibold">{selectedPlan.subject}</h3>
-                    <p className="text-sm text-gray-500">Created on {formatDate(selectedPlan.created_at)}</p>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button variant="outline" onClick={handleDownload}>
-                      <Download className="w-4 h-4 mr-2" />
-                      Download TXT
-                    </Button>
-                    <Button variant="outline" onClick={handleDownloadDocx}>
-                      <FileText className="w-4 h-4 mr-2" />
-                      Download DOCX
-                    </Button>
-                  </div>
+                <div>
+                  <h3 className="text-xl font-semibold mb-1">{selectedPlan.subject}</h3>
+                  <p className="text-sm text-gray-500">{formatDate(selectedPlan.created_at)}</p>
                 </div>
                 <div className="grid gap-4 mb-6">
                   <div className="bg-white p-4 rounded-lg border">
@@ -206,6 +194,24 @@ const MyAccount = () => {
                     {selectedPlan.content}
                   </pre>
                 </div>
+                <div className="flex flex-col sm:flex-row gap-2 mt-4">
+                  <Button 
+                    variant="outline" 
+                    onClick={handleDownload}
+                    className="w-full sm:w-auto bg-[#0a1d2c] text-white hover:bg-[#0a1d2c]/90"
+                  >
+                    <Download className="w-4 h-4 mr-2" />
+                    Download TXT
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    onClick={handleDownloadDocx}
+                    className="w-full sm:w-auto bg-[#0a1d2c] text-white hover:bg-[#0a1d2c]/90"
+                  >
+                    <FileText className="w-4 h-4 mr-2" />
+                    Download DOCX
+                  </Button>
+                </div>
               </div>
             ) : lessonPlans.length === 0 ? (
               <div className="text-center py-8 text-gray-500">
@@ -216,12 +222,12 @@ const MyAccount = () => {
                 {lessonPlans.map((plan) => (
                   <Card key={plan.id} className="hover:shadow-lg transition-shadow">
                     <CardContent className="p-6">
-                      <div className="flex items-start justify-between">
+                      <div className="flex flex-col">
                         <div className="flex items-center space-x-2">
                           <FileText className="w-5 h-5 text-blue-600" />
                           <h3 className="font-semibold text-lg text-gray-900">{plan.subject}</h3>
                         </div>
-                        <span className="text-xs text-gray-500">{formatDate(plan.created_at)}</span>
+                        <span className="text-xs text-gray-500 mt-1">{formatDate(plan.created_at)}</span>
                       </div>
                       <div className="mt-4 space-y-2">
                         <p className="text-sm text-gray-600">Topic: {plan.topic}</p>
