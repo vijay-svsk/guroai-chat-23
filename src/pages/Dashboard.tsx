@@ -22,52 +22,23 @@ const Dashboard = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const checkSubscription = async () => {
+    const checkAuth = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {
         toast({
           title: "Authentication Required",
-          description: "Please subscribe to access GuroAI",
+          description: "Please log in to access GuroAI",
           duration: 3000,
         });
-        navigate('/payment');
+        navigate('/auth');
         return;
       }
 
       setEmail(user.email || "");
-
-      // Check subscription status
-      const { data: subscription, error } = await supabase
-        .from('subscriptions')
-        .select('*')
-        .eq('user_id', user.id)
-        .single();
-
-      if (error || !subscription) {
-        navigate('/payment');
-        return;
-      }
-
-      const now = new Date();
-      const trialEnd = subscription.trial_end ? new Date(subscription.trial_end) : null;
-      const endDate = new Date(subscription.end_date);
-
-      if (
-        subscription.status !== 'active' || 
-        (trialEnd && now > trialEnd && now > endDate)
-      ) {
-        toast({
-          title: "Subscription Required",
-          description: "Your subscription has expired. Please renew to continue using GuroAI.",
-          duration: 3000,
-        });
-        navigate('/payment');
-        return;
-      }
     };
 
-    checkSubscription();
+    checkAuth();
   }, [navigate, toast]);
 
   const handleMyAccount = () => {
