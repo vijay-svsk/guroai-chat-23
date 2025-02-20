@@ -7,7 +7,6 @@ import ReactConfetti from "react-confetti";
 import { AuthForm } from "@/components/auth/AuthForm";
 import { AuthHeader } from "@/components/auth/AuthHeader";
 import { useAuthHandler } from "@/hooks/use-auth-handler";
-import { Button } from "@/components/ui/button";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -53,7 +52,7 @@ const Auth = () => {
           <CardHeader>
             <CardTitle>{isLogin ? "Sign In" : "Sign Up"}</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent>
             <AuthForm
               isLogin={isLogin}
               email={email}
@@ -66,16 +65,6 @@ const Auth = () => {
               onSubmit={handleAuth}
               onToggleMode={() => setIsLogin(!isLogin)}
             />
-            
-            <div className="text-center">
-              <Button
-                variant="secondary"
-                className="w-full bg-[#94DEA5] hover:bg-[#94DEA5]/90 text-white"
-                onClick={() => navigate('/signup-new-account')}
-              >
-                Don't have an account? Sign up
-              </Button>
-            </div>
           </CardContent>
         </Card>
       </div>
