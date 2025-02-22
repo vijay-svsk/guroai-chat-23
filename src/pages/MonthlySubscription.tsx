@@ -7,8 +7,24 @@ import { Clock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
+interface TimeRemaining {
+  days: number;
+  hours: number;
+  minutes: number;
+  seconds: number;
+}
+
+const calculateTimeRemaining = (daysRemaining: number): TimeRemaining => {
+  const totalSeconds = daysRemaining * 24 * 60 * 60;
+  const days = Math.floor(totalSeconds / (24 * 60 * 60));
+  const hours = Math.floor((totalSeconds % (24 * 60 * 60)) / (60 * 60));
+  const minutes = Math.floor((totalSeconds % (60 * 60)) / 60);
+  const seconds = Math.floor(totalSeconds % 60);
+  return { days, hours, minutes, seconds };
+};
+
 const MonthlySubscription = () => {
-  const [daysRemaining, setDaysRemaining] = useState<number>(30);
+  const [timeRemaining, setTimeRemaining] = useState<TimeRemaining>({ days: 30, hours: 0, minutes: 0, seconds: 0 });
   const [email, setEmail] = useState<string>("");
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -24,44 +40,56 @@ const MonthlySubscription = () => {
 
       // Get subscription status
       const { data: subscription } = await supabase
-        .from('subscription_status')
-        .select('days_remaining')
+        .from('subscriptions')
+        .select('end_date, status')
         .eq('user_id', user.id)
         .single();
 
       if (subscription) {
-        setDaysRemaining(Math.max(0, subscription.days_remaining));
+        const endDate = new Date(subscription.end_date);
+        const now = new Date();
+        const diffTime = Math.max(0, endDate.getTime() - now.getTime());
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
         
-        // Show notification if 10 or fewer days remaining
-        if (subscription.days_remaining <= 10 && subscription.days_remaining > 0) {
+        if (diffDays <= 10 && diffDays > 0) {
           toast({
             title: "Subscription Ending Soon",
-            description: `Your subscription will expire in ${subscription.days_remaining} days. Please renew to maintain access.`,
+            description: `Your subscription will expire in ${diffDays} days. Please renew to maintain access.`,
             duration: 5000,
           });
         }
         
-        // Redirect to payment if subscription has expired
-        if (subscription.days_remaining <= 0) {
-          navigate('/payment');
-        }
+        setTimeRemaining(calculateTimeRemaining(diffDays));
       }
     };
 
     checkAuth();
     
-    // Check subscription status every hour
-    const interval = setInterval(checkAuth, 3600000);
-    return () => clearInterval(interval);
+    // Update countdown every second
+    const timer = setInterval(() => {
+      setTimeRemaining(prev => {
+        const totalSeconds = prev.days * 24 * 60 * 60 + prev.hours * 60 * 60 + prev.minutes * 60 + prev.seconds - 1;
+        if (totalSeconds <= 0) {
+          clearInterval(timer);
+          navigate('/payment');
+          return { days: 0, hours: 0, minutes: 0, seconds: 0 };
+        }
+        return calculateTimeRemaining(totalSeconds / (24 * 60 * 60));
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
   }, [navigate, toast]);
 
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-      <div className="bg-guro-blue p-4">
-        <div className="max-w-7xl mx-auto">
-          <h1 className="text-3xl font-bold text-white">GuroAI</h1>
-        </div>
+      <div className="bg-guro-blue p-4 flex justify-center items-center">
+        <img 
+          src="/lovable-uploads/455a23fe-17a6-4eba-92d1-fc732a28b3e7.png" 
+          alt="GuroAI Logo" 
+          className="w-40 h-auto"
+        />
       </div>
 
       {/* Main Content */}
@@ -69,26 +97,30 @@ const MonthlySubscription = () => {
         <Card className="shadow-xl">
           <CardContent className="pt-6">
             <div className="text-center space-y-8">
-              <h2 className="text-2xl font-semibold text-[#023d54]">
+              <h2 className="text-lg font-medium text-[#023d54] truncate">
                 {email}
               </h2>
 
               {/* Animated Timer */}
               <div className="relative mx-auto w-48 h-48">
                 <div
-                  className="absolute inset-0 rounded-full"
+                  className="absolute inset-0 rounded-full transition-all duration-1000 ease-in-out"
                   style={{
-                    background: `conic-gradient(#8cd09b ${(daysRemaining / 30) * 100}%, #e5e7eb ${(daysRemaining / 30) * 100}%)`,
-                    animation: "rotate 2s linear infinite"
+                    background: `conic-gradient(#8cd09b ${((timeRemaining.days * 24 * 60 * 60 + timeRemaining.hours * 60 * 60 + timeRemaining.minutes * 60 + timeRemaining.seconds) / (30 * 24 * 60 * 60)) * 100}%, #e5e7eb ${((timeRemaining.days * 24 * 60 * 60 + timeRemaining.hours * 60 * 60 + timeRemaining.minutes * 60 + timeRemaining.seconds) / (30 * 24 * 60 * 60)) * 100}%)`,
+                    transform: 'rotate(-90deg)'
                   }}
                 />
                 <div className="absolute inset-2 bg-white rounded-full flex items-center justify-center">
                   <div className="text-center">
-                    <Clock className="w-12 h-12 mx-auto mb-2 text-[#8cd09b]" />
-                    <p className="text-2xl font-bold text-[#023d54]">
-                      {daysRemaining}
-                    </p>
-                    <p className="text-sm text-[#023d54]">Days Left</p>
+                    <Clock className="w-8 h-8 mx-auto mb-1 text-[#8cd09b]" />
+                    <div className="space-y-1">
+                      <p className="text-xl font-bold text-[#023d54]">
+                        {timeRemaining.days}d {timeRemaining.hours}h
+                      </p>
+                      <p className="text-sm text-[#023d54]">
+                        {timeRemaining.minutes}m {timeRemaining.seconds}s
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
