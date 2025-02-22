@@ -1,4 +1,3 @@
-
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -184,16 +183,21 @@ const LearnMore = () => {
           </div>
         </section>
 
-        {/* CTA Section */}
+        {/* CTA Section - Updated to match Payment page style */}
         <section className="text-center py-12">
-          <h2 className="text-3xl font-bold text-guro-blue mb-6">Ready to Transform Your Teaching?</h2>
-          <p className="text-xl text-gray-600 mb-8">Join thousands of educators who are saving time and improving student outcomes with GuroAI</p>
-          <Button 
-            onClick={() => navigate('/payment')}
-            className="bg-guro-blue hover:bg-guro-blue/90 text-white px-8 py-6 rounded-lg text-lg transition-all duration-300 hover:scale-105"
-          >
-            Subscribe to GuroAI-299php/month
-          </Button>
+          <h2 className="text-3xl font-bold text-guro-blue mb-4">Ready to Transform Your Teaching?</h2>
+          <div className="text-center space-y-4">
+            <div className="text-3xl font-bold text-guro-blue">
+              ₱299<span className="text-xl text-gray-500">/month</span>
+            </div>
+            <Button 
+              onClick={() => navigate('/payment')}
+              size="lg"
+              className="w-full md:w-auto md:px-8 bg-guro-blue hover:bg-guro-blue/90"
+            >
+              Subscribe to GuroAI - ₱299/month
+            </Button>
+          </div>
         </section>
       </main>
     </div>
