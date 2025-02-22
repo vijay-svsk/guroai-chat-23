@@ -46,10 +46,10 @@ export const useAuthHandler = () => {
             description: "Successfully logged in",
             duration: 3000,
           });
-          navigate("/dashboard");
+          navigate("/monthlysubscription");
         }
       } else {
-        // For signup, create subscription and redirect to dashboard
+        // For signup, create subscription and redirect to monthlysubscription
         const { user } = await signUpUser(email, password);
 
         if (user) {
@@ -60,7 +60,7 @@ export const useAuthHandler = () => {
             description: "Your account has been created successfully.",
             duration: 3000,
           });
-          navigate("/dashboard");
+          navigate("/monthlysubscription");
         }
       }
     } catch (error: any) {

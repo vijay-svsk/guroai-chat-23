@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 
 export const checkSubscriptionStatus = async (userId: string) => {
@@ -24,9 +25,9 @@ export const checkSubscriptionStatus = async (userId: string) => {
 };
 
 export const getDaysRemaining = async (userId: string) => {
-  const { data, error } = await supabase
-    .from('subscription_status')
-    .select('days_remaining')
+  const { data: subscription, error } = await supabase
+    .from('subscriptions')
+    .select('end_date')
     .eq('user_id', userId)
     .single();
 
@@ -35,7 +36,16 @@ export const getDaysRemaining = async (userId: string) => {
     throw new Error('Unable to get subscription status');
   }
 
-  return data?.days_remaining || 0;
+  if (!subscription) {
+    return 0;
+  }
+
+  const endDate = new Date(subscription.end_date);
+  const now = new Date();
+  const diffTime = Math.max(0, endDate.getTime() - now.getTime());
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+  return diffDays;
 };
 
 export const createInitialSubscription = async (userId: string) => {
