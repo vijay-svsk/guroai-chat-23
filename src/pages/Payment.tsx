@@ -1,5 +1,4 @@
 
-import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -12,14 +11,9 @@ const Payment = () => {
   const location = useLocation();
   const { toast } = useToast();
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      // Redirect to Xendit checkout after user has had time to read the value proposition
-      window.location.href = 'https://checkout.xendit.co/od/guroai.online';
-    }, 10000); // 10 second delay before redirect
-
-    return () => clearTimeout(timer);
-  }, []);
+  const handleSubscribe = () => {
+    window.location.href = 'https://checkout.xendit.co/od/guroai.online';
+  };
 
   const features = [
     {
@@ -102,14 +96,12 @@ const Payment = () => {
               ₱299<span className="text-xl text-gray-500">/month</span>
             </div>
             <Button 
+              onClick={handleSubscribe}
               size="lg"
               className="w-full md:w-auto md:px-8 bg-guro-blue hover:bg-guro-blue/90"
             >
               Subscribe to GuroAI - ₱299/month
             </Button>
-            <p className="text-sm text-gray-500">
-              You will be redirected to our secure payment page in a few seconds...
-            </p>
           </div>
         </CardContent>
       </Card>
