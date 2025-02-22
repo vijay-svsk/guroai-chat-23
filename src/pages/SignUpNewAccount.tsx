@@ -7,7 +7,7 @@ const SignUpNewAccount = () => {
   const navigate = useNavigate();
 
   const handleSubscription = () => {
-    window.location.href = 'https://buy.stripe.com/bIY29h7YR1n63JK4gs';
+    window.location.href = 'https://checkout.xendit.co/od/guroai';
   };
 
   return (

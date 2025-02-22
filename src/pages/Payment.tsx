@@ -12,8 +12,8 @@ const Payment = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Immediately redirect to Stripe
-    window.location.href = 'https://buy.stripe.com/bIY29h7YR1n63JK4gs';
+    // Redirect to Xendit checkout
+    window.location.href = 'https://checkout.xendit.co/od/guroai';
   }, []); // Empty dependency array ensures this runs once on mount
 
   // This content will only be shown briefly before redirect
