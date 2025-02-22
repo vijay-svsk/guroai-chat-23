@@ -8,14 +8,9 @@ import ReactConfetti from "react-confetti";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { TeachingPreferencesForm } from "@/components/dashboard/TeachingPreferencesForm";
 import { TeachingMethodSelection } from "@/components/dashboard/TeachingMethodSelection";
-import { checkSubscriptionStatus } from "@/services/subscription-service";
-import { differenceInDays } from "date-fns";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Clock } from "lucide-react";
 
 const Dashboard = () => {
   const [email, setEmail] = useState("");
-  const [remainingDays, setRemainingDays] = useState<number | null>(null);
   const [formData, setFormData] = useState({
     subject: "",
     gradeLevel: "",
@@ -28,7 +23,7 @@ const Dashboard = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const checkAuthAndSubscription = async () => {
+    const checkAuth = async () => {
       try {
         const { data: { user } } = await supabase.auth.getUser();
         
@@ -42,59 +37,18 @@ const Dashboard = () => {
           return;
         }
 
-        // Check subscription status
-        const { data: subscription } = await supabase
-          .from('subscriptions')
-          .select('*')
-          .eq('user_id', user.id)
-          .maybeSingle();
-
-        if (!subscription || subscription.status !== 'active') {
-          toast({
-            title: "Subscription Required",
-            description: "Please subscribe to access GuroAI",
-            duration: 3000,
-          });
-          navigate('/');
-          return;
-        }
-
-        // Calculate remaining days
-        const endDate = new Date(subscription.end_date);
-        const now = new Date();
-        const days = differenceInDays(endDate, now);
-
-        if (days <= 0) {
-          toast({
-            title: "Subscription Expired",
-            description: "Your subscription has expired. Please renew to continue using GuroAI",
-            duration: 3000,
-          });
-          navigate('/');
-          return;
-        }
-
-        setRemainingDays(days);
         setEmail(user.email || "");
       } catch (error) {
-        console.error('Error checking auth and subscription:', error);
+        console.error('Error checking auth:', error);
         toast({
           title: "Error",
-          description: "An error occurred while checking your subscription",
+          description: "An error occurred while checking authentication",
           variant: "destructive",
         });
-        navigate('/');
       }
     };
 
-    checkAuthAndSubscription();
-
-    // Set up interval to check subscription status every hour
-    const interval = setInterval(() => {
-      checkAuthAndSubscription();
-    }, 3600000); // 1 hour in milliseconds
-
-    return () => clearInterval(interval);
+    checkAuth();
   }, [navigate, toast]);
 
   const handleMyAccount = () => {
@@ -150,15 +104,6 @@ const Dashboard = () => {
 
       <main className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-3xl mx-auto space-y-8">
-          {remainingDays !== null && (
-            <Alert className="bg-guro-blue/10 border-guro-blue">
-              <Clock className="h-4 w-4 text-guro-blue" />
-              <AlertDescription className="text-guro-blue">
-                Your subscription is active. {remainingDays} days remaining until renewal.
-              </AlertDescription>
-            </Alert>
-          )}
-
           <div className="text-center">
             <h1 className="text-4xl font-bold text-guro-blue mb-4">
               Let's Personalize Your Experience
