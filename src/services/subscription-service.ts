@@ -18,7 +18,6 @@ export const checkSubscriptionStatus = async (userId: string) => {
   }
 
   // Check if subscription has expired (more than 1 month since start_date)
-  const startDate = new Date(subscription.start_date);
   const endDate = new Date(subscription.end_date);
   const now = new Date();
 
@@ -28,7 +27,7 @@ export const checkSubscriptionStatus = async (userId: string) => {
 export const createInitialSubscription = async (userId: string) => {
   const startDate = new Date();
   const endDate = new Date();
-  endDate.setMonth(endDate.getMonth() + 1); // Set end date to 1 month from now
+  endDate.setDate(endDate.getDate() + 30); // Set end date to 30 days from now
 
   const { error: subscriptionError } = await supabase
     .from('subscriptions')
@@ -48,7 +47,7 @@ export const createInitialSubscription = async (userId: string) => {
 export const updateSubscription = async (userId: string) => {
   const startDate = new Date();
   const endDate = new Date();
-  endDate.setMonth(endDate.getMonth() + 1); // Set end date to 1 month from now
+  endDate.setDate(endDate.getDate() + 30); // Set end date to 30 days from now
 
   const { error } = await supabase
     .from('subscriptions')

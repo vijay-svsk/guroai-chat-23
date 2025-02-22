@@ -9,6 +9,7 @@ import { TestimonialsSection } from "@/components/home/TestimonialsSection";
 import { ReviewsSection } from "@/components/home/ReviewsSection";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { checkSubscriptionStatus } from "@/services/subscription-service";
 
 const Index = () => {
   const [showContent, setShowContent] = useState(false);
@@ -21,20 +22,9 @@ const Index = () => {
         const { data: { user } } = await supabase.auth.getUser();
         
         if (user) {
-          // Check if user has an active subscription
-          const { data: subscription, error } = await supabase
-            .from('subscriptions')
-            .select('*')
-            .eq('user_id', user.id)
-            .maybeSingle();
+          const hasActiveSubscription = await checkSubscriptionStatus(user.id);
 
-          if (error) {
-            console.error('Error checking subscription:', error);
-            setShowContent(true);
-            return;
-          }
-
-          if (subscription?.status === 'active') {
+          if (hasActiveSubscription) {
             // User is authenticated and has active subscription - redirect to dashboard
             navigate('/dashboard');
             return;
