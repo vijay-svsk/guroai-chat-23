@@ -30,7 +30,7 @@ export const HeroSection = ({ onStartTrial }: HeroSectionProps) => {
           onClick={onStartTrial}
           className="bg-guro-blue hover:bg-guro-blue/90 text-white px-8 py-6 rounded-lg text-lg transition-all duration-300 hover:scale-105"
         >
-          Start Free Trial
+          Unlock Full Access
         </Button>
         <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
           <Button 
