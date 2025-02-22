@@ -55,11 +55,35 @@ const MonthlySubscription = () => {
           .from('subscriptions')
           .select('end_date, status')
           .eq('user_id', user.id)
-          .single();
+          .maybeSingle();
 
-        if (error) throw error;
+        if (error && error.code !== 'PGRST116') throw error;
 
-        if (subscription) {
+        if (!subscription) {
+          // Create new subscription if none exists
+          const startDate = new Date();
+          const endDate = new Date();
+          endDate.setDate(endDate.getDate() + 30); // 30 days from now
+
+          const { data: newSubscription, error: createError } = await supabase
+            .from('subscriptions')
+            .insert({
+              user_id: user.id,
+              status: 'active',
+              start_date: startDate.toISOString(),
+              end_date: endDate.toISOString(),
+            })
+            .select()
+            .single();
+
+          if (createError) throw createError;
+
+          if (newSubscription) {
+            const newEndDate = new Date(newSubscription.end_date);
+            setSubscriptionEndDate(newEndDate);
+            setTimeRemaining(calculateTimeRemaining(newEndDate));
+          }
+        } else {
           const endDate = new Date(subscription.end_date);
           setSubscriptionEndDate(endDate);
           
