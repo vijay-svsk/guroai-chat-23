@@ -9,7 +9,6 @@ import { TestimonialsSection } from "@/components/home/TestimonialsSection";
 import { ReviewsSection } from "@/components/home/ReviewsSection";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { checkSubscriptionStatus } from "@/services/subscription-service";
 
 const Index = () => {
   const [showContent, setShowContent] = useState(false);
@@ -17,15 +16,14 @@ const Index = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    const checkAuthAndSubscription = async () => {
+    const checkAuth = async () => {
       try {
         const { data: { user } } = await supabase.auth.getUser();
         
         if (user) {
-          const hasActiveSubscription = await checkSubscriptionStatus(user.id);
-
-          if (hasActiveSubscription) {
-            // User is authenticated and has active subscription - redirect to dashboard
+          // If user is authenticated and they explicitly navigated to '/', 
+          // redirect them to dashboard
+          if (window.location.pathname === '/') {
             navigate('/dashboard');
             return;
           }
@@ -38,7 +36,7 @@ const Index = () => {
       }
     };
 
-    checkAuthAndSubscription();
+    checkAuth();
   }, [navigate]);
 
   const handleStartSubscription = () => {
