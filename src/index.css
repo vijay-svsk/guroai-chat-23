@@ -1,4 +1,3 @@
-
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 @tailwind base;
@@ -67,5 +66,18 @@
 
   ::-webkit-scrollbar-thumb:hover {
     @apply bg-guro-blue/30;
+  }
+
+  @keyframes rotate {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  .subscription-timer {
+    transition: all 0.3s ease-in-out;
   }
 }
