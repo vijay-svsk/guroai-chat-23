@@ -192,7 +192,7 @@ const LearnMore = () => {
             onClick={() => navigate('/payment')}
             className="bg-guro-blue hover:bg-guro-blue/90 text-white px-8 py-6 rounded-lg text-lg transition-all duration-300 hover:scale-105"
           >
-            Start Free Trial
+            Subscribe to GuroAI-299php/month
           </Button>
         </section>
       </main>
