@@ -26,7 +26,7 @@ const Index = () => {
             .from('subscriptions')
             .select('*')
             .eq('user_id', user.id)
-            .single();
+            .maybeSingle();
 
           if (error) {
             console.error('Error checking subscription:', error);
@@ -41,8 +41,7 @@ const Index = () => {
           }
         }
 
-        // Show content for new users or users without active subscription
-        setTimeout(() => setShowContent(true), 500); // Reduced timeout to 500ms
+        setTimeout(() => setShowContent(true), 500);
       } catch (error) {
         console.error('Error in auth check:', error);
         setShowContent(true);
@@ -52,7 +51,7 @@ const Index = () => {
     checkAuthAndSubscription();
   }, [navigate]);
 
-  const handleStartTrial = () => {
+  const handleStartSubscription = () => {
     navigate("/payment");
   };
 
@@ -61,9 +60,9 @@ const Index = () => {
       <LogoAnimation showContent={showContent} />
 
       <div className={`transition-opacity duration-500 ${showContent ? 'opacity-100' : 'opacity-0'}`}>
-        <HeroSection onStartTrial={handleStartTrial} />
+        <HeroSection onStartTrial={handleStartSubscription} />
         <FeaturesSection />
-        <PricingSection onStartTrial={handleStartTrial} />
+        <PricingSection onStartTrial={handleStartSubscription} />
         <TestimonialsSection />
         <ReviewsSection />
       </div>

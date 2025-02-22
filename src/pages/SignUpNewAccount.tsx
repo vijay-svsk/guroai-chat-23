@@ -15,10 +15,10 @@ const SignUpNewAccount = () => {
       <div className="max-w-3xl mx-auto">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-guro-blue mb-4">
-            Start Your Free Trial
+            Get Started with GuroAI
           </h1>
           <p className="text-xl text-gray-600">
-            Try GuroAI free for 7 days, then just $4.99/month
+            Start using GuroAI today for just ₱299/month
           </p>
         </div>
 
@@ -27,7 +27,7 @@ const SignUpNewAccount = () => {
             <div className="flex items-center justify-between pb-6 border-b">
               <div>
                 <h2 className="text-2xl font-semibold text-guro-blue">
-                  7-Day Free Trial
+                  Monthly Subscription
                 </h2>
                 <p className="text-gray-600 mt-1">
                   Full access to all features
@@ -35,10 +35,10 @@ const SignUpNewAccount = () => {
               </div>
               <div className="text-right">
                 <div className="text-3xl font-bold text-guro-blue">
-                  $0
+                  ₱299
                 </div>
                 <div className="text-sm text-gray-500">
-                  then $4.99/month
+                  per month
                 </div>
               </div>
             </div>
@@ -75,7 +75,7 @@ const SignUpNewAccount = () => {
                 onClick={handleSubscription}
                 className="w-full bg-guro-blue hover:bg-guro-blue/90 text-white py-6 text-lg"
               >
-                Start Free Trial
+                Subscribe Now
               </Button>
               <Button
                 onClick={() => navigate('/auth')}
@@ -84,9 +84,6 @@ const SignUpNewAccount = () => {
               >
                 Already paid? Create your account
               </Button>
-              <p className="text-sm text-center text-gray-500">
-                Cancel anytime during your trial. No obligation.
-              </p>
             </div>
           </div>
         </Card>
@@ -113,7 +110,7 @@ const SignUpNewAccount = () => {
             />
           </div>
           <p className="text-sm text-gray-500">
-            Secure payment processing by Stripe
+            Secure payment processing by Xendit
           </p>
         </div>
       </div>
