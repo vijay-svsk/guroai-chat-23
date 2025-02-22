@@ -33,7 +33,7 @@ const NewUserAccountLogin = () => {
           description: "Successfully logged in",
           duration: 3000,
         });
-        navigate("/dashboard");
+        navigate("/monthlysubscription");
       }
     } catch (error: any) {
       toast({
