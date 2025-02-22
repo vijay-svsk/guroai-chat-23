@@ -36,39 +36,53 @@ const MonthlySubscription = () => {
   });
   const [email, setEmail] = useState<string>("");
   const [subscriptionEndDate, setSubscriptionEndDate] = useState<Date | null>(null);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
     const checkAuth = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        navigate('/auth');
-        return;
-      }
-      setEmail(user.email || "");
-
-      // Get subscription status
-      const { data: subscription } = await supabase
-        .from('subscriptions')
-        .select('end_date, status')
-        .eq('user_id', user.id)
-        .single();
-
-      if (subscription) {
-        const endDate = new Date(subscription.end_date);
-        setSubscriptionEndDate(endDate);
-        
-        const timeLeft = calculateTimeRemaining(endDate);
-        setTimeRemaining(timeLeft);
-        
-        if (timeLeft.days <= 10 && timeLeft.days > 0) {
-          toast({
-            title: "Subscription Ending Soon",
-            description: `Your subscription will expire in ${timeLeft.days} days. Please renew to maintain access.`,
-            duration: 5000
-          });
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          navigate('/auth');
+          return;
         }
+        setEmail(user.email || "");
+
+        // Get subscription status
+        const { data: subscription, error } = await supabase
+          .from('subscriptions')
+          .select('end_date, status')
+          .eq('user_id', user.id)
+          .single();
+
+        if (error) throw error;
+
+        if (subscription) {
+          const endDate = new Date(subscription.end_date);
+          setSubscriptionEndDate(endDate);
+          
+          const timeLeft = calculateTimeRemaining(endDate);
+          setTimeRemaining(timeLeft);
+          
+          if (timeLeft.days <= 10 && timeLeft.days > 0) {
+            toast({
+              title: "Subscription Ending Soon",
+              description: `Your subscription will expire in ${timeLeft.days} days. Please renew to maintain access.`,
+              duration: 5000
+            });
+          }
+        }
+      } catch (error) {
+        console.error('Error loading subscription:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load subscription status",
+          variant: "destructive"
+        });
+      } finally {
+        setLoading(false);
       }
     };
     checkAuth();
@@ -99,6 +113,25 @@ const MonthlySubscription = () => {
   const maxSeconds = 30 * 24 * 60 * 60; // 30 days in seconds
   const progressPercentage = (totalSeconds / maxSeconds) * 100;
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white">
+        <div className="bg-[#0a1d2c] p-4 flex justify-center items-center">
+          <img 
+            alt="GuroAI Logo" 
+            className="w-40 h-auto" 
+            src="/lovable-uploads/885e1cea-e151-4401-a75b-92d7877ab168.jpg" 
+          />
+        </div>
+        <div className="flex justify-center items-center min-h-[60vh]">
+          <div className="animate-pulse">
+            <Clock className="w-16 h-16 text-[#8cd09b]" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
@@ -122,15 +155,16 @@ const MonthlySubscription = () => {
               {/* Animated Timer */}
               <div className="relative mx-auto w-48 h-48">
                 <div 
-                  className="absolute inset-0 rounded-full transition-all duration-1000 ease-in-out" 
+                  className="absolute inset-0 rounded-full transition-all duration-1000 ease-in-out"
                   style={{
                     background: `conic-gradient(#8cd09b ${progressPercentage}%, #e5e7eb ${progressPercentage}%)`,
-                    transform: 'rotate(-90deg)'
+                    transform: 'rotate(-90deg)',
+                    transition: 'all 1s linear'
                   }}
                 />
                 <div className="absolute inset-2 bg-white rounded-full flex items-center justify-center">
                   <div className="text-center">
-                    <Clock className="w-8 h-8 mx-auto mb-1 text-[#8cd09b]" />
+                    <Clock className="w-8 h-8 mx-auto mb-1 text-[#8cd09b] animate-pulse" />
                     <div className="space-y-1">
                       <p className="text-xl font-bold text-[#023d54]">
                         {timeRemaining.days}d {timeRemaining.hours}h
