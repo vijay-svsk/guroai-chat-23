@@ -7,7 +7,7 @@ const SignUpNewAccount = () => {
   const navigate = useNavigate();
 
   const handleSubscription = () => {
-    window.location.href = 'https://checkout.xendit.co/od/guroai';
+    window.location.href = 'https://checkout.xendit.co/od/guroai.online';
   };
 
   return (

@@ -13,7 +13,7 @@ const Payment = () => {
 
   useEffect(() => {
     // Redirect to Xendit checkout
-    window.location.href = 'https://checkout.xendit.co/od/guroai';
+    window.location.href = 'https://checkout.xendit.co/od/guroai.online';
   }, []); // Empty dependency array ensures this runs once on mount
 
   // This content will only be shown briefly before redirect
