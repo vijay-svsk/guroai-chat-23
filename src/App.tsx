@@ -19,6 +19,8 @@ import TermsOfService from "./pages/TermsOfService";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import { Toaster } from "@/components/ui/toaster";
 
+console.log("App component rendering");
+
 function App() {
   return (
     <React.StrictMode>

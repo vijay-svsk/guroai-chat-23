@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 
 const PrivacyPolicy = () => {
+  console.log("Privacy Policy component rendering");
   const navigate = useNavigate();
 
   return (
