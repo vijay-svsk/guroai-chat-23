@@ -12,12 +12,27 @@ interface FormData {
   topic: string;
   language: string;
   method: "7es" | "4as";
+  previousTopic?: string; // Added for continuity
+}
+
+interface GeneratedContent {
+  reviewImage: string;
+  motivationImage: string;
+  content: {
+    reviewQuestions: string[];
+    hotsQuestions: string[];
+    integration: {
+      connectedSubject: string;
+      discussion: string[];
+    };
+  };
 }
 
 const LessonPlanAI = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [response, setResponse] = useState<string>("");
   const [isEditing, setIsEditing] = useState(false);
+  const [generatedContent, setGeneratedContent] = useState<GeneratedContent | null>(null);
   const location = useLocation();
   const navigate = useNavigate();
   const formData = location.state as FormData;
@@ -27,7 +42,8 @@ const LessonPlanAI = () => {
     if (data.method === "4as") {
       return `Create a detailed lesson plan using the 4As method (Activity, Analysis, Abstraction, Application) for ${data.subject} at ${data.gradeLevel} level, focusing on the topic: ${data.topic}. The lesson should be conducted in ${data.language}. Please provide a comprehensive breakdown of each stage with specific activities and instructions.`;
     }
-    return `Create a full lesson plan for ${data.subject} at ${data.gradeLevel} level, focusing on the topic: ${data.topic}, to be conducted in ${data.language}. The response should have 5,000 words. Only generate what is asked.
+    
+    let prompt = `Create a full lesson plan for ${data.subject} at ${data.gradeLevel} level, focusing on the topic: ${data.topic}, to be conducted in ${data.language}. The response should have 5,000 words. Only generate what is asked.
 
 A. Content Standard
 B. Performance Standard
@@ -45,15 +61,15 @@ C. MATERIALS
 
 III. Procedure
 A. PRELIMINARIES
-1. (Reviewing previous lesson or presenting the new lesson)
-Instruction: Provide a search prompt for a Google image related to the topic, then ask 3 questions about that image.
+1. REVIEWING PREVIOUS LESSON OR PRESENTING THE NEW LESSON
+{REVIEW_SECTION}
 
-2. Establishing the purpose of the new lesson (Motivation)
-Instruction: Provide a search prompt for a Google image related to the new lesson, then ask 8 Higher Order Thinking Skills (HOTS) questions about that image.
+2. ESTABLISHING THE PURPOSE OF THE NEW LESSON (MOTIVATION)
+{MOTIVATION_SECTION}
 
 B. PRESENTING EXAMPLES/INSTANCES OF THE NEW LESSON
-Instruction: In reviewing the previous lesson, ensure it connects to the new lesson. The motivation section should have images or clear prompts for what to include. When presenting examples, integrate a concept from another subject.
-Example: Word problem.
+INTEGRATION OF CONTENT WITHIN AND ACROSS THE CURRICULUM TEACHING AREAS
+{INTEGRATION_SECTION}
 
 C. DISCUSSING NEW CONCEPT AND PRACTICING NEW SKILLS #1
 Instruction: Provide an instruction and 5 multiple-choice questions with 3 options each.
@@ -79,24 +95,84 @@ Instruction: Provide an instruction and 10 multiple-choice questions related to 
 
 V. ASSIGNMENT
 Instruction: Create 2 assignment questions that reinforce the lesson.`;
+
+    return prompt;
   };
 
-  const cleanResponse = (text: string) => {
-    return text.replace(/[#*]/g, '').replace(/\n\s*\n/g, '\n\n').trim();
+  const generateLessonImages = async (data: FormData) => {
+    try {
+      const { data: imageData, error } = await supabase.functions.invoke('generate-lesson-images', {
+        body: {
+          subject: data.subject,
+          topic: data.topic,
+          previousTopic: data.previousTopic || data.topic // fallback to current topic if no previous topic
+        }
+      });
+
+      if (error) throw error;
+      setGeneratedContent(imageData);
+      
+      return imageData;
+    } catch (error) {
+      console.error("Error generating images:", error);
+      toast({
+        title: "Error",
+        description: "Failed to generate lesson images. Please try again.",
+        variant: "destructive",
+        duration: 3000
+      });
+      return null;
+    }
   };
 
   const generateLessonPlan = async () => {
     if (!formData) return;
     setIsLoading(true);
+    
     try {
+      // First generate images and content
+      const imageContent = await generateLessonImages(formData);
+      
+      if (!imageContent) throw new Error("Failed to generate images and content");
+
+      // Replace placeholders in the prompt with generated content
+      let prompt = generatePrompt(formData);
+      
+      const reviewSection = `
+Observe the image below:
+[Image URL: ${imageContent.reviewImage}]
+
+Let's review our previous lesson with these questions:
+${imageContent.content.reviewQuestions.map((q, i) => `${i + 1}. ${q}`).join("\n")}
+`;
+
+      const motivationSection = `
+Now, let's look at this image that introduces our new lesson:
+[Image URL: ${imageContent.motivationImage}]
+
+Let's explore this image with some higher-order thinking questions:
+${imageContent.content.hotsQuestions.map((q, i) => `${i + 1}. ${q}`).join("\n")}
+`;
+
+      const integrationSection = `
+Integration with ${imageContent.content.integration.connectedSubject}:
+
+${imageContent.content.integration.discussion.join("\n\n")}
+`;
+
+      prompt = prompt
+        .replace("{REVIEW_SECTION}", reviewSection)
+        .replace("{MOTIVATION_SECTION}", motivationSection)
+        .replace("{INTEGRATION_SECTION}", integrationSection);
+
+      // Generate the full lesson plan
       const {
         data,
         error
       } = await supabase.functions.invoke('generate-lesson-plan', {
-        body: {
-          prompt: generatePrompt(formData)
-        }
+        body: { prompt }
       });
+
       if (error) throw error;
       setResponse(cleanResponse(data.generatedText));
       toast({
@@ -109,11 +185,16 @@ Instruction: Create 2 assignment questions that reinforce the lesson.`;
       toast({
         title: "Error",
         description: "Failed to generate lesson plan. Please try again.",
+        variant: "destructive",
         duration: 3000
       });
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const cleanResponse = (text: string) => {
+    return text.replace(/[#*]/g, '').replace(/\n\s*\n/g, '\n\n').trim();
   };
 
   useEffect(() => {
