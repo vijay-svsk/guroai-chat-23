@@ -46,28 +46,56 @@ export const LessonPlanContent = ({
       );
     }
 
-    const processedResponse = response.split('\n').map((line, index) => {
+    const lines = response.split('\n');
+    const processedContent = [];
+    let showReviewImage = false;
+    let showMotivationImage = false;
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      
       if (line.startsWith('IMAGE PROMPT:')) {
-        return null; // Skip image prompts in the display
+        continue; // Skip image prompts
       }
-      return <div key={index}>{line}</div>;
-    });
+
+      // Add the line to our processed content
+      processedContent.push(<div key={i}>{line}</div>);
+
+      // Check for section headers and insert images
+      if (line.includes("Reviewing previous lesson") || line.includes("presenting the new lesson")) {
+        showReviewImage = true;
+        if (reviewImage) {
+          processedContent.push(
+            <div key={`review-image-${i}`} className="my-4">
+              <img 
+                src={reviewImage} 
+                alt="Review visual aid" 
+                className="max-w-[400px] h-auto rounded-lg shadow-lg mx-auto" 
+              />
+            </div>
+          );
+        }
+      }
+
+      if (line.includes("Establishing the purpose of the new lesson")) {
+        showMotivationImage = true;
+        if (motivationImage) {
+          processedContent.push(
+            <div key={`motivation-image-${i}`} className="my-4">
+              <img 
+                src={motivationImage} 
+                alt="Motivation visual aid" 
+                className="max-w-[400px] h-auto rounded-lg shadow-lg mx-auto" 
+              />
+            </div>
+          );
+        }
+      }
+    }
 
     return (
-      <div className="space-y-6">
-        {reviewImage && (
-          <div className="my-4">
-            <img src={reviewImage} alt="Review visual aid" className="max-w-full rounded-lg shadow-lg mx-auto" />
-          </div>
-        )}
-        {motivationImage && (
-          <div className="my-4">
-            <img src={motivationImage} alt="Motivation visual aid" className="max-w-full rounded-lg shadow-lg mx-auto" />
-          </div>
-        )}
-        <div className="whitespace-pre-wrap font-sans text-gray-800">
-          {processedResponse}
-        </div>
+      <div className="whitespace-pre-wrap font-sans text-gray-800">
+        {processedContent}
       </div>
     );
   };
