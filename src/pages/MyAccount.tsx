@@ -115,6 +115,23 @@ const MyAccount = () => {
             )}
           </CardContent>
         </Card>
+
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle className="text-2xl font-bold text-gray-900">Account Settings</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <Button
+                variant="destructive"
+                onClick={() => navigate('/delete-account')}
+                className="w-full sm:w-auto"
+              >
+                Delete Account
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
