@@ -6,17 +6,45 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { LessonPlanHeader } from "@/components/lesson-plan/LessonPlanHeader";
 import { LessonPlanContent } from "@/components/lesson-plan/LessonPlanContent";
-import { generatePrompt, cleanResponse } from "@/utils/prompt-utils";
+import { generatePrompt, cleanResponse, extractImagePrompts } from "@/utils/prompt-utils";
 import type { FormData } from "@/types/lesson-plan-ai";
 
 const LessonPlanAI = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [response, setResponse] = useState<string>("");
   const [isEditing, setIsEditing] = useState(false);
+  const [reviewImage, setReviewImage] = useState<string>("");
+  const [motivationImage, setMotivationImage] = useState<string>("");
   const location = useLocation();
   const navigate = useNavigate();
   const formData = location.state as FormData;
   const { toast } = useToast();
+
+  const generateImages = async (text: string) => {
+    const { firstPrompt, secondPrompt } = extractImagePrompts(text);
+    if (!firstPrompt || !secondPrompt) return;
+
+    try {
+      const { data, error } = await supabase.functions.invoke(
+        "generate-lesson-images",
+        {
+          body: { firstPrompt, secondPrompt },
+        }
+      );
+
+      if (error) throw error;
+
+      setReviewImage(data.reviewImage);
+      setMotivationImage(data.motivationImage);
+    } catch (error) {
+      console.error("Error generating images:", error);
+      toast({
+        title: "Error",
+        description: "Failed to generate lesson images. Proceeding with text only.",
+        variant: "destructive",
+      });
+    }
+  };
 
   const generateLessonPlan = async () => {
     if (!formData) return;
@@ -40,7 +68,12 @@ const LessonPlanAI = () => {
         throw new Error("No response received from the AI");
       }
 
-      setResponse(cleanResponse(data.generatedText));
+      const cleanedResponse = cleanResponse(data.generatedText);
+      setResponse(cleanedResponse);
+      
+      // Generate images after getting the lesson plan
+      await generateImages(cleanedResponse);
+
       toast({
         title: "Success!",
         description: "Your lesson plan has been generated.",
@@ -195,6 +228,8 @@ const LessonPlanAI = () => {
               onSave={handleSaveLessonPlan}
               onDownloadTxt={handleDownloadTxt}
               onDownloadDocx={handleDownloadDocx}
+              reviewImage={reviewImage}
+              motivationImage={motivationImage}
             />
           </CardContent>
         </Card>

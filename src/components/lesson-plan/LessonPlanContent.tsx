@@ -7,6 +7,8 @@ interface LessonPlanContentProps {
   isLoading: boolean;
   isEditing: boolean;
   response: string;
+  reviewImage?: string;
+  motivationImage?: string;
   onResponseChange: (value: string) => void;
   onSave: () => void;
   onDownloadTxt: () => void;
@@ -17,6 +19,8 @@ export const LessonPlanContent = ({
   isLoading,
   isEditing,
   response,
+  reviewImage,
+  motivationImage,
   onResponseChange,
   onSave,
   onDownloadTxt,
@@ -31,20 +35,47 @@ export const LessonPlanContent = ({
     );
   }
 
+  const renderContent = () => {
+    if (isEditing) {
+      return (
+        <textarea
+          value={response}
+          onChange={(e) => onResponseChange(e.target.value)}
+          className="w-full h-[500px] p-4 border rounded-md font-mono text-sm"
+        />
+      );
+    }
+
+    const processedResponse = response.split('\n').map((line, index) => {
+      if (line.startsWith('IMAGE PROMPT:')) {
+        return null; // Skip image prompts in the display
+      }
+      return <div key={index}>{line}</div>;
+    });
+
+    return (
+      <div className="space-y-6">
+        {reviewImage && (
+          <div className="my-4">
+            <img src={reviewImage} alt="Review visual aid" className="max-w-full rounded-lg shadow-lg mx-auto" />
+          </div>
+        )}
+        {motivationImage && (
+          <div className="my-4">
+            <img src={motivationImage} alt="Motivation visual aid" className="max-w-full rounded-lg shadow-lg mx-auto" />
+          </div>
+        )}
+        <div className="whitespace-pre-wrap font-sans text-gray-800">
+          {processedResponse}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <>
       <div className="bg-white border rounded-md p-4">
-        {isEditing ? (
-          <textarea
-            value={response}
-            onChange={(e) => onResponseChange(e.target.value)}
-            className="w-full h-[500px] p-4 border rounded-md font-mono text-sm"
-          />
-        ) : (
-          <pre className="whitespace-pre-wrap font-sans text-gray-800">
-            {response}
-          </pre>
-        )}
+        {renderContent()}
       </div>
       <div className="flex flex-col gap-4">
         <Button

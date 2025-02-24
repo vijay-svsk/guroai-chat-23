@@ -23,15 +23,15 @@ C. MATERIALS
 
 III. Procedure
 A. PRELIMINARIES
-1. (Reviewing previous lesson or presenting the new lesson)
-Instruction: Provide questions that will link to the previous lesson.
+1. Reviewing previous lesson
+Instruction: First, generate a descriptive prompt for an AI art generator to create an image that will help review the previous lesson. The image should be engaging and connected to both the previous lesson and the current topic. Then, write "Instruction: Observe the given Picture. I will ask questions about the picture." followed by 3 thought-provoking questions that help review the previous lesson or activate prior knowledge.
 
 2. Establishing the purpose of the new lesson (Motivation)
-Instruction: Provide HOTS questions related to the new lesson.
+Instruction: Generate another descriptive prompt for an AI art generator to create an image that introduces the new lesson. This image should be thematically connected to the first image while focusing on the new topic. Then provide 6 Higher Order Thinking Skills (HOTS) questions based on the image and the lesson objective.
 
 B. PRESENTING EXAMPLES/INSTANCES OF THE NEW LESSON
-Instruction: In reviewing the previous lesson, ensure it connects to the new lesson. When presenting examples, integrate a concept from another subject.
-Example: Word problem.
+Instruction: INTEGRATION OF CONTENT WITHIN AND ACROSS THE CURRICULUM TEACHING AREAS
+Create a coherent transition from the motivation section by integrating concepts from another subject area that naturally connects with the current topic. Write two detailed paragraphs explaining how this integration enhances understanding of both subjects. Then provide specific examples and word problems that demonstrate this cross-curricular connection.
 
 C. DISCUSSING NEW CONCEPT AND PRACTICING NEW SKILLS #1
 Instruction: Provide an instruction and 5 multiple-choice questions with 3 options each.
@@ -52,9 +52,23 @@ IV. EVALUATION
 Instruction: Provide an instruction and 10 multiple-choice questions related to the lesson with clear instructions.
 
 V. ASSIGNMENT
-Instruction: Create 2 assignment questions that reinforce the lesson.`;
+Instruction: Create 2 assignment questions that reinforce the lesson.
+
+IMPORTANT: For image generation prompts, be extremely specific and descriptive to ensure the generated images are appropriate for educational use and clearly connected to the lesson content. Place each image prompt on its own line starting with "IMAGE PROMPT:" so they can be easily extracted.`;
 };
 
 export const cleanResponse = (text: string) => {
   return text.replace(/[#*]/g, "").replace(/\n\s*\n/g, "\n\n").trim();
 };
+
+export const extractImagePrompts = (text: string): { firstPrompt: string, secondPrompt: string } => {
+  const lines = text.split('\n');
+  const prompts = lines.filter(line => line.startsWith('IMAGE PROMPT:'))
+    .map(line => line.replace('IMAGE PROMPT:', '').trim());
+  
+  return {
+    firstPrompt: prompts[0] || '',
+    secondPrompt: prompts[1] || ''
+  };
+};
+
