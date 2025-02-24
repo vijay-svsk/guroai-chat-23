@@ -40,7 +40,15 @@ D. DISCUSSING NEW CONCEPT AND PRACTICING NEW SKILLS #2
 Instruction: Provide an instruction and 5 multiple-choice questions with 3 options each.
 
 E. DEVELOPING MASTERY (LEADS TO FORMATIVE ASSESSMENT)
-Instruction: Create a rubric for a group activity. Divide the class into 3 groups and provide clear instructions for each.
+Instruction: Create a text-based rubric for a group activity. Divide the class into 3 groups and provide the following for each group:
+1. Clear task description
+2. Performance criteria in paragraph form, describing:
+   - Outstanding performance (what constitutes excellent work)
+   - Satisfactory performance (what meets basic requirements)
+   - Needs improvement (areas where work falls short)
+3. Specific guidelines for group collaboration
+4. Timeline for completion
+Present this information in a clear, narrative format without using tables or columns.
 
 F. FINDING PRACTICAL APPLICATION OF CONCEPTS AND SKILLS IN DAILY LIVING
 Instruction: Provide an instruction and 5 multiple-choice questions that show how the lesson can be applied in daily life.
