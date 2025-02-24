@@ -15,6 +15,8 @@ import MyAccount from "./pages/MyAccount";
 import DeviceRestricted from "./pages/DeviceRestricted";
 import NewUserAccountLogin from "./pages/NewUserAccountLogin";
 import MonthlySubscription from "./pages/MonthlySubscription";
+import TermsOfService from "./pages/TermsOfService";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 import { Toaster } from "@/components/ui/toaster";
 
 function App() {
@@ -35,6 +37,8 @@ function App() {
           <Route path="/device-restricted" element={<DeviceRestricted />} />
           <Route path="/newuseraccountlogin" element={<NewUserAccountLogin />} />
           <Route path="/monthlysubscription" element={<MonthlySubscription />} />
+          <Route path="/terms-of-service" element={<TermsOfService />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         <Toaster />
