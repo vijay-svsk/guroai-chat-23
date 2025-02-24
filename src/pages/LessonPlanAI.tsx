@@ -1,13 +1,18 @@
-
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2 } from "lucide-react";
+import { Loader2, Download, RefreshCw, Edit, FileText, Save } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { FormData } from "@/types/lesson-plan-types";
-import { generateLessonImages, generateFullLessonPlan, saveLessonPlan } from "@/services/lesson-plan-service";
-import { LessonPlanActions } from "@/components/lesson-plan/LessonPlanActions";
+
+interface FormData {
+  subject: string;
+  gradeLevel: string;
+  topic: string;
+  language: string;
+  method: "7es" | "4as";
+}
 
 const LessonPlanAI = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -18,17 +23,82 @@ const LessonPlanAI = () => {
   const formData = location.state as FormData;
   const { toast } = useToast();
 
+  const generatePrompt = (data: FormData) => {
+    if (data.method === "4as") {
+      return `Create a detailed lesson plan using the 4As method (Activity, Analysis, Abstraction, Application) for ${data.subject} at ${data.gradeLevel} level, focusing on the topic: ${data.topic}. The lesson should be conducted in ${data.language}. Please provide a comprehensive breakdown of each stage with specific activities and instructions.`;
+    }
+    return `Create a full lesson plan for ${data.subject} at ${data.gradeLevel} level, focusing on the topic: ${data.topic}, to be conducted in ${data.language}. The response should have 5,000 words. Only generate what is asked.
+
+A. Content Standard
+B. Performance Standard
+C. Learning Competencies
+D. MELC-Based Competency
+E. Objectives
+1. Cognitive
+2. Psychomotor
+3. Affective
+
+II. SUBJECT MATTER
+A. TOPIC
+B. REFERENCES
+C. MATERIALS
+
+III. Procedure
+A. PRELIMINARIES
+1. (Reviewing previous lesson or presenting the new lesson)
+Instruction: Provide a search prompt for a Google image related to the topic, then ask 3 questions about that image.
+
+2. Establishing the purpose of the new lesson (Motivation)
+Instruction: Provide a search prompt for a Google image related to the new lesson, then ask 8 Higher Order Thinking Skills (HOTS) questions about that image.
+
+B. PRESENTING EXAMPLES/INSTANCES OF THE NEW LESSON
+Instruction: In reviewing the previous lesson, ensure it connects to the new lesson. The motivation section should have images or clear prompts for what to include. When presenting examples, integrate a concept from another subject.
+Example: Word problem.
+
+C. DISCUSSING NEW CONCEPT AND PRACTICING NEW SKILLS #1
+Instruction: Provide an instruction and 5 multiple-choice questions with 3 options each.
+
+D. DISCUSSING NEW CONCEPT AND PRACTICING NEW SKILLS #2
+Instruction: Provide an instruction and 5 multiple-choice questions with 3 options each.
+
+E. DEVELOPING MASTERY (LEADS TO FORMATIVE ASSESSMENT)
+Instruction: Create a rubric for a group activity. Divide the class into 3 groups:
+1. Group 1 will perform a role-play.
+2. Group 2 will give a report.
+3. Group 3 will sing a song related to the lesson.
+Provide clear, concise instructions (1-2 sentences) for each group. For the song, create a short rhyming song about the lesson using a popular kids' tune.
+
+F. FINDING PRACTICAL APPLICATION OF CONCEPTS AND SKILLS IN DAILY LIVING
+Instruction: Provide an instruction and 5 multiple-choice questions that show how the lesson can be applied in daily life.
+
+G. GENERALIZATION
+Instruction: Write 3 generalization questions to help the class summarize what they learned.
+
+IV. EVALUATION
+Instruction: Provide an instruction and 10 multiple-choice questions related to the lesson with clear instructions.
+
+V. ASSIGNMENT
+Instruction: Create 2 assignment questions that reinforce the lesson.`;
+  };
+
+  const cleanResponse = (text: string) => {
+    return text.replace(/[#*]/g, '').replace(/\n\s*\n/g, '\n\n').trim();
+  };
+
   const generateLessonPlan = async () => {
     if (!formData) return;
     setIsLoading(true);
-    
     try {
-      const imageContent = await generateLessonImages(formData);
-      if (!imageContent) throw new Error("Failed to generate images and content");
-      
-      const generatedText = await generateFullLessonPlan(formData, imageContent);
-      setResponse(generatedText);
-      
+      const {
+        data,
+        error
+      } = await supabase.functions.invoke('generate-lesson-plan', {
+        body: {
+          prompt: generatePrompt(formData)
+        }
+      });
+      if (error) throw error;
+      setResponse(cleanResponse(data.generatedText));
       toast({
         title: "Success!",
         description: "Your lesson plan has been generated.",
@@ -39,7 +109,6 @@ const LessonPlanAI = () => {
       toast({
         title: "Error",
         description: "Failed to generate lesson plan. Please try again.",
-        variant: "destructive",
         duration: 3000
       });
     } finally {
@@ -47,9 +116,38 @@ const LessonPlanAI = () => {
     }
   };
 
+  useEffect(() => {
+    generateLessonPlan();
+  }, [formData]);
+
   const handleSaveLessonPlan = async () => {
     try {
-      await saveLessonPlan(response, formData);
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast({
+          title: "Error",
+          description: "Please log in to save lesson plans.",
+          variant: "destructive",
+          duration: 3000
+        });
+        return;
+      }
+
+      const { error } = await supabase
+        .from('lesson_plans')
+        .insert({
+          user_id: user.id,
+          content: response,
+          subject: formData.subject,
+          grade_level: formData.gradeLevel,
+          topic: formData.topic,
+          language: formData.language,
+          method: formData.method
+        });
+
+      if (error) throw error;
+
       toast({
         title: "Success!",
         description: "Lesson plan saved successfully.",
@@ -67,9 +165,11 @@ const LessonPlanAI = () => {
     }
   };
 
-  const handleDownloadTxt = () => {
+  const handleDownload = () => {
     const element = document.createElement("a");
-    const file = new Blob([response], { type: 'text/plain' });
+    const file = new Blob([response], {
+      type: 'text/plain'
+    });
     element.href = URL.createObjectURL(file);
     element.download = `lesson_plan_${formData.subject.toLowerCase()}_${formData.method}.txt`;
     document.body.appendChild(element);
@@ -90,6 +190,7 @@ const LessonPlanAI = () => {
 
       if (error) throw error;
 
+      // Create a link to download the base64 docx file
       const element = document.createElement("a");
       element.href = `data:application/vnd.openxmlformats-officedocument.wordprocessingml.document;base64,${data.docxBase64}`;
       element.download = `lesson_plan_${formData.subject.toLowerCase()}_${formData.method}.docx`;
@@ -113,9 +214,13 @@ const LessonPlanAI = () => {
     }
   };
 
-  useEffect(() => {
+  const handleRegenerateClick = () => {
     generateLessonPlan();
-  }, [formData]);
+  };
+
+  const toggleEdit = () => {
+    setIsEditing(!isEditing);
+  };
 
   if (!formData) {
     return (
@@ -153,6 +258,23 @@ const LessonPlanAI = () => {
                   Empowering educators, simplifying teaching—GuroAI, your partner in effortless lesson planning.
                 </p>
               </div>
+              <div className="flex gap-2">
+                {isLoading ? (
+                  <Loader2 className="w-6 h-6 animate-spin" />
+                ) : (
+                  <>
+                    <Button variant="outline" size="icon" onClick={handleRegenerateClick} disabled={isLoading} className="h-10 w-10">
+                      <RefreshCw className="h-4 w-4" />
+                    </Button>
+                    <Button variant="outline" size="icon" onClick={toggleEdit} disabled={isLoading} className="h-10 w-10">
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <Button variant="outline" size="icon" onClick={handleDownload} disabled={isLoading || !response} className="h-10 w-10">
+                      <Download className="h-4 w-4" />
+                    </Button>
+                  </>
+                )}
+              </div>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -167,7 +289,7 @@ const LessonPlanAI = () => {
                   {isEditing ? (
                     <textarea
                       value={response}
-                      onChange={e => setResponse(e.target.value)}
+                      onChange={e => setResponse(cleanResponse(e.target.value))}
                       className="w-full h-[500px] p-4 border rounded-md font-mono text-sm"
                     />
                   ) : (
@@ -176,15 +298,32 @@ const LessonPlanAI = () => {
                     </pre>
                   )}
                 </div>
-                <LessonPlanActions 
-                  isLoading={isLoading}
-                  hasResponse={!!response}
-                  onRegenerateClick={generateLessonPlan}
-                  onEditClick={() => setIsEditing(!isEditing)}
-                  onDownloadTxt={handleDownloadTxt}
-                  onDownloadDocx={handleDownloadDocx}
-                  onSave={handleSaveLessonPlan}
-                />
+                <div className="flex flex-col gap-4">
+                  <Button
+                    onClick={handleSaveLessonPlan}
+                    disabled={isLoading || !response}
+                    className="w-full sm:w-auto flex items-center gap-2"
+                  >
+                    <Save className="h-4 w-4" />
+                    Save this Lesson Plan
+                  </Button>
+                  <Button
+                    onClick={handleDownload}
+                    disabled={isLoading || !response}
+                    className="w-full sm:w-auto flex items-center gap-2"
+                  >
+                    <Download className="h-4 w-4" />
+                    Download as TXT
+                  </Button>
+                  <Button
+                    onClick={handleDownloadDocx}
+                    disabled={isLoading || !response}
+                    className="w-full sm:w-auto flex items-center gap-2"
+                  >
+                    <FileText className="h-4 w-4" />
+                    Download as DOCX
+                  </Button>
+                </div>
               </>
             )}
           </CardContent>
