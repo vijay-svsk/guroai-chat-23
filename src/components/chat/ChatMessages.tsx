@@ -1,4 +1,5 @@
 
+import { Bot } from "lucide-react";
 import { LoadingState } from "@/components/subscription/LoadingState";
 import { ChatMessage } from "./ChatMessage";
 
