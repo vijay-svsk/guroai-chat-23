@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Header } from "@/components/subscription/Header";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Search, Lightbulb, Bot } from "lucide-react";
+import { Bot } from "lucide-react";
 
 const AskGuro = () => {
   const [question, setQuestion] = useState("");
@@ -42,7 +42,7 @@ const AskGuro = () => {
       <Header />
       <div className="max-w-3xl mx-auto px-4 py-12">
         <h1 className="text-3xl font-bold text-center text-[#023d54] mb-8">
-          What can I help with?
+          Hi, I'm GuroAI. How can I help you today?
         </h1>
         
         <div className="relative">
@@ -65,33 +65,6 @@ const AskGuro = () => {
               </Button>
             </div>
           </form>
-
-          <div className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
-            <Button
-              type="button"
-              size="icon"
-              variant="ghost"
-              className="h-8 w-8 rounded-full hover:bg-[#023d54]/5"
-            >
-              <Plus className="h-4 w-4 text-[#023d54]" />
-            </Button>
-            <Button
-              type="button"
-              size="icon"
-              variant="ghost"
-              className="h-8 w-8 rounded-full hover:bg-[#023d54]/5"
-            >
-              <Search className="h-4 w-4 text-[#023d54]" />
-            </Button>
-            <Button
-              type="button"
-              size="icon"
-              variant="ghost"
-              className="h-8 w-8 rounded-full hover:bg-[#023d54]/5"
-            >
-              <Lightbulb className="h-4 w-4 text-[#023d54]" />
-            </Button>
-          </div>
         </div>
 
         {answer && (
