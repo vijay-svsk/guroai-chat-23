@@ -3,3 +3,6 @@ project_id = "mfkomfsqtkbhkoznxmyv"
 
 [functions.generate-slides]
 verify_jwt = true
+
+[functions.download-slides]
+verify_jwt = true

@@ -5,13 +5,14 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { Upload, Presentation, Play } from "lucide-react";
+import { Upload, Presentation, Play, Download } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 export const SlidePresentation = () => {
   const [file, setFile] = useState<File | null>(null);
   const [instructions, setInstructions] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
+  const [generatedSlides, setGeneratedSlides] = useState<any>(null);
   const { toast } = useToast();
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -21,6 +22,53 @@ export const SlidePresentation = () => {
       toast({
         title: "File uploaded successfully",
         description: uploadedFile.name,
+      });
+    }
+  };
+
+  const handleDownload = async () => {
+    if (!generatedSlides) {
+      toast({
+        title: "No slides generated",
+        description: "Please generate slides first",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const { data: pptxData, error } = await supabase.functions.invoke(
+        'download-slides',
+        {
+          body: { slidesData: generatedSlides },
+        }
+      );
+
+      if (error) throw error;
+
+      // Create a blob from the response and trigger download
+      const blob = new Blob([pptxData], {
+        type: 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
+      });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'presentation.pptx';
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+
+      toast({
+        title: "Success!",
+        description: "Your presentation has been downloaded.",
+      });
+    } catch (error) {
+      console.error('Error downloading slides:', error);
+      toast({
+        title: "Error",
+        description: "Failed to download presentation. Please try again.",
+        variant: "destructive",
       });
     }
   };
@@ -50,12 +98,11 @@ export const SlidePresentation = () => {
 
       if (functionError) throw functionError;
 
+      setGeneratedSlides(functionData);
       toast({
         title: "Success!",
         description: "Your slides have been generated successfully.",
       });
-
-      // Handle the generated slides (e.g., download or preview)
     } catch (error) {
       console.error('Error generating slides:', error);
       toast({
@@ -129,24 +176,37 @@ export const SlidePresentation = () => {
               />
             </div>
 
-            {/* Generate Button */}
-            <Button
-              className="w-full bg-[#8cd09b] hover:bg-[#8cd09b]/90 text-[#0a1d2c] font-medium"
-              onClick={handleGenerate}
-              disabled={isGenerating || !file}
-            >
-              {isGenerating ? (
-                <>
-                  <Play className="w-4 h-4 mr-2 animate-spin" />
-                  Generating...
-                </>
-              ) : (
-                <>
-                  <Presentation className="w-4 h-4 mr-2" />
-                  Generate Slides
-                </>
+            {/* Action Buttons */}
+            <div className="flex gap-4">
+              <Button
+                className="flex-1 bg-[#8cd09b] hover:bg-[#8cd09b]/90 text-[#0a1d2c] font-medium"
+                onClick={handleGenerate}
+                disabled={isGenerating || !file}
+              >
+                {isGenerating ? (
+                  <>
+                    <Play className="w-4 h-4 mr-2 animate-spin" />
+                    Generating...
+                  </>
+                ) : (
+                  <>
+                    <Presentation className="w-4 h-4 mr-2" />
+                    Generate Slides
+                  </>
+                )}
+              </Button>
+
+              {generatedSlides && (
+                <Button
+                  className="flex-1 bg-[#8cd09b] hover:bg-[#8cd09b]/90 text-[#0a1d2c] font-medium"
+                  onClick={handleDownload}
+                  disabled={isGenerating}
+                >
+                  <Download className="w-4 h-4 mr-2" />
+                  Download PPTX
+                </Button>
               )}
-            </Button>
+            </div>
           </div>
         </Card>
       </main>
