@@ -102,7 +102,7 @@ export const useChatAuth = () => {
       title: "Signed out",
       description: "You've been signed out from GuroAI Chat."
     });
-    navigate("/askguro");
+    navigate("/"); // Changed from "/askguro" to "/" to redirect to index page
   };
 
   return { 
