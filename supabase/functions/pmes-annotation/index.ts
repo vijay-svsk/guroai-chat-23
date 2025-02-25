@@ -53,7 +53,9 @@ serve(async (req) => {
             3. Concrete suggestions for improvement
             4. An overall rating from 1-5 for PMES alignment
             
-            Format your response with clear headings and bullet points for readability.`
+            Format your response with clear indentation and line breaks for readability.
+            Do not use any # or * characters in your response.
+            Use numbers or dashes for lists instead of bullets.`
           },
           { 
             role: 'user', 
@@ -72,7 +74,10 @@ serve(async (req) => {
     }
 
     const data = await response.json();
-    const annotations = data.choices[0].message.content;
+    let annotations = data.choices[0].message.content;
+    
+    // Remove any remaining # and * characters from the response
+    annotations = annotations.replace(/[#*]/g, '');
 
     console.log('Successfully generated PMES annotations');
 
