@@ -34,7 +34,6 @@ serve(async (req) => {
 
     // Define the section headers for Column 1
     const sectionHeaders = [
-      "I. OBJECTIVES",
       "A. Content Standard",
       "B. Performance Standard",
       "C. Learning Competencies",

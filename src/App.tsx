@@ -8,6 +8,7 @@ import Dashboard from "./pages/Dashboard";
 import LearnMore from "./pages/LearnMore";
 import NotFound from "./pages/NotFound";
 import LessonPlanAI from "./pages/LessonPlanAI";
+import LessonPlanDocx from "./pages/LessonPlanDocx";
 import FourAsAI from "./pages/FourAsAI";
 import Auth from "./pages/Auth";
 import SignUpNewAccount from "./pages/SignUpNewAccount";
@@ -33,6 +34,7 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/learn-more" element={<LearnMore />} />
           <Route path="/lesson-plan-ai" element={<LessonPlanAI />} />
+          <Route path="/lesson-plan-docx" element={<LessonPlanDocx />} />
           <Route path="/four-as-ai" element={<FourAsAI />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/signup-new-account" element={<SignUpNewAccount />} />

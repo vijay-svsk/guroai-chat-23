@@ -53,7 +53,7 @@ export const LessonPlanContent = ({
 
     const processedResponse = response.split('\n').map((line, index) => {
       if (line.startsWith('IMAGE PROMPT:')) {
-        return null; // Skip image prompts in the display
+        return null;
       }
       return <div key={index}>{line}</div>;
     });
