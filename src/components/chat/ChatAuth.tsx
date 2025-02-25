@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CreditCard } from "lucide-react";
 
@@ -30,6 +30,9 @@ export const ChatAuth = ({ onSubscribe }: ChatAuthProps) => {
     <div className="max-w-md w-full mx-auto p-4">
       <Card className="shadow-lg border-[#023d54]/20">
         <CardHeader className="text-center">
+          <CardTitle className="text-2xl font-bold text-[#023d54]">
+            GuroAI Chat
+          </CardTitle>
           <CardDescription className="text-[#023d54]/70 text-base">
             Subscribe to start chatting with GuroAI
           </CardDescription>
