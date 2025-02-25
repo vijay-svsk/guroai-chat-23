@@ -38,23 +38,6 @@ const AskGuro = () => {
     );
   }
 
-  if (!userId) {
-    return (
-      <div className="flex flex-col min-h-screen bg-gradient-to-b from-white to-[#f8fafc]">
-        <div className="flex-1 flex flex-col items-center justify-center">
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-[#023d54] tracking-tight mb-2">
-              Please Sign In
-            </h1>
-            <p className="text-2xl text-[#023d54]/80 tracking-tight">
-              Sign in to start chatting with GuroAI
-            </p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-white to-[#f8fafc]">
       {/* Top bar with New Chat button */}

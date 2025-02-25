@@ -1,28 +1,22 @@
 
 import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
+import { v4 as uuidv4 } from "uuid";
 
 export const useChatAuth = () => {
   const [userId, setUserId] = useState<string | null>(null);
-  const { toast } = useToast();
 
   useEffect(() => {
-    checkUser();
-  }, []);
-
-  const checkUser = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user) {
-      setUserId(user.id);
+    // Instead of checking for authentication, assign a temporary anonymous ID
+    // either from localStorage or create a new one
+    const storedId = localStorage.getItem("anonymous_chat_id");
+    if (storedId) {
+      setUserId(storedId);
     } else {
-      toast({
-        title: "Authentication Required",
-        description: "Please sign in to use the chat feature.",
-        variant: "destructive"
-      });
+      const newId = uuidv4();
+      localStorage.setItem("anonymous_chat_id", newId);
+      setUserId(newId);
     }
-  };
+  }, []);
 
   return { userId };
 };

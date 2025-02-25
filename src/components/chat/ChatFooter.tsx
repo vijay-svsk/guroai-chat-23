@@ -28,7 +28,7 @@ export const ChatFooter = ({
           setQuestion={setQuestion}
           onSubmit={onSubmit}
           isLoading={isLoading}
-          disabled={!userId}
+          disabled={isLoading} // Only disable when loading, not based on userId
           onFileUpload={onFileUpload}
           onImageGenerate={onImageGenerate}
         />
