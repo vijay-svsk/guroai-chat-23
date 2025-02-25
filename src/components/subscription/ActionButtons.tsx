@@ -23,6 +23,12 @@ export const ActionButtons = () => {
         </div>
         Ask GuroAI
       </Button>
+      <Button 
+        onClick={() => navigate('/pmes-annotation')} 
+        className="w-full bg-[#8cd09b] hover:bg-[#7bc08b] text-[#023d54] font-semibold py-3 px-6 rounded-lg transition-all"
+      >
+        Generate PMES Annotation
+      </Button>
     </div>
   );
 };
