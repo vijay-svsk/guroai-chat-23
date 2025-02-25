@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
@@ -129,6 +128,10 @@ const MonthlySubscription = () => {
     return () => clearInterval(timer);
   }, [subscriptionEndDate, navigate]);
 
+  const handleSlidePresentationClick = () => {
+    window.location.href = 'https://slidesgpt.com/';
+  };
+
   // Calculate the progress percentage for the conic gradient
   const totalSeconds = timeRemaining.days * 24 * 60 * 60 + 
                       timeRemaining.hours * 60 * 60 + 
@@ -209,7 +212,7 @@ const MonthlySubscription = () => {
                   Generate Lesson Plan
                 </Button>
                 <Button 
-                  onClick={() => navigate('/slidepresentation')} 
+                  onClick={handleSlidePresentationClick} 
                   className="w-full bg-[#8cd09b] hover:bg-[#7bc08b] text-[#023d54] font-semibold py-3 px-6 rounded-lg transition-all"
                 >
                   <Presentation className="mr-2" />
