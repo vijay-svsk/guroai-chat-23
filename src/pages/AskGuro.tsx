@@ -6,11 +6,12 @@ import { WelcomeScreen } from "@/components/chat/WelcomeScreen";
 import { ChatSidebar } from "@/components/chat/ChatSidebar";
 import { ChatHeader } from "@/components/chat/ChatHeader";
 import { ChatFooter } from "@/components/chat/ChatFooter";
+import { ChatAuth } from "@/components/chat/ChatAuth";
 import { useChat } from "@/hooks/use-chat";
 import { useChatAuth } from "@/hooks/use-chat-auth";
 
 const AskGuro = () => {
-  const { userId } = useChatAuth();
+  const { userId, isCheckingAuth, signInToChat, registerForChat, signOut } = useChatAuth();
   const [showPreviousChats, setShowPreviousChats] = useState(false);
   
   const {
@@ -28,7 +29,7 @@ const AskGuro = () => {
     handleImageGeneration,
   } = useChat(userId);
 
-  if (isLoadingHistory) {
+  if (isCheckingAuth || isLoadingHistory) {
     return (
       <div className="flex flex-col min-h-screen bg-gradient-to-b from-white to-[#f8fafc]">
         <div className="flex-1 flex items-center justify-center">
@@ -38,10 +39,33 @@ const AskGuro = () => {
     );
   }
 
+  if (!userId) {
+    return (
+      <div className="flex flex-col min-h-screen bg-gradient-to-b from-white to-[#f8fafc] py-10">
+        <div className="flex-1 flex flex-col items-center justify-center">
+          <div className="text-center mb-8">
+            <h1 className="text-4xl font-bold text-[#023d54] tracking-tight mb-2">
+              GuroAI Chat
+            </h1>
+            <p className="text-xl text-[#023d54]/80 mb-8">
+              Sign in to start chatting with GuroAI
+            </p>
+          </div>
+          <ChatAuth onSignIn={signInToChat} onRegister={registerForChat} />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-white to-[#f8fafc]">
       {/* Top bar with New Chat button */}
-      <ChatHeader startNewChat={startNewChat} isLoading={isLoading} />
+      <ChatHeader 
+        startNewChat={startNewChat} 
+        isLoading={isLoading} 
+        onSignOut={signOut}
+        isAuthenticated={!!userId}
+      />
 
       <div className="flex flex-1 max-w-5xl mx-auto w-full px-4 relative">
         {/* Previous Responses Sidebar */}

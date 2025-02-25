@@ -1,22 +1,108 @@
 
 import { useState, useEffect } from "react";
-import { v4 as uuidv4 } from "uuid";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 
 export const useChatAuth = () => {
   const [userId, setUserId] = useState<string | null>(null);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+  const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    // Instead of checking for authentication, assign a temporary anonymous ID
-    // either from localStorage or create a new one
-    const storedId = localStorage.getItem("anonymous_chat_id");
-    if (storedId) {
-      setUserId(storedId);
-    } else {
-      const newId = uuidv4();
-      localStorage.setItem("anonymous_chat_id", newId);
-      setUserId(newId);
-    }
+    checkUser();
   }, []);
 
-  return { userId };
+  const checkUser = async () => {
+    setIsCheckingAuth(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        setUserId(user.id);
+      } else {
+        // User is not authenticated
+        setUserId(null);
+      }
+    } catch (error) {
+      console.error("Error checking auth:", error);
+      setUserId(null);
+    } finally {
+      setIsCheckingAuth(false);
+    }
+  };
+
+  const signInToChat = async (email: string, password: string) => {
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (error) throw error;
+      
+      if (data.user) {
+        setUserId(data.user.id);
+        toast({
+          title: "Welcome to GuroAI Chat!",
+          description: "You're now signed in.",
+        });
+        return true;
+      }
+      return false;
+    } catch (error: any) {
+      toast({
+        title: "Sign-in failed",
+        description: error.message,
+        variant: "destructive"
+      });
+      return false;
+    }
+  };
+
+  const registerForChat = async (email: string, password: string) => {
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password
+      });
+
+      if (error) throw error;
+      
+      if (data.user) {
+        setUserId(data.user.id);
+        toast({
+          title: "Account created!",
+          description: "You're now registered for GuroAI Chat.",
+        });
+        return true;
+      }
+      return false;
+    } catch (error: any) {
+      toast({
+        title: "Registration failed",
+        description: error.message,
+        variant: "destructive"
+      });
+      return false;
+    }
+  };
+
+  const signOut = async () => {
+    await supabase.auth.signOut();
+    setUserId(null);
+    toast({
+      title: "Signed out",
+      description: "You've been signed out from GuroAI Chat."
+    });
+    navigate("/askguro");
+  };
+
+  return { 
+    userId, 
+    isCheckingAuth, 
+    signInToChat, 
+    registerForChat, 
+    signOut 
+  };
 };
