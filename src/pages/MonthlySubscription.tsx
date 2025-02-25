@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Clock, FilePresentation } from "lucide-react";
+import { Clock, Presentation } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -212,7 +212,7 @@ const MonthlySubscription = () => {
                   onClick={() => navigate('/slidepresentation')} 
                   className="w-full bg-[#8cd09b] hover:bg-[#7bc08b] text-[#023d54] font-semibold py-3 px-6 rounded-lg transition-all"
                 >
-                  <FilePresentation className="mr-2" />
+                  <Presentation className="mr-2" />
                   Generate Slide Presentation
                 </Button>
               </div>
