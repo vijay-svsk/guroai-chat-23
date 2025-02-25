@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -183,6 +182,52 @@ const AskGuro = () => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
+  const handleFileUpload = async (file: File) => {
+    if (!userId) return;
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const { data, error } = await supabase.functions.invoke('process-file', {
+        body: formData,
+      });
+
+      if (error) throw error;
+
+      const userMessage: ChatMessage = {
+        role: 'user',
+        content: `I've uploaded a file named "${file.name}". Please analyze it.`
+      };
+
+      setMessages(prev => [...prev, userMessage]);
+      setQuestion("");
+      setIsLoading(true);
+      scrollToBottom();
+
+      await saveMessage(userMessage);
+
+      const assistantMessage: ChatMessage = {
+        role: 'assistant',
+        content: data.analysis
+      };
+
+      setMessages(prev => [...prev, assistantMessage]);
+      await saveMessage(assistantMessage);
+      await loadChatSessions();
+    } catch (error) {
+      console.error('Error:', error);
+      toast({
+        title: "Error",
+        description: "Failed to process the file. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+      scrollToBottom();
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!question.trim() || !userId) return;
@@ -342,6 +387,7 @@ const AskGuro = () => {
             onSubmit={handleSubmit}
             isLoading={isLoading}
             disabled={!userId}
+            onFileUpload={handleFileUpload}
           />
           
           {/* Disclaimer Footer */}
