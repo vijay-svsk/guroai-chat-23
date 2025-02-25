@@ -1,7 +1,7 @@
 
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { Document, Packer, Paragraph, TextRun } from "npm:docx";
+import { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, WidthType } from "npm:docx";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -23,21 +23,70 @@ serve(async (req) => {
 
     console.log('Received content length:', content.length);
 
-    // Create a new document
+    // Split content into lines and process them
+    const lines = content.split('\n');
+    const tableRows = [];
+    let currentHeader = '';
+    let currentContent = [];
+
+    for (const line of lines) {
+      if (line.trim() === '') continue;
+
+      // Check if line is a header (e.g., "Content Standard:", "Performance Standard:")
+      if (line.includes(':') && !line.startsWith(' ')) {
+        // If we have accumulated content, add it to table
+        if (currentHeader) {
+          tableRows.push(new TableRow({
+            children: [
+              new TableCell({
+                children: [new Paragraph({ children: [new TextRun({ text: currentHeader, bold: true })] })],
+                width: { size: 30, type: WidthType.PERCENTAGE }
+              }),
+              new TableCell({
+                children: currentContent.map(text => 
+                  new Paragraph({ children: [new TextRun({ text })] })
+                ),
+                width: { size: 70, type: WidthType.PERCENTAGE }
+              })
+            ]
+          }));
+        }
+        currentHeader = line.trim();
+        currentContent = [];
+      } else {
+        currentContent.push(line.trim());
+      }
+    }
+
+    // Add the last section
+    if (currentHeader) {
+      tableRows.push(new TableRow({
+        children: [
+          new TableCell({
+            children: [new Paragraph({ children: [new TextRun({ text: currentHeader, bold: true })] })],
+            width: { size: 30, type: WidthType.PERCENTAGE }
+          }),
+          new TableCell({
+            children: currentContent.map(text => 
+              new Paragraph({ children: [new TextRun({ text })] })
+            ),
+            width: { size: 70, type: WidthType.PERCENTAGE }
+          })
+        ]
+      }));
+    }
+
+    // Create the document with the table
     const doc = new Document({
       sections: [{
         properties: {},
-        children: content.split('\n').map(line => 
-          new Paragraph({
-            children: [
-              new TextRun({
-                text: line || ' ', // Handle empty lines
-                size: 24, // 12pt font
-              }),
-            ],
+        children: [
+          new Table({
+            rows: tableRows,
+            width: { size: 100, type: WidthType.PERCENTAGE }
           })
-        ),
-      }],
+        ]
+      }]
     });
 
     console.log('Document created successfully');
