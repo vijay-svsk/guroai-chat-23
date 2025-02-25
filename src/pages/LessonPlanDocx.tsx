@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -8,13 +8,25 @@ import { supabase } from "@/integrations/supabase/client";
 
 const LessonPlanDocx = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
   const [docxUrl, setDocxUrl] = useState<string | null>(null);
+  
+  // Get the content from navigation state
   const content = location.state?.content;
 
   useEffect(() => {
-    if (!content) return;
+    // If no content is provided, redirect back to lesson plan creation
+    if (!content) {
+      navigate("/lesson-plan-ai");
+      toast({
+        title: "No Content Found",
+        description: "Please generate a lesson plan first.",
+        variant: "destructive",
+      });
+      return;
+    }
 
     const generateDocx = async () => {
       try {
@@ -48,21 +60,7 @@ const LessonPlanDocx = () => {
     };
 
     generateDocx();
-  }, [content]);
-
-  if (!content) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <Card className="w-full max-w-2xl">
-          <CardContent className="p-6">
-            <p className="text-center text-gray-600">
-              No lesson plan content provided. Please generate a lesson plan first.
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
+  }, [content, navigate, toast]);
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">

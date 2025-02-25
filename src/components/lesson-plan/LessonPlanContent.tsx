@@ -37,7 +37,19 @@ export const LessonPlanContent = ({
   }
 
   const handleProceedToNextStep = () => {
-    navigate("/lesson-plan-docx", { state: { content: response } });
+    // Ensure we have content before navigating
+    if (response) {
+      navigate("/lesson-plan-docx", { 
+        state: { 
+          content: response,
+          // Also pass any other relevant data
+          images: {
+            reviewImage,
+            motivationImage
+          }
+        } 
+      });
+    }
   };
 
   const renderContent = () => {
