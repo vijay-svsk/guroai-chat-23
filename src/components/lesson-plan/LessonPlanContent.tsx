@@ -1,7 +1,9 @@
 
 import { Button } from "@/components/ui/button";
-import { Save, Download, FileText } from "lucide-react";
+import { Save, Download, FileText, Presentation } from "lucide-react";
 import { Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface LessonPlanContentProps {
   isLoading: boolean;
@@ -26,6 +28,44 @@ export const LessonPlanContent = ({
   onDownloadTxt,
   onDownloadDocx,
 }: LessonPlanContentProps) => {
+  const { toast } = useToast();
+  const [isGeneratingSlides, setIsGeneratingSlides] = useState(false);
+
+  const handleGenerateSlides = async () => {
+    try {
+      setIsGeneratingSlides(true);
+      const { data, error } = await supabase.functions.invoke('generate-slides', {
+        body: { content: response }
+      });
+
+      if (error) throw error;
+
+      // Create and trigger download
+      const element = document.createElement("a");
+      element.href = data.presentationUrl;
+      element.download = "lesson_plan_slides.pptx";
+      document.body.appendChild(element);
+      element.click();
+      document.body.removeChild(element);
+
+      toast({
+        title: "Success!",
+        description: "Your presentation slides have been generated and downloaded.",
+        duration: 3000,
+      });
+    } catch (error) {
+      console.error("Error generating slides:", error);
+      toast({
+        title: "Error",
+        description: "Failed to generate presentation slides. Please try again.",
+        variant: "destructive",
+        duration: 3000,
+      });
+    } finally {
+      setIsGeneratingSlides(false);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="text-center py-12">
@@ -113,6 +153,14 @@ export const LessonPlanContent = ({
         >
           <Save className="h-4 w-4" />
           Save this Lesson Plan
+        </Button>
+        <Button
+          onClick={handleGenerateSlides}
+          disabled={isLoading || !response || isGeneratingSlides}
+          className="w-full sm:w-auto flex items-center gap-2"
+        >
+          <Presentation className="h-4 w-4" />
+          {isGeneratingSlides ? "Generating Slides..." : "Generate Slides"}
         </Button>
         <Button
           onClick={onDownloadTxt}
