@@ -1,8 +1,10 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CreditCard } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ChatAuthProps {
   onSubscribe: () => void;
@@ -12,6 +14,27 @@ interface ChatAuthProps {
 export const ChatAuth = ({ onSubscribe, isSubscribed = false }: ChatAuthProps) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [session, setSession] = useState<any>(null);
+  const navigate = useNavigate();
+
+  // Check if user is already authenticated with Supabase
+  useEffect(() => {
+    const getSession = async () => {
+      const { data } = await supabase.auth.getSession();
+      setSession(data.session);
+    };
+    
+    getSession();
+    
+    // Set up auth listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, newSession) => {
+        setSession(newSession);
+      }
+    );
+    
+    return () => subscription.unsubscribe();
+  }, []);
 
   const handleSubscribeClick = () => {
     setError(null);
@@ -27,7 +50,12 @@ export const ChatAuth = ({ onSubscribe, isSubscribed = false }: ChatAuthProps) =
     }
   };
 
-  if (isSubscribed) {
+  const handleStartChat = () => {
+    navigate('/ask-guro');
+  };
+
+  // If already authenticated and subscribed
+  if (session || isSubscribed) {
     return (
       <div className="max-w-md w-full mx-auto p-4">
         <Card className="shadow-lg border-[#023d54]/20">
@@ -44,6 +72,13 @@ export const ChatAuth = ({ onSubscribe, isSubscribed = false }: ChatAuthProps) =
               <p className="text-center text-green-600 font-medium">
                 Thank you for subscribing to GuroAI Chat!
               </p>
+              
+              <Button 
+                onClick={handleStartChat}
+                className="w-full bg-[#023d54] hover:bg-[#023d54]/90" 
+              >
+                Start Chatting Now
+              </Button>
             </div>
           </CardContent>
         </Card>

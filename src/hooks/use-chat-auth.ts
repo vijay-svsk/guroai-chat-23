@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
 // Create a namespace for chat-specific authentication
 const CHAT_AUTH_KEY = "guro_chat_auth";
@@ -26,7 +27,16 @@ export const useChatAuth = () => {
 
   const checkUser = async () => {
     try {
-      // First check local storage for chat-specific auth
+      // First check Supabase auth
+      const { data } = await supabase.auth.getSession();
+      
+      if (data.session) {
+        setUserId(data.session.user.id);
+        setIsCheckingAuth(false);
+        return;
+      }
+      
+      // If no Supabase auth, check local storage for chat-specific auth
       const chatAuthData = localStorage.getItem(CHAT_AUTH_KEY);
       
       if (chatAuthData) {
@@ -43,7 +53,7 @@ export const useChatAuth = () => {
         }
       }
       
-      // If no valid chat auth in local storage, reset state
+      // If no valid auth anywhere, reset state
       setUserId(null);
     } catch (error) {
       console.error("Error checking chat auth:", error);
@@ -69,7 +79,10 @@ export const useChatAuth = () => {
   };
 
   const signOut = async () => {
-    // Just remove the chat-specific auth from local storage
+    // Sign out from Supabase
+    await supabase.auth.signOut();
+    
+    // Remove chat-specific auth from local storage
     localStorage.removeItem(CHAT_AUTH_KEY);
     setUserId(null);
     

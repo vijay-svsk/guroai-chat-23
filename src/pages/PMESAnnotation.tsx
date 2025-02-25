@@ -14,6 +14,7 @@ const PMESAnnotation = () => {
   const [annotations, setAnnotations] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isSubscribed, setIsSubscribed] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -22,10 +23,45 @@ const PMESAnnotation = () => {
     const checkAuth = async () => {
       const { data } = await supabase.auth.getSession();
       setIsAuthenticated(!!data.session);
+
+      // If authenticated, check subscription
+      if (data.session) {
+        try {
+          const userId = data.session.user.id;
+          const hasSubscription = await checkSubscriptionStatus(userId);
+          setIsSubscribed(hasSubscription);
+        } catch (error) {
+          console.error("Error checking subscription:", error);
+        }
+      }
     };
     
     checkAuth();
   }, []);
+
+  // Helper function to check subscription status
+  const checkSubscriptionStatus = async (userId: string) => {
+    const { data: subscription, error } = await supabase
+      .from('subscriptions')
+      .select('*')
+      .eq('user_id', userId)
+      .maybeSingle();
+
+    if (error) {
+      console.error('Error checking subscription:', error);
+      return false;
+    }
+
+    if (!subscription) {
+      return false;
+    }
+
+    // Check if subscription has expired (more than 1 month since start_date)
+    const endDate = new Date(subscription.end_date);
+    const now = new Date();
+
+    return subscription.status === 'active' && now < endDate;
+  };
 
   const handleAnnotate = async () => {
     if (!lessonPlan.trim()) {
@@ -68,7 +104,13 @@ const PMESAnnotation = () => {
   };
 
   const handleAskGuro = () => {
-    navigate('/ask-guro');
+    // If authenticated and subscribed, navigate directly to ask-guro
+    if (isAuthenticated && isSubscribed) {
+      navigate('/ask-guro');
+    } else {
+      // Redirect to login or subscription page
+      navigate('/ask-guro');
+    }
   };
 
   return (
