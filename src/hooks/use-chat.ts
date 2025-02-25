@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -185,7 +184,7 @@ export const useChat = (userId: string | null) => {
 
       if (error) throw error;
       if (!data?.answer) throw new Error('No answer received');
-      
+
       const assistantMessage: ChatMessage = {
         role: 'assistant',
         content: data.answer
@@ -193,7 +192,7 @@ export const useChat = (userId: string | null) => {
 
       setMessages(prev => [...prev, assistantMessage]);
       await saveMessage(assistantMessage);
-      await loadChatSessions(); // Refresh chat history
+      await loadChatSessions();
     } catch (error) {
       console.error('Error:', error);
       toast({
