@@ -73,24 +73,36 @@ const LessonPlanAI = () => {
   };
 
   useEffect(() => {
+    // If there's no formData, redirect to dashboard
     if (!formData) {
       navigate("/dashboard");
       return;
     }
-    generateLessonPlan(formData);
-  }, [formData]);
 
+    // Only generate lesson plan if we have the method and required fields
+    if (formData.method && formData.subject && formData.gradeLevel && formData.topic) {
+      generateLessonPlan(formData);
+    }
+  }, [formData, navigate, generateLessonPlan]);
+
+  // If there's no formData, don't render anything (useEffect will handle redirect)
   if (!formData) {
+    return null;
+  }
+
+  // If we have formData but no method selected yet, show empty state
+  if (!formData.method) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <Card className="w-full max-w-2xl">
-          <CardContent className="p-6">
-            <p className="text-center text-gray-600">
-              No lesson plan parameters provided. Please return to the dashboard and
-              fill in the required information.
-            </p>
-          </CardContent>
-        </Card>
+      <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto">
+          <Card className="bg-white shadow-xl">
+            <CardContent className="p-6">
+              <p className="text-center text-gray-600 py-12">
+                Please select a teaching method and provide your teaching preferences first.
+              </p>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     );
   }
