@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { User, LogOut } from "lucide-react";
+import { User, LogOut, CreditCard } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -17,7 +17,7 @@ export const DashboardHeader = ({ email, onMyAccount }: DashboardHeaderProps) =>
   const handleLogout = async () => {
     try {
       await supabase.auth.signOut();
-      navigate('/'); // Changed from '/index' to '/'
+      navigate('/');
       toast({
         title: "Logged out successfully",
         description: "See you next time!",
@@ -45,6 +45,14 @@ export const DashboardHeader = ({ email, onMyAccount }: DashboardHeaderProps) =>
             </div>
           </div>
           <div className="flex flex-col sm:flex-row gap-2 items-center">
+            <Button 
+              variant="secondary" 
+              onClick={() => navigate('/monthlysubscription')} 
+              className="border-white text-slate-900 bg-green-400 hover:bg-green-300 w-full sm:w-fit"
+            >
+              <CreditCard className="w-4 h-4 mr-2" />
+              <span>Monthly Subscription</span>
+            </Button>
             <Button 
               variant="secondary" 
               onClick={onMyAccount} 
