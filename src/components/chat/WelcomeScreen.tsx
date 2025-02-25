@@ -1,5 +1,6 @@
 
-import { GuroAvatar, cn } from "@/lib/utils";
+import { cn } from "@/lib/utils";
+import { GuroAvatar } from "@/components/ui/guro-avatar";
 
 export const WelcomeScreen = () => {
   return (

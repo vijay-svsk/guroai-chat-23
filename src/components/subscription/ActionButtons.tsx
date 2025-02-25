@@ -1,7 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { GuroAvatar } from "@/lib/utils";
-import { MessageSquare } from "lucide-react";
+import { GuroAvatar } from "@/components/ui/guro-avatar";
 import { useNavigate } from "react-router-dom";
 
 export const ActionButtons = () => {
