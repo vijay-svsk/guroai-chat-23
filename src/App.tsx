@@ -20,6 +20,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import DeleteAccount from "./pages/DeleteAccount";
 import SlidePresentation from "./pages/SlidePresentation";
 import AskGuro from "./pages/AskGuro";
+import PMESAnnotation from "./pages/PMESAnnotation";
 import { Toaster } from "@/components/ui/toaster";
 
 console.log("App component rendering");
@@ -47,6 +48,7 @@ function App() {
           <Route path="/delete-account" element={<DeleteAccount />} />
           <Route path="/slidepresentation" element={<SlidePresentation />} />
           <Route path="/ask-guro" element={<AskGuro />} />
+          <Route path="/pmes-annotation" element={<PMESAnnotation />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         <Toaster />
@@ -56,4 +58,3 @@ function App() {
 }
 
 export default App;
-

@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -16,14 +16,14 @@ const PMESAnnotation = () => {
   const { toast } = useToast();
 
   // Check authentication status when component mounts
-  useState(() => {
+  useEffect(() => {
     const checkAuth = async () => {
       const { data } = await supabase.auth.getSession();
       setIsAuthenticated(!!data.session);
     };
     
     checkAuth();
-  });
+  }, []);
 
   const handleAnnotate = async () => {
     if (!lessonPlan.trim()) {
