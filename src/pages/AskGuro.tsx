@@ -3,10 +3,9 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Header } from "@/components/subscription/Header";
-import { Card, CardContent } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { MessageSquare, Send, Bot } from "lucide-react";
+import { Plus, Search, Lightbulb, Bot } from "lucide-react";
 
 const AskGuro = () => {
   const [question, setQuestion] = useState("");
@@ -39,48 +38,67 @@ const AskGuro = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className="min-h-screen bg-white">
       <Header />
-      <div className="max-w-3xl mx-auto w-full px-4 py-8 flex-1">
-        <Card className="shadow-xl border-[#023d54]/10">
-          <CardContent className="pt-6">
-            <div className="space-y-8">
-              <div className="flex items-center gap-3 text-[#023d54]">
-                <Bot className="w-8 h-8" />
-                <h1 className="text-3xl font-bold">Ask GuroAI</h1>
-              </div>
-              
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="flex gap-2">
-                  <Input
-                    value={question}
-                    onChange={(e) => setQuestion(e.target.value)}
-                    placeholder="What can I help you with?"
-                    disabled={isLoading}
-                    className="flex-1 border-[#023d54]/20 focus-visible:ring-[#023d54] text-[#023d54]"
-                  />
-                  <Button 
-                    type="submit" 
-                    disabled={isLoading || !question.trim()}
-                    className="bg-[#8cd09b] hover:bg-[#8cd09b]/90 text-[#023d54] font-semibold"
-                  >
-                    <Send className="w-4 h-4" />
-                  </Button>
-                </div>
-              </form>
-
-              {answer && (
-                <div className="mt-6 p-6 bg-[#023d54]/5 rounded-lg border border-[#023d54]/10">
-                  <div className="flex gap-3 mb-3">
-                    <MessageSquare className="w-5 h-5 text-[#023d54]" />
-                    <span className="font-medium text-[#023d54]">GuroAI's Response</span>
-                  </div>
-                  <p className="text-[#023d54]/90 whitespace-pre-wrap">{answer}</p>
-                </div>
-              )}
+      <div className="max-w-3xl mx-auto px-4 py-12">
+        <h1 className="text-3xl font-bold text-center text-[#023d54] mb-8">
+          What can I help with?
+        </h1>
+        
+        <div className="relative">
+          <form onSubmit={handleSubmit} className="relative">
+            <Input
+              value={question}
+              onChange={(e) => setQuestion(e.target.value)}
+              placeholder="Ask anything"
+              disabled={isLoading}
+              className="w-full pl-4 pr-14 py-6 text-lg rounded-full border-2 border-[#023d54]/10 focus-visible:ring-[#023d54] text-[#023d54] shadow-sm"
+            />
+            <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
+              <Button
+                type="submit"
+                size="icon"
+                disabled={isLoading || !question.trim()}
+                className="h-10 w-10 rounded-full bg-[#023d54] hover:bg-[#023d54]/90"
+              >
+                <Bot className="h-5 w-5" />
+              </Button>
             </div>
-          </CardContent>
-        </Card>
+          </form>
+
+          <div className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
+            <Button
+              type="button"
+              size="icon"
+              variant="ghost"
+              className="h-8 w-8 rounded-full hover:bg-[#023d54]/5"
+            >
+              <Plus className="h-4 w-4 text-[#023d54]" />
+            </Button>
+            <Button
+              type="button"
+              size="icon"
+              variant="ghost"
+              className="h-8 w-8 rounded-full hover:bg-[#023d54]/5"
+            >
+              <Search className="h-4 w-4 text-[#023d54]" />
+            </Button>
+            <Button
+              type="button"
+              size="icon"
+              variant="ghost"
+              className="h-8 w-8 rounded-full hover:bg-[#023d54]/5"
+            >
+              <Lightbulb className="h-4 w-4 text-[#023d54]" />
+            </Button>
+          </div>
+        </div>
+
+        {answer && (
+          <div className="mt-8 p-6 bg-[#023d54]/5 rounded-lg border border-[#023d54]/10">
+            <p className="text-[#023d54]/90 whitespace-pre-wrap">{answer}</p>
+          </div>
+        )}
       </div>
     </div>
   );
