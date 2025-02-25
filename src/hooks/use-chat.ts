@@ -256,7 +256,7 @@ export const useChat = (userId: string | null) => {
   const handleImageGeneration = () => {
     if (!userId) return;
     
-    // Set a prompt for image generation
+    // Set a prompt for OpenAI DALL-E image generation
     setQuestion("generate an image about ");
     
     // Focus on the textarea
