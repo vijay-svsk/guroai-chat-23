@@ -20,8 +20,7 @@ export const ChatHeader = ({
       <div className="max-w-5xl mx-auto w-full px-4 py-2">
         <div className="flex justify-between items-center">
           <div className="flex items-center">
-            <img src="/lovable-uploads/4d8f87fa-3f3d-4a33-8914-c2a1d7ff8cc2.png" alt="GuroAI Logo" className="h-10 w-auto mr-2" />
-            <span className="font-bold text-xl">GuroAI Chat</span>
+            {/* Logo and text removed */}
           </div>
           <div className="flex gap-2">
             <Button 
