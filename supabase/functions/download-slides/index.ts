@@ -9,6 +9,7 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -16,6 +17,12 @@ serve(async (req) => {
   try {
     console.log('Starting PPTX generation...');
     const { slidesData } = await req.json();
+
+    if (!slidesData || !slidesData.slides) {
+      throw new Error('Invalid slides data provided');
+    }
+
+    console.log('Received slides data:', JSON.stringify(slidesData));
 
     // Create a new presentation
     const pres = new pptxgen();
@@ -25,31 +32,49 @@ serve(async (req) => {
     pres.layout = 'CUSTOM';
 
     // Generate slides based on the data structure
+    console.log('Generating slides...');
     slidesData.slides.forEach((slideData: any, index: number) => {
+      console.log(`Creating slide ${index + 1} of type: ${slideData.type}`);
       const slide = pres.addSlide();
       
-      switch (slideData.type) {
-        case 'title':
-          createTitleSlide(slide, slideData.content);
-          break;
-        case 'objectives':
-          createObjectivesSlide(slide, slideData.content);
-          break;
-        // ... Handle other slide types
+      try {
+        switch (slideData.type) {
+          case 'title':
+            createTitleSlide(slide, slideData.content);
+            break;
+          case 'objectives':
+            createObjectivesSlide(slide, slideData.content);
+            break;
+          case 'content':
+            createContentSlide(slide, slideData.content);
+            break;
+          // Add more slide types as needed
+          default:
+            console.log(`Unknown slide type: ${slideData.type}`);
+        }
+      } catch (error) {
+        console.error(`Error creating slide ${index + 1}:`, error);
+        // Continue with next slide instead of failing completely
       }
     });
 
     // Generate the PPTX file
+    console.log('Generating final PPTX file...');
     const pptxBuffer = await pres.write('base64');
     console.log('PPTX file generated successfully');
 
     return new Response(
       JSON.stringify({ pptxData: pptxBuffer }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { 
+        headers: { 
+          ...corsHeaders, 
+          'Content-Type': 'application/json' 
+        } 
+      }
     );
 
   } catch (error) {
-    console.error('Error generating PPTX:', error);
+    console.error('Error in download-slides function:', error);
     return new Response(
       JSON.stringify({ 
         error: 'Failed to generate PPTX', 
@@ -57,14 +82,22 @@ serve(async (req) => {
       }),
       { 
         status: 500, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        headers: { 
+          ...corsHeaders, 
+          'Content-Type': 'application/json' 
+        } 
       }
     );
   }
 });
 
 function createTitleSlide(slide: any, content: { title: string; subtitle: string }) {
-  slide.addText(content.title, {
+  if (!content) {
+    console.warn('No content provided for title slide');
+    return;
+  }
+  
+  slide.addText(content.title || 'Untitled Presentation', {
     x: '10%',
     y: '40%',
     w: '80%',
@@ -73,17 +106,24 @@ function createTitleSlide(slide: any, content: { title: string; subtitle: string
     align: 'center'
   });
 
-  slide.addText(content.subtitle, {
-    x: '10%',
-    y: '60%',
-    w: '80%',
-    fontSize: 24,
-    align: 'center'
-  });
+  if (content.subtitle) {
+    slide.addText(content.subtitle, {
+      x: '10%',
+      y: '60%',
+      w: '80%',
+      fontSize: 24,
+      align: 'center'
+    });
+  }
 }
 
 function createObjectivesSlide(slide: any, content: { title: string; items: string[] }) {
-  slide.addText(content.title, {
+  if (!content) {
+    console.warn('No content provided for objectives slide');
+    return;
+  }
+
+  slide.addText(content.title || 'Objectives', {
     x: '10%',
     y: '10%',
     w: '80%',
@@ -91,13 +131,40 @@ function createObjectivesSlide(slide: any, content: { title: string; items: stri
     bold: true
   });
 
-  content.items.forEach((item: string, index: number) => {
-    slide.addText(`${index + 1}. ${item}`, {
-      x: '15%',
-      y: `${30 + (index * 15)}%`,
-      w: '70%',
-      fontSize: 24,
-      bullet: true
+  if (Array.isArray(content.items)) {
+    content.items.forEach((item: string, index: number) => {
+      slide.addText(item, {
+        x: '15%',
+        y: `${30 + (index * 15)}%`,
+        w: '70%',
+        fontSize: 24,
+        bullet: true
+      });
     });
-  });
+  }
 }
+
+function createContentSlide(slide: any, content: { title: string; text: string }) {
+  if (!content) {
+    console.warn('No content provided for content slide');
+    return;
+  }
+
+  slide.addText(content.title || 'Content', {
+    x: '10%',
+    y: '10%',
+    w: '80%',
+    fontSize: 32,
+    bold: true
+  });
+
+  if (content.text) {
+    slide.addText(content.text, {
+      x: '10%',
+      y: '30%',
+      w: '80%',
+      fontSize: 20
+    });
+  }
+}
+

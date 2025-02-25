@@ -23,6 +23,7 @@ export const ActionButtons = ({
   setGeneratedSlides,
 }: ActionButtonsProps) => {
   const { toast } = useToast();
+  const [isDownloading, setIsDownloading] = React.useState(false);
 
   const handleGenerate = async () => {
     if (!file) {
@@ -85,7 +86,10 @@ export const ActionButtons = ({
       return;
     }
 
+    setIsDownloading(true);
     try {
+      console.log('Sending slides data to download function:', generatedSlides);
+      
       const { data: pptxData, error } = await supabase.functions.invoke(
         'download-slides',
         {
@@ -98,13 +102,22 @@ export const ActionButtons = ({
         throw error;
       }
 
-      if (!pptxData) {
-        throw new Error('No data received from the download-slides function');
+      if (!pptxData || !pptxData.pptxData) {
+        throw new Error('No PPTX data received from the download-slides function');
       }
 
-      const blob = new Blob([pptxData], {
+      // Convert base64 to Blob
+      const byteCharacters = atob(pptxData.pptxData);
+      const byteNumbers = new Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+      const byteArray = new Uint8Array(byteNumbers);
+      
+      const blob = new Blob([byteArray], {
         type: 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
       });
+      
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -125,6 +138,8 @@ export const ActionButtons = ({
         description: error instanceof Error ? error.message : "An unexpected error occurred",
         variant: "destructive",
       });
+    } finally {
+      setIsDownloading(false);
     }
   };
 
@@ -152,10 +167,10 @@ export const ActionButtons = ({
         <Button
           className="flex-1 bg-[#8cd09b] hover:bg-[#8cd09b]/90 text-[#0a1d2c] font-medium"
           onClick={handleDownload}
-          disabled={isGenerating}
+          disabled={isDownloading || isGenerating}
         >
           <Download className="w-4 h-4 mr-2" />
-          Download PPTX
+          {isDownloading ? 'Downloading...' : 'Download PPTX'}
         </Button>
       )}
     </div>
