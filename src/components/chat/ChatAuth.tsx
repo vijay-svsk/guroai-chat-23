@@ -27,6 +27,8 @@ export const ChatAuth = ({ onSignIn, onRegister }: ChatAuthProps) => {
     
     try {
       await onSignIn(email, password);
+    } catch (err) {
+      setError("Failed to sign in. Please check your credentials.");
     } finally {
       setLoading(false);
     }
@@ -41,10 +43,17 @@ export const ChatAuth = ({ onSignIn, onRegister }: ChatAuthProps) => {
       return;
     }
 
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters");
+      return;
+    }
+
     setLoading(true);
     
     try {
       await onRegister(email, password);
+    } catch (err) {
+      setError("Failed to create account. Please try again.");
     } finally {
       setLoading(false);
     }

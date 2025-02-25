@@ -9,11 +9,13 @@ import { ChatFooter } from "@/components/chat/ChatFooter";
 import { ChatAuth } from "@/components/chat/ChatAuth";
 import { useChat } from "@/hooks/use-chat";
 import { useChatAuth } from "@/hooks/use-chat-auth";
+import { useToast } from "@/hooks/use-toast";
 
 const AskGuro = () => {
   const { userId, isCheckingAuth, signInToChat, registerForChat, signOut } = useChatAuth();
   const [showPreviousChats, setShowPreviousChats] = useState(false);
   const [isPageLoading, setIsPageLoading] = useState(true);
+  const { toast } = useToast();
   
   const {
     question,
@@ -30,14 +32,25 @@ const AskGuro = () => {
     handleImageGeneration,
   } = useChat(userId);
 
-  // Simulate faster loading for better UX
+  // Improve initial loading experience
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsPageLoading(false);
-    }, 500); // Short timeout to show the welcome message faster
+    }, 500);
     
     return () => clearTimeout(timer);
   }, []);
+
+  // Show welcome toast when user successfully logs in
+  useEffect(() => {
+    if (userId && !isCheckingAuth && !isPageLoading) {
+      toast({
+        title: "Welcome to GuroAI Chat",
+        description: "Ask any question to get started",
+        duration: 3000,
+      });
+    }
+  }, [userId, isCheckingAuth, isPageLoading, toast]);
 
   // Only show loading state if we're still checking auth AND loading is taking longer than expected
   if ((isCheckingAuth || isLoadingHistory) && isPageLoading) {
