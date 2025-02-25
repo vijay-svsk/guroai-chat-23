@@ -2,3 +2,5 @@
 project_id = "mfkomfsqtkbhkoznxmyv"
 [functions.ask-guro]
 verify_jwt = false
+[functions.pmes-annotation]
+verify_jwt = false
