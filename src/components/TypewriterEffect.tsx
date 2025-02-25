@@ -1,39 +1,64 @@
 
-import React, { useState, useEffect } from 'react';
-import { FormulaRenderer } from './FormulaRenderer';
+import { useState, useEffect } from "react";
 
 interface TypewriterEffectProps {
   text: string;
-  speed?: number;
 }
 
-export const TypewriterEffect = ({ text, speed = 5 }: TypewriterEffectProps) => {
-  const [displayedText, setDisplayedText] = useState('');
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isComplete, setIsComplete] = useState(false);
+export const TypewriterEffect = ({ text }: TypewriterEffectProps) => {
+  const [displayText, setDisplayText] = useState("");
+  const [index, setIndex] = useState(0);
+  const [isDone, setIsDone] = useState(false);
 
-  const cleanText = text.replace(/[#*]/g, '');
+  // Check if the text contains image markdown
+  const hasImageMarkdown = text.includes("![");
 
   useEffect(() => {
-    if (currentIndex < cleanText.length) {
-      const timer = setTimeout(() => {
-        setDisplayedText(prev => prev + cleanText[currentIndex]);
-        setCurrentIndex(prev => prev + 1);
-      }, speed);
-
-      return () => clearTimeout(timer);
-    } else {
-      setIsComplete(true);
+    // If text contains image markdown, display it immediately without typewriter effect
+    if (hasImageMarkdown) {
+      setDisplayText(text);
+      setIsDone(true);
+      return;
     }
-  }, [currentIndex, cleanText, speed]);
+
+    // Normal typewriter effect for text without images
+    if (index < text.length && !isDone) {
+      const timeout = setTimeout(() => {
+        setDisplayText(displayText + text[index]);
+        setIndex(index + 1);
+      }, 5);
+
+      return () => clearTimeout(timeout);
+    } else if (index >= text.length) {
+      setIsDone(true);
+    }
+  }, [text, index, displayText, isDone, hasImageMarkdown]);
+
+  // Function to process content for displaying
+  const processContentForDisplay = (content: string) => {
+    // Check if content contains an image markdown
+    const imageRegex = /!\[([^\]]*)\]\(([^)]+)\)/g;
+    
+    if (imageRegex.test(content)) {
+      // Replace image markdown with actual image elements
+      return content.replace(imageRegex, (match, alt, url) => {
+        return `<div class="my-4"><img src="${url}" alt="${alt}" class="max-w-full rounded-md shadow-md" style="max-height: 500px;" /></div>`;
+      });
+    }
+    
+    return content;
+  };
+
+  const processedContent = processContentForDisplay(displayText);
+  const containsImage = processedContent !== displayText;
 
   return (
-    <span className="whitespace-pre-wrap">
-      {isComplete ? (
-        <FormulaRenderer text={displayedText} />
+    <div className="prose max-w-none text-[#023d54]/90 whitespace-pre-wrap leading-relaxed">
+      {containsImage ? (
+        <div dangerouslySetInnerHTML={{ __html: processedContent }} />
       ) : (
-        displayedText
+        displayText
       )}
-    </span>
+    </div>
   );
 };
