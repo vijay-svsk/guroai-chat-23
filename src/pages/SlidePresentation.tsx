@@ -28,7 +28,7 @@ export const SlidePresentation = () => {
   const handleGenerate = async () => {
     if (!file) {
       toast({
-        title: "No file selected",
+        title: "No file uploaded",
         description: "Please upload a file first",
         variant: "destructive",
       });

@@ -18,6 +18,7 @@ import MonthlySubscription from "./pages/MonthlySubscription";
 import TermsOfService from "./pages/TermsOfService";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import DeleteAccount from "./pages/DeleteAccount";
+import SlidePresentation from "./pages/SlidePresentation";
 import { Toaster } from "@/components/ui/toaster";
 
 console.log("App component rendering");
@@ -43,6 +44,7 @@ function App() {
           <Route path="/terms-of-service" element={<TermsOfService />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/delete-account" element={<DeleteAccount />} />
+          <Route path="/slidepresentation" element={<SlidePresentation />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         <Toaster />
