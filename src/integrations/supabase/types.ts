@@ -9,6 +9,30 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      chat_messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["message_role"]
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["message_role"]
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["message_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
       lesson_plans: {
         Row: {
           content: string
@@ -136,6 +160,7 @@ export type Database = {
       }
     }
     Enums: {
+      message_role: "user" | "assistant"
       subscription_status: "active" | "expired" | "canceled"
     }
     CompositeTypes: {

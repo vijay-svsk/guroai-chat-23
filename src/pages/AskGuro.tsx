@@ -1,5 +1,5 @@
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Header } from "@/components/subscription/Header";
@@ -18,8 +18,56 @@ const AskGuro = () => {
   const [question, setQuestion] = useState("");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(true);
   const { toast } = useToast();
   const chatEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    loadChatHistory();
+  }, []);
+
+  const loadChatHistory = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('chat_messages')
+        .select('*')
+        .order('created_at', { ascending: true });
+
+      if (error) throw error;
+
+      setMessages(data.map(msg => ({
+        role: msg.role,
+        content: msg.content
+      })));
+    } catch (error) {
+      console.error('Error loading chat history:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load chat history.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoadingHistory(false);
+    }
+  };
+
+  const saveMessage = async (message: ChatMessage) => {
+    const { error } = await supabase
+      .from('chat_messages')
+      .insert({
+        content: message.content,
+        role: message.role
+      });
+
+    if (error) {
+      console.error('Error saving message:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save message.",
+        variant: "destructive"
+      });
+    }
+  };
 
   const scrollToBottom = () => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -40,6 +88,8 @@ const AskGuro = () => {
     scrollToBottom();
 
     try {
+      await saveMessage(userMessage);
+
       const { data, error } = await supabase.functions.invoke('ask-guro', {
         body: { question: userMessage.content }
       });
@@ -53,6 +103,7 @@ const AskGuro = () => {
       };
 
       setMessages(prev => [...prev, assistantMessage]);
+      await saveMessage(assistantMessage);
     } catch (error) {
       console.error('Error:', error);
       toast({
@@ -70,7 +121,11 @@ const AskGuro = () => {
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-white to-[#f8fafc]">
       <Header />
       <div className="flex-1 flex flex-col max-w-5xl mx-auto w-full px-4">
-        {messages.length === 0 ? (
+        {isLoadingHistory ? (
+          <div className="flex-1 flex items-center justify-center">
+            <LoadingState />
+          </div>
+        ) : messages.length === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-center">
             <div className="text-center mb-8">
               <h1 className="text-4xl font-bold text-[#023d54] tracking-tight mb-2">
