@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Bot, Send } from "lucide-react";
 import { LoadingState } from "@/components/subscription/LoadingState";
 import { cn } from "@/lib/utils";
+import { TypewriterEffect } from "@/components/TypewriterEffect";
 
 interface ChatMessage {
   role: 'user' | 'assistant';
@@ -196,9 +197,13 @@ const AskGuro = () => {
                   )}
                 </div>
                 <div className="flex-1">
-                  <p className="text-[#023d54]/90 whitespace-pre-wrap leading-relaxed">
-                    {message.content}
-                  </p>
+                  {message.role === 'assistant' ? (
+                    <TypewriterEffect text={message.content} />
+                  ) : (
+                    <p className="text-[#023d54]/90 whitespace-pre-wrap leading-relaxed">
+                      {message.content}
+                    </p>
+                  )}
                 </div>
               </div>
             ))}
