@@ -13,7 +13,6 @@ interface LessonPlanContentProps {
   onResponseChange: (value: string) => void;
   onSave: () => void;
   onDownloadTxt: () => void;
-  onDownloadDocx: () => void;
 }
 
 export const LessonPlanContent = ({
@@ -83,7 +82,7 @@ export const LessonPlanContent = ({
       <div className="bg-white border rounded-md p-4">
         {renderContent()}
       </div>
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col sm:flex-row gap-4 mt-6">
         <Button
           onClick={onSave}
           disabled={isLoading || !response}
