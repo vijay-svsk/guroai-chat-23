@@ -40,16 +40,25 @@ export const ActionButtons = ({
       formData.append('file', file);
       formData.append('instructions', instructions);
 
-      const { data: functionData, error: functionError } = await supabase.functions.invoke(
+      const { data: responseData, error: functionError } = await supabase.functions.invoke(
         'generate-slides',
         {
           body: formData,
         }
       );
 
-      if (functionError) throw functionError;
+      if (functionError) {
+        console.error('Function error:', functionError);
+        throw new Error(functionError.message);
+      }
 
-      setGeneratedSlides(functionData);
+      if (!responseData) {
+        throw new Error('No data received from the generate-slides function');
+      }
+
+      console.log('Generated slides data:', responseData);
+      setGeneratedSlides(responseData);
+      
       toast({
         title: "Success!",
         description: "Your slides have been generated successfully.",
@@ -57,8 +66,8 @@ export const ActionButtons = ({
     } catch (error) {
       console.error('Error generating slides:', error);
       toast({
-        title: "Error",
-        description: "Failed to generate slides. Please try again.",
+        title: "Error generating slides",
+        description: error instanceof Error ? error.message : "An unexpected error occurred",
         variant: "destructive",
       });
     } finally {
@@ -84,7 +93,14 @@ export const ActionButtons = ({
         }
       );
 
-      if (error) throw error;
+      if (error) {
+        console.error('Download error:', error);
+        throw error;
+      }
+
+      if (!pptxData) {
+        throw new Error('No data received from the download-slides function');
+      }
 
       const blob = new Blob([pptxData], {
         type: 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
@@ -105,8 +121,8 @@ export const ActionButtons = ({
     } catch (error) {
       console.error('Error downloading slides:', error);
       toast({
-        title: "Error",
-        description: "Failed to download presentation. Please try again.",
+        title: "Error downloading presentation",
+        description: error instanceof Error ? error.message : "An unexpected error occurred",
         variant: "destructive",
       });
     }
