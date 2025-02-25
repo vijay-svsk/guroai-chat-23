@@ -2,7 +2,7 @@
 project_id = "mfkomfsqtkbhkoznxmyv"
 
 [functions.generate-slides]
-verify_jwt = true
+verify_jwt = false
 
 [functions.download-slides]
-verify_jwt = true
+verify_jwt = false
