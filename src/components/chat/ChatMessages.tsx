@@ -1,7 +1,7 @@
 
-import { Bot } from "lucide-react";
 import { LoadingState } from "@/components/subscription/LoadingState";
 import { ChatMessage } from "./ChatMessage";
+import { GuroAvatar } from "@/components/ui/guro-avatar";
 
 interface ChatMessagesProps {
   messages: Array<{ role: 'user' | 'assistant'; content: string }>;
@@ -18,9 +18,7 @@ export const ChatMessages = ({ messages, isLoading, chatEndRef }: ChatMessagesPr
       {isLoading && (
         <div className="flex w-full items-start gap-4 p-6 bg-gray-50">
           <div className="flex-shrink-0 w-8 h-8">
-            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-[#023d54]">
-              <Bot className="w-5 h-5 text-white" />
-            </div>
+            <GuroAvatar />
           </div>
           <LoadingState />
         </div>

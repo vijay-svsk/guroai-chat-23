@@ -1,8 +1,8 @@
 
-import { Bot } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { TypewriterEffect } from "@/components/TypewriterEffect";
 import { FormulaRenderer } from "@/components/FormulaRenderer";
+import { GuroAvatar } from "@/components/ui/guro-avatar";
 
 interface ChatMessageProps {
   role: 'user' | 'assistant';
@@ -19,9 +19,7 @@ export const ChatMessage = ({ role, content }: ChatMessageProps) => {
     >
       <div className="flex-shrink-0 w-8 h-8">
         {role === 'assistant' ? (
-          <div className="flex items-center justify-center w-8 h-8 rounded-full bg-[#023d54]">
-            <Bot className="w-5 h-5 text-white" />
-          </div>
+          <GuroAvatar />
         ) : (
           <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-300">
             <div className="w-4 h-4 rounded-full bg-white" />
