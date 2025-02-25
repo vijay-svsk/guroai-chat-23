@@ -1,16 +1,7 @@
 
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import {
-  Document,
-  Packer,
-  Paragraph,
-  TextRun,
-  Table,
-  TableRow,
-  TableCell,
-  WidthType,
-} from "npm:docx";
+import { Document, Packer, Paragraph, TextRun } from "npm:docx";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -32,107 +23,20 @@ serve(async (req) => {
 
     console.log('Received content length:', content.length);
 
-    // Define the section headers for Column 1
-    const sectionHeaders = [
-      "A. Content Standard",
-      "B. Performance Standard",
-      "C. Learning Competencies",
-      "D. MELC-Based Competency",
-      "E. Objectives",
-      "1. Cognitive",
-      "2. Psychomotor",
-      "3. Affective",
-      "II. SUBJECT MATTER",
-      "A. TOPIC",
-      "B. REFERENCES",
-      "C. MATERIALS",
-      "III. Procedure",
-      "A. PRELIMINARIES",
-      "1. Reviewing previous lesson",
-      "2. Establishing purpose (Motivation)",
-      "B. PRESENTING EXAMPLES/INSTANCES",
-      "C. DISCUSSING NEW CONCEPT AND SKILLS #1",
-      "D. DISCUSSING NEW CONCEPT AND SKILLS #2",
-      "E. DEVELOPING MASTERY",
-      "F. PRACTICAL APPLICATION",
-      "G. GENERALIZATION",
-      "IV. EVALUATION",
-      "V. ASSIGNMENT"
-    ];
-
-    // Parse content into sections
-    const sections: { [key: string]: string } = {};
-    let currentSection = "";
-    let currentContent = "";
-    
-    content.split('\n').forEach((line) => {
-      const trimmedLine = line.trim();
-      if (sectionHeaders.some(header => 
-        trimmedLine.toLowerCase().includes(header.toLowerCase().replace(/[^a-zA-Z\s]/g, '')))) {
-        if (currentSection) {
-          sections[currentSection] = currentContent.trim();
-        }
-        currentSection = trimmedLine;
-        currentContent = "";
-      } else {
-        currentContent += line + "\n";
-      }
-    });
-    if (currentSection) {
-      sections[currentSection] = currentContent.trim();
-    }
-
-    // Create table with two columns
-    const table = new Table({
-      width: {
-        size: 100,
-        type: WidthType.PERCENTAGE,
-      },
-      columnWidths: [30, 70],
-      margins: {
-        top: 100,
-        bottom: 100,
-        right: 100,
-        left: 100,
-      },
-    });
-
-    // Add rows to table
-    sectionHeaders.forEach((header) => {
-      const row = new TableRow({
-        children: [
-          new TableCell({
-            children: [new Paragraph({
-              children: [new TextRun({ text: header, bold: true })],
-            })],
-            width: {
-              size: 30,
-              type: WidthType.PERCENTAGE,
-            },
-          }),
-          new TableCell({
-            children: [new Paragraph({
-              children: [new TextRun({ 
-                text: Object.entries(sections)
-                  .find(([key]) => key.toLowerCase().includes(header.toLowerCase().replace(/[^a-zA-Z\s]/g, '')))
-                  ?.[1] || " "
-              })],
-            })],
-            width: {
-              size: 70,
-              type: WidthType.PERCENTAGE,
-            },
-          }),
-        ],
-      });
-      table.addRow(row);
-    });
-
-    // Create document with the table
+    // Create a new document
     const doc = new Document({
       sections: [{
         properties: {},
-        children: [table],
+        children: content.split('\n').map(line => 
+          new Paragraph({
+            children: [
+              new TextRun({
+                text: line || ' ', // Handle empty lines
+                size: 24, // 12pt font
+              }),
+            ],
+          })
+        ),
       }],
     });
 
