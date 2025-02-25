@@ -6,7 +6,7 @@ import { Header } from "@/components/subscription/Header";
 import { Card, CardContent } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { MessageSquare, Send } from "lucide-react";
+import { MessageSquare, Send, Bot } from "lucide-react";
 
 const AskGuro = () => {
   const [question, setQuestion] = useState("");
@@ -39,30 +39,30 @@ const AskGuro = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white flex flex-col">
       <Header />
-      <div className="max-w-3xl mx-auto mt-12 px-4">
-        <Card className="shadow-xl">
+      <div className="max-w-3xl mx-auto w-full px-4 py-8 flex-1">
+        <Card className="shadow-xl border-[#023d54]/10">
           <CardContent className="pt-6">
-            <div className="space-y-6">
-              <h2 className="text-2xl font-bold text-[#023d54] flex items-center gap-2">
-                <MessageSquare className="w-6 h-6" />
-                Ask GuroAI
-              </h2>
+            <div className="space-y-8">
+              <div className="flex items-center gap-3 text-[#023d54]">
+                <Bot className="w-8 h-8" />
+                <h1 className="text-3xl font-bold">Ask GuroAI</h1>
+              </div>
               
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="flex gap-2">
                   <Input
                     value={question}
                     onChange={(e) => setQuestion(e.target.value)}
-                    placeholder="Ask me anything..."
+                    placeholder="What can I help you with?"
                     disabled={isLoading}
-                    className="flex-1"
+                    className="flex-1 border-[#023d54]/20 focus-visible:ring-[#023d54] text-[#023d54]"
                   />
                   <Button 
                     type="submit" 
                     disabled={isLoading || !question.trim()}
-                    className="bg-[#8cd09b] hover:bg-[#7bc08b] text-[#023d54]"
+                    className="bg-[#8cd09b] hover:bg-[#8cd09b]/90 text-[#023d54] font-semibold"
                   >
                     <Send className="w-4 h-4" />
                   </Button>
@@ -70,8 +70,12 @@ const AskGuro = () => {
               </form>
 
               {answer && (
-                <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-                  <p className="whitespace-pre-wrap text-gray-700">{answer}</p>
+                <div className="mt-6 p-6 bg-[#023d54]/5 rounded-lg border border-[#023d54]/10">
+                  <div className="flex gap-3 mb-3">
+                    <MessageSquare className="w-5 h-5 text-[#023d54]" />
+                    <span className="font-medium text-[#023d54]">GuroAI's Response</span>
+                  </div>
+                  <p className="text-[#023d54]/90 whitespace-pre-wrap">{answer}</p>
                 </div>
               )}
             </div>
