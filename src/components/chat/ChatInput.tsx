@@ -1,5 +1,5 @@
 
-import { Send, Upload } from "lucide-react";
+import { Paperclip, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
@@ -26,8 +26,13 @@ export const ChatInput = ({
 
   useEffect(() => {
     if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto';
-      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+      // Reset height to default
+      textareaRef.current.style.height = '48px';
+      
+      // Only expand if content exceeds the default height
+      if (textareaRef.current.scrollHeight > 48) {
+        textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+      }
     }
   }, [question]);
 
@@ -60,7 +65,7 @@ export const ChatInput = ({
                   (isLoading || disabled) && "opacity-50 cursor-not-allowed"
                 )}
               >
-                <Upload className="w-5 h-5 text-[#023d54]" />
+                <Paperclip className="w-5 h-5 text-[#023d54]" />
               </label>
             </div>
             <div className="flex-1 relative">
