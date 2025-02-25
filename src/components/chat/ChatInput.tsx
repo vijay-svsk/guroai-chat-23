@@ -1,5 +1,5 @@
 
-import { Paperclip, Send } from "lucide-react";
+import { Image, Paperclip, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
@@ -12,6 +12,7 @@ interface ChatInputProps {
   isLoading: boolean;
   disabled: boolean;
   onFileUpload?: (file: File) => void;
+  onImageGenerate?: () => void;
 }
 
 export const ChatInput = ({
@@ -20,7 +21,8 @@ export const ChatInput = ({
   onSubmit,
   isLoading,
   disabled,
-  onFileUpload
+  onFileUpload,
+  onImageGenerate
 }: ChatInputProps) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -68,6 +70,22 @@ export const ChatInput = ({
                 <Paperclip className="w-5 h-5 text-[#023d54]" />
               </label>
             </div>
+            {onImageGenerate && (
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={onImageGenerate}
+                  disabled={isLoading || disabled}
+                  className={cn(
+                    "flex items-center justify-center w-12 h-12 rounded-full cursor-pointer transition-colors",
+                    "border-2 border-[#023d54]/10 hover:bg-gray-100",
+                    (isLoading || disabled) && "opacity-50 cursor-not-allowed"
+                  )}
+                >
+                  <Image className="w-5 h-5 text-[#023d54]" />
+                </button>
+              </div>
+            )}
             <div className="flex-1 relative">
               <Textarea
                 ref={textareaRef}

@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -228,6 +229,22 @@ const AskGuro = () => {
     }
   };
 
+  const handleImageGeneration = () => {
+    if (!userId) return;
+    
+    // Set a prompt for DALL-E image generation
+    setQuestion("generate an image about ");
+    
+    // Focus on the textarea
+    const textarea = document.querySelector('textarea');
+    if (textarea) {
+      textarea.focus();
+      // Place cursor at the end
+      const length = textarea.value.length;
+      textarea.setSelectionRange(length, length);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!question.trim() || !userId) return;
@@ -388,6 +405,7 @@ const AskGuro = () => {
             isLoading={isLoading}
             disabled={!userId}
             onFileUpload={handleFileUpload}
+            onImageGenerate={handleImageGeneration}
           />
           
           {/* Disclaimer Footer */}
