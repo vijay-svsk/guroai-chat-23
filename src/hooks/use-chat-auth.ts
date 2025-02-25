@@ -95,7 +95,7 @@ export const useChatAuth = () => {
 
   const registerForChat = async (email: string, password: string) => {
     try {
-      // Instead of registering directly, redirect to Xendit payment
+      // Redirect to Xendit payment
       window.location.href = 'https://checkout.xendit.co/od/guroai.online';
       return false; // Return false as we're redirecting, not completing registration
     } catch (error: any) {

@@ -43,11 +43,6 @@ export const ChatAuth = ({ onSignIn, onRegister }: ChatAuthProps) => {
       return;
     }
 
-    if (password.length < 6) {
-      setError("Password must be at least 6 characters");
-      return;
-    }
-
     setLoading(true);
     
     try {
@@ -58,6 +53,11 @@ export const ChatAuth = ({ onSignIn, onRegister }: ChatAuthProps) => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSubscribeClick = () => {
+    // Directly redirect to Xendit payment page
+    window.location.href = 'https://checkout.xendit.co/od/guroai.online';
   };
 
   return (
@@ -151,7 +151,7 @@ export const ChatAuth = ({ onSignIn, onRegister }: ChatAuthProps) => {
                 </div>
                 
                 <Button 
-                  onClick={handleRegister}
+                  onClick={handleSubscribeClick}
                   className="w-full bg-[#023d54] hover:bg-[#023d54]/90" 
                   disabled={loading}
                 >
