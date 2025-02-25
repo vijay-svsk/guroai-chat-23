@@ -38,8 +38,8 @@ serve(async (req) => {
     });
 
     if (!response.ok) {
-      const errorData = await response.text();
-      console.error('Abacus AI API error:', errorData);
+      const errorText = await response.text();
+      console.error('Abacus AI API error:', errorText);
       throw new Error(`Abacus AI API error: ${response.statusText}`);
     }
 

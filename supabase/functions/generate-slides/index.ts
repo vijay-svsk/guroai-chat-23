@@ -23,13 +23,16 @@ serve(async (req) => {
     const file = formData.get('file');
     const instructions = formData.get('instructions') || '';
 
-    if (!file) {
-      throw new Error('No file provided');
+    if (!file || !(file instanceof File)) {
+      throw new Error('No file provided or invalid file format');
     }
 
-    // Convert file to base64
-    const arrayBuffer = await (file as File).arrayBuffer();
-    const base64Content = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
+    console.log('Processing file:', file.name, 'size:', file.size);
+
+    // Read file as ArrayBuffer and convert to base64
+    const fileArrayBuffer = await file.arrayBuffer();
+    const uint8Array = new Uint8Array(fileArrayBuffer);
+    const base64Content = btoa(String.fromCharCode.apply(null, uint8Array));
 
     console.log('Making request to Abacus AI API...');
     
@@ -41,14 +44,14 @@ serve(async (req) => {
       },
       body: JSON.stringify({
         content: base64Content,
-        fileName: (file as File).name,
+        fileName: file.name,
         instructions: instructions,
       }),
     });
 
     if (!response.ok) {
-      const errorData = await response.text();
-      console.error('Abacus AI API error:', errorData);
+      const errorText = await response.text();
+      console.error('Abacus AI API error:', errorText);
       throw new Error(`Abacus AI API error: ${response.statusText}`);
     }
 
