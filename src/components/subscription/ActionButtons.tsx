@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { Presentation } from "lucide-react";
+import { Presentation, MessageSquare } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 export const ActionButtons = () => {
@@ -24,6 +24,13 @@ export const ActionButtons = () => {
       >
         <Presentation className="mr-2" />
         Generate Slide Presentation
+      </Button>
+      <Button 
+        onClick={() => navigate('/ask-guro')} 
+        className="w-full bg-[#8cd09b] hover:bg-[#7bc08b] text-[#023d54] font-semibold py-3 px-6 rounded-lg transition-all"
+      >
+        <MessageSquare className="mr-2" />
+        Ask GuroAI
       </Button>
     </div>
   );

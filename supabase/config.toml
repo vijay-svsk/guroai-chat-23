@@ -1,8 +1,4 @@
 
 project_id = "mfkomfsqtkbhkoznxmyv"
-
-[functions.generate-slides]
-verify_jwt = false
-
-[functions.download-slides]
+[functions.ask-guro]
 verify_jwt = false
