@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -255,7 +256,7 @@ export const useChat = (userId: string | null) => {
   const handleImageGeneration = () => {
     if (!userId) return;
     
-    // Set a prompt for DALL-E image generation
+    // Set a prompt for image generation
     setQuestion("generate an image about ");
     
     // Focus on the textarea

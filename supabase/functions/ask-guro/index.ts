@@ -3,6 +3,7 @@ import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
+const llamaApiKey = Deno.env.get('LLAMA_API_KEY');
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -19,30 +20,32 @@ serve(async (req) => {
 
     // Check if this is an image generation request
     if (question.toLowerCase().startsWith('generate an image')) {
+      if (!llamaApiKey) {
+        throw new Error('LLAMA_API_KEY is not set');
+      }
+
       const imagePrompt = question.replace(/^generate an image( about)?/i, '').trim();
       
-      // Make request to DALL-E API
-      const imageResponse = await fetch('https://api.openai.com/v1/images/generations', {
+      // Make request to Llama API for image generation
+      const imageResponse = await fetch('https://api.llama-api.com/generate/image', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${openAIApiKey}`,
+          'Authorization': `Bearer ${llamaApiKey}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: "dall-e-3",
           prompt: imagePrompt,
-          n: 1,
-          size: "1024x1024"
+          num_images: 1
         }),
       });
 
       const imageData = await imageResponse.json();
       
       if (imageData.error) {
-        throw new Error(imageData.error.message);
+        throw new Error(imageData.error.message || 'Error generating image');
       }
 
-      const imageUrl = imageData.data?.[0]?.url;
+      const imageUrl = imageData.images?.[0]?.url;
       if (!imageUrl) {
         throw new Error('No image was generated');
       }
