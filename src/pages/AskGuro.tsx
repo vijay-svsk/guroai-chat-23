@@ -1,11 +1,10 @@
-
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Header } from "@/components/subscription/Header";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Bot, Send } from "lucide-react";
+import { Bot, Send, Plus } from "lucide-react";
 import { LoadingState } from "@/components/subscription/LoadingState";
 import { cn } from "@/lib/utils";
 import { TypewriterEffect } from "@/components/TypewriterEffect";
@@ -74,6 +73,11 @@ const AskGuro = () => {
     } finally {
       setIsLoadingHistory(false);
     }
+  };
+
+  const startNewChat = () => {
+    setMessages([]);
+    setQuestion("");
   };
 
   const saveMessage = async (message: ChatMessage) => {
@@ -164,61 +168,75 @@ const AskGuro = () => {
               </p>
             </div>
           </div>
-        ) : messages.length === 0 ? (
-          <div className="flex-1 flex flex-col items-center justify-center">
-            <div className="text-center mb-8">
-              <h1 className="text-4xl font-bold text-[#023d54] tracking-tight mb-2">
-                Hi, I'm GuroAI.
-              </h1>
-              <p className="text-2xl text-[#023d54]/80 tracking-tight">
-                How can I help you today?
-              </p>
-            </div>
-          </div>
         ) : (
-          <div className="flex-1 py-8 space-y-6 overflow-y-auto">
-            {messages.map((message, index) => (
-              <div
-                key={index}
-                className={cn(
-                  "flex w-full items-start gap-4 p-6",
-                  message.role === 'assistant' ? "bg-gray-50" : "bg-white"
-                )}
+          <>
+            <div className="mb-4">
+              <Button
+                onClick={startNewChat}
+                className="bg-[#8cd09b] hover:bg-[#8cd09b]/90 text-[#023d54] flex items-center gap-2"
+                disabled={isLoading}
               >
-                <div className="flex-shrink-0 w-8 h-8">
-                  {message.role === 'assistant' ? (
-                    <div className="flex items-center justify-center w-8 h-8 rounded-full bg-[#023d54]">
-                      <Bot className="w-5 h-5 text-white" />
-                    </div>
-                  ) : (
-                    <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-300">
-                      <div className="w-4 h-4 rounded-full bg-white" />
-                    </div>
-                  )}
-                </div>
-                <div className="flex-1">
-                  {message.role === 'assistant' ? (
-                    <TypewriterEffect text={message.content} />
-                  ) : (
-                    <p className="text-[#023d54]/90 whitespace-pre-wrap leading-relaxed">
-                      {message.content}
-                    </p>
-                  )}
+                <Plus className="w-4 h-4" />
+                New Chat
+              </Button>
+            </div>
+            {messages.length === 0 ? (
+              <div className="flex-1 flex flex-col items-center justify-center">
+                <div className="text-center mb-8">
+                  <h1 className="text-4xl font-bold text-[#023d54] tracking-tight mb-2">
+                    Hi, I'm GuroAI.
+                  </h1>
+                  <p className="text-2xl text-[#023d54]/80 tracking-tight">
+                    How can I help you today?
+                  </p>
                 </div>
               </div>
-            ))}
-            {isLoading && (
-              <div className="flex w-full items-start gap-4 p-6 bg-gray-50">
-                <div className="flex-shrink-0 w-8 h-8">
-                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-[#023d54]">
-                    <Bot className="w-5 h-5 text-white" />
+            ) : (
+              <div className="flex-1 py-8 space-y-6 overflow-y-auto">
+                {messages.map((message, index) => (
+                  <div
+                    key={index}
+                    className={cn(
+                      "flex w-full items-start gap-4 p-6",
+                      message.role === 'assistant' ? "bg-gray-50" : "bg-white"
+                    )}
+                  >
+                    <div className="flex-shrink-0 w-8 h-8">
+                      {message.role === 'assistant' ? (
+                        <div className="flex items-center justify-center w-8 h-8 rounded-full bg-[#023d54]">
+                          <Bot className="w-5 h-5 text-white" />
+                        </div>
+                      ) : (
+                        <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-300">
+                          <div className="w-4 h-4 rounded-full bg-white" />
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      {message.role === 'assistant' ? (
+                        <TypewriterEffect text={message.content} />
+                      ) : (
+                        <p className="text-[#023d54]/90 whitespace-pre-wrap leading-relaxed">
+                          {message.content}
+                        </p>
+                      )}
+                    </div>
                   </div>
-                </div>
-                <LoadingState />
+                ))}
+                {isLoading && (
+                  <div className="flex w-full items-start gap-4 p-6 bg-gray-50">
+                    <div className="flex-shrink-0 w-8 h-8">
+                      <div className="flex items-center justify-center w-8 h-8 rounded-full bg-[#023d54]">
+                        <Bot className="w-5 h-5 text-white" />
+                      </div>
+                    </div>
+                    <LoadingState />
+                  </div>
+                )}
+                <div ref={chatEndRef} />
               </div>
             )}
-            <div ref={chatEndRef} />
-          </div>
+          </>
         )}
 
         <div className="sticky bottom-0 py-4 bg-gradient-to-b from-transparent to-[#f8fafc]">
