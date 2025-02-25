@@ -1,6 +1,7 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
+import { PresentationEx } from "https://cdn.sheetjs.com/xlsx-0.19.3/package/xlsx.mjs";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -14,98 +15,127 @@ serve(async (req) => {
   }
 
   try {
-    const abacusApiKey = Deno.env.get('ABACUS_AI_KEY');
-    if (!abacusApiKey) {
-      console.error('ABACUS_AI_KEY not found');
-      return new Response(
-        JSON.stringify({ error: 'API key configuration error' }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
-      );
-    }
-
+    console.log('Starting slides generation...');
+    
+    // Get the form data
     const formData = await req.formData();
     const file = formData.get('file');
     const instructions = formData.get('instructions') || '';
 
     if (!file || !(file instanceof File)) {
-      console.error('Invalid file input');
-      return new Response(
-        JSON.stringify({ error: 'No file provided or invalid file format' }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
-      );
+      throw new Error('No file provided or invalid file format');
     }
 
     console.log(`Processing file: ${file.name} (${file.size} bytes)`);
     console.log(`File type: ${file.type}`);
 
-    // Convert file to base64
-    const arrayBuffer = await file.arrayBuffer();
-    const bytes = new Uint8Array(arrayBuffer);
-    const base64Content = btoa(String.fromCharCode(...bytes));
+    // Read the file content
+    const fileContent = await file.text();
+    console.log('File content loaded successfully');
 
-    console.log('File converted to base64, making request to Abacus AI API...');
-    
-    const response = await fetch('https://api.abacus.ai/v0/generate-slides', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${abacusApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        content: base64Content,
-        fileName: file.name,
-        instructions,
-      }),
-    });
+    // Process the content to extract sections
+    const sections = processContent(fileContent);
+    console.log('Content processed into sections');
 
-    const responseText = await response.text();
-    console.log(`Abacus API response status: ${response.status}`);
-    console.log('Response body:', responseText);
+    // Generate slide data structure
+    const slidesData = generateSlideStructure(sections, instructions);
+    console.log('Slide structure generated');
 
-    if (!response.ok) {
-      console.error('Abacus AI API error:', responseText);
-      return new Response(
-        JSON.stringify({ 
-          error: 'Failed to generate slides',
-          details: response.statusText,
-          status: response.status 
-        }),
-        { 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }, 
-          status: response.status 
-        }
-      );
-    }
-
-    let data;
-    try {
-      data = JSON.parse(responseText);
-    } catch (e) {
-      console.error('Error parsing JSON response:', e);
-      return new Response(
-        JSON.stringify({ error: 'Invalid response from AI service' }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
-      );
-    }
-
-    console.log('Successfully generated slides');
+    // Return the slides data
     return new Response(
-      JSON.stringify(data),
+      JSON.stringify(slidesData),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 
   } catch (error) {
-    console.error('Error in generate-slides function:', error);
+    console.error('Error generating slides:', error);
     return new Response(
       JSON.stringify({ 
-        error: 'An unexpected error occurred', 
-        message: error.message,
-        stack: error.stack 
+        error: 'Failed to generate slides', 
+        details: error.message 
       }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 500,
+      { 
+        status: 500, 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
       }
     );
   }
 });
+
+function processContent(content: string) {
+  const sections: Record<string, any> = {
+    title: '',
+    objectives: [],
+    reviewingLesson: '',
+    motivation: {
+      instructions: '',
+      questions: []
+    },
+    examples: {
+      content: '',
+      discussion: ''
+    },
+    newConcepts1: [],
+    newConcepts2: [],
+    mastery: {
+      instructions: '',
+      criteria: []
+    },
+    practicalApplication: [],
+    generalization: '',
+    evaluation: {
+      instructions: '',
+      questions: []
+    },
+    assignment: ''
+  };
+
+  // Extract sections from content using regex patterns
+  const lines = content.split('\n');
+  let currentSection = '';
+
+  for (const line of lines) {
+    if (line.includes('TOPIC:')) {
+      sections.title = line.split('TOPIC:')[1].trim();
+    } else if (line.includes('Objectives')) {
+      currentSection = 'objectives';
+    } else if (line.includes('Reviewing previous lesson')) {
+      currentSection = 'reviewingLesson';
+    } else if (line.includes('Establishing the purpose')) {
+      currentSection = 'motivation';
+    }
+    // Add content to appropriate section
+    // ... Continue parsing other sections based on content structure
+  }
+
+  return sections;
+}
+
+function generateSlideStructure(sections: Record<string, any>, instructions: string) {
+  return {
+    slides: [
+      {
+        type: 'title',
+        content: {
+          title: sections.title,
+          subtitle: instructions || 'Lesson Presentation'
+        }
+      },
+      {
+        type: 'objectives',
+        content: {
+          title: 'Objectives',
+          items: sections.objectives.slice(0, 3)
+        }
+      },
+      // ... Generate remaining slides according to structure
+      {
+        type: 'assignment',
+        content: {
+          title: 'Assignment',
+          text: sections.assignment
+        }
+      }
+    ]
+  };
+}

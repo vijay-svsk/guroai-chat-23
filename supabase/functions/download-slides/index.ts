@@ -1,6 +1,7 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
+import * as pptxgen from "https://esm.sh/pptxgenjs@3.12.0";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -8,59 +9,95 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const abacusApiKey = Deno.env.get('ABACUS_AI_KEY');
-    if (!abacusApiKey) {
-      throw new Error('ABACUS_AI_KEY not found in environment variables');
-    }
-
+    console.log('Starting PPTX generation...');
     const { slidesData } = await req.json();
-    if (!slidesData) {
-      throw new Error('No slides data provided');
-    }
 
-    console.log('Making request to Abacus AI API for PPTX download...');
+    // Create a new presentation
+    const pres = new pptxgen();
     
-    const response = await fetch('https://api.abacus.ai/v0/download-slides', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${abacusApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        slidesData: slidesData
-      }),
+    // Set default slide properties
+    pres.defineLayout({ name: 'CUSTOM', width: 10, height: 5.625 });
+    pres.layout = 'CUSTOM';
+
+    // Generate slides based on the data structure
+    slidesData.slides.forEach((slideData: any, index: number) => {
+      const slide = pres.addSlide();
+      
+      switch (slideData.type) {
+        case 'title':
+          createTitleSlide(slide, slideData.content);
+          break;
+        case 'objectives':
+          createObjectivesSlide(slide, slideData.content);
+          break;
+        // ... Handle other slide types
+      }
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Abacus AI API error:', errorText);
-      throw new Error(`Abacus AI API error: ${response.statusText}`);
-    }
+    // Generate the PPTX file
+    const pptxBuffer = await pres.write('base64');
+    console.log('PPTX file generated successfully');
 
-    const pptxBuffer = await response.arrayBuffer();
-    console.log('Successfully downloaded PPTX');
-
-    return new Response(pptxBuffer, {
-      headers: {
-        ...corsHeaders,
-        'Content-Type': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-        'Content-Disposition': 'attachment; filename="presentation.pptx"'
-      },
-    });
-  } catch (error) {
-    console.error('Error in download-slides function:', error);
     return new Response(
-      JSON.stringify({ error: error.message }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 500,
+      JSON.stringify({ pptxData: pptxBuffer }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+
+  } catch (error) {
+    console.error('Error generating PPTX:', error);
+    return new Response(
+      JSON.stringify({ 
+        error: 'Failed to generate PPTX', 
+        details: error.message 
+      }),
+      { 
+        status: 500, 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
       }
     );
   }
 });
+
+function createTitleSlide(slide: any, content: { title: string; subtitle: string }) {
+  slide.addText(content.title, {
+    x: '10%',
+    y: '40%',
+    w: '80%',
+    fontSize: 44,
+    bold: true,
+    align: 'center'
+  });
+
+  slide.addText(content.subtitle, {
+    x: '10%',
+    y: '60%',
+    w: '80%',
+    fontSize: 24,
+    align: 'center'
+  });
+}
+
+function createObjectivesSlide(slide: any, content: { title: string; items: string[] }) {
+  slide.addText(content.title, {
+    x: '10%',
+    y: '10%',
+    w: '80%',
+    fontSize: 32,
+    bold: true
+  });
+
+  content.items.forEach((item: string, index: number) => {
+    slide.addText(`${index + 1}. ${item}`, {
+      x: '15%',
+      y: `${30 + (index * 15)}%`,
+      w: '70%',
+      fontSize: 24,
+      bullet: true
+    });
+  });
+}
