@@ -30,15 +30,8 @@ export const ChatAuth = ({ onSubscribe }: ChatAuthProps) => {
     <div className="max-w-md w-full mx-auto p-4">
       <Card className="shadow-lg border-[#023d54]/20">
         <CardHeader className="text-center">
-          <div className="flex justify-center mb-2">
-            <img 
-              src="/lovable-uploads/d07b2441-830b-4ce2-89e4-3e17b7f268b4.png" 
-              alt="GuroAI Logo" 
-              className="h-40 w-auto"
-            />
-          </div>
           <CardDescription className="text-[#023d54]/70 text-base">
-            Subscribe to start chatting
+            Subscribe to start chatting with GuroAI
           </CardDescription>
         </CardHeader>
         <CardContent>

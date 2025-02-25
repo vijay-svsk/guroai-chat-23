@@ -69,13 +69,12 @@ const AskGuro = () => {
       <div className="flex flex-col min-h-screen bg-gradient-to-b from-white to-[#f8fafc] py-10">
         <div className="flex-1 flex flex-col items-center justify-center">
           <div className="text-center mb-8">
-            <div className="flex justify-center mb-4">
-              <img 
-                src="/lovable-uploads/d07b2441-830b-4ce2-89e4-3e17b7f268b4.png" 
-                alt="GuroAI Logo" 
-                className="h-32 w-auto" 
-              />
-            </div>
+            <h1 className="text-4xl font-bold text-[#023d54] tracking-tight mb-2">
+              GuroAI Chat
+            </h1>
+            <p className="text-xl text-[#023d54]/80 mb-8">
+              Subscribe to start chatting with GuroAI
+            </p>
           </div>
           <ChatAuth onSubscribe={redirectToSubscribe} />
         </div>
