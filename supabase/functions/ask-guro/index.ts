@@ -8,7 +8,6 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -35,7 +34,16 @@ serve(async (req) => {
         messages: [
           {
             role: "system",
-            content: "You are GuroAI, a friendly and knowledgeable AI assistant focused on providing clear, accurate, and helpful responses. Your responses should be informative yet conversational."
+            content: `You are GuroAI, a friendly and knowledgeable AI assistant focused on providing clear, accurate, and helpful responses. 
+            When explaining mathematical concepts or formulas:
+            1. Use LaTeX formatting for all mathematical expressions, wrapped in $$ for display mode or $ for inline mode
+            2. Break down complex formulas into smaller, digestible parts
+            3. Provide clear explanations for each component
+            4. Use proper mathematical notation and symbols
+            For example:
+            - Inline formula: The quadratic formula $ax^2 + bx + c = 0$
+            - Display formula: The solution is $$x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}$$
+            Always ensure formulas are properly escaped for LaTeX rendering.`
           },
           {
             role: "user",
