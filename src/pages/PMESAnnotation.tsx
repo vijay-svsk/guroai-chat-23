@@ -4,9 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Loader2, FileCheck, FileWarning } from "lucide-react";
+import { Loader2, FileCheck, FileWarning, ArrowRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
 
 const PMESAnnotation = () => {
   const [lessonPlan, setLessonPlan] = useState("");
@@ -14,6 +15,7 @@ const PMESAnnotation = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   // Check authentication status when component mounts
   useEffect(() => {
@@ -63,6 +65,10 @@ const PMESAnnotation = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleAskGuro = () => {
+    navigate('/ask-guro');
   };
 
   return (
@@ -142,6 +148,19 @@ const PMESAnnotation = () => {
                     )}
                   </div>
                 </div>
+                
+                {/* Ask GuroAI Button - Only show when annotations are available */}
+                {annotations && (
+                  <div className="flex justify-center mt-4">
+                    <Button 
+                      onClick={handleAskGuro} 
+                      className="bg-[#8cd09b] hover:bg-[#7bc08b] text-[#023d54] font-semibold px-6 py-3 rounded-lg transition-all"
+                    >
+                      Ask GuroAI
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  </div>
+                )}
               </div>
             </div>
           </CardContent>
