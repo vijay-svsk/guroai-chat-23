@@ -6,20 +6,22 @@ interface TypewriterEffectProps {
   speed?: number;
 }
 
-export const TypewriterEffect = ({ text, speed = 20 }: TypewriterEffectProps) => {
+export const TypewriterEffect = ({ text, speed = 5 }: TypewriterEffectProps) => {
   const [displayedText, setDisplayedText] = useState('');
   const [currentIndex, setCurrentIndex] = useState(0);
 
+  const cleanText = text.replace(/[#*]/g, '');
+
   useEffect(() => {
-    if (currentIndex < text.length) {
+    if (currentIndex < cleanText.length) {
       const timer = setTimeout(() => {
-        setDisplayedText(prev => prev + text[currentIndex]);
+        setDisplayedText(prev => prev + cleanText[currentIndex]);
         setCurrentIndex(prev => prev + 1);
       }, speed);
 
       return () => clearTimeout(timer);
     }
-  }, [currentIndex, text, speed]);
+  }, [currentIndex, cleanText, speed]);
 
   return <span className="whitespace-pre-wrap">{displayedText}</span>;
 };
