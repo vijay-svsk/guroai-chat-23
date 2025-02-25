@@ -61,9 +61,6 @@ export const useChatAuth = () => {
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
-        options: {
-          storeSession: false // Don't store in browser storage (crucial)
-        }
       });
 
       if (error) throw error;
@@ -98,35 +95,9 @@ export const useChatAuth = () => {
 
   const registerForChat = async (email: string, password: string) => {
     try {
-      // Use Supabase auth but don't store the session in browser storage
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          storeSession: false // Don't store in browser storage (crucial)
-        }
-      });
-
-      if (error) throw error;
-      
-      if (data.user) {
-        // Store chat-specific auth in local storage
-        const chatAuth = {
-          id: data.user.id,
-          email: data.user.email,
-          expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() // 24 hours from now
-        };
-        
-        localStorage.setItem(CHAT_AUTH_KEY, JSON.stringify(chatAuth));
-        setUserId(data.user.id);
-        
-        toast({
-          title: "Account created!",
-          description: "You're now registered for GuroAI Chat.",
-        });
-        return true;
-      }
-      return false;
+      // Instead of registering directly, redirect to Xendit payment
+      window.location.href = 'https://checkout.xendit.co/od/guroai.online';
+      return false; // Return false as we're redirecting, not completing registration
     } catch (error: any) {
       toast({
         title: "Registration failed",

@@ -5,7 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Mail, Lock, ArrowRight } from "lucide-react";
+import { Mail, Lock, ArrowRight, CreditCard } from "lucide-react";
 
 interface ChatAuthProps {
   onSignIn: (email: string, password: string) => Promise<boolean>;
@@ -51,9 +51,10 @@ export const ChatAuth = ({ onSignIn, onRegister }: ChatAuthProps) => {
     setLoading(true);
     
     try {
+      // This will redirect to payment page
       await onRegister(email, password);
     } catch (err) {
-      setError("Failed to create account. Please try again.");
+      setError("Failed to redirect to payment page. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -67,14 +68,14 @@ export const ChatAuth = ({ onSignIn, onRegister }: ChatAuthProps) => {
             GuroAI Chat
           </CardTitle>
           <CardDescription className="text-[#023d54]/70 text-base">
-            Sign in or register to start chatting with GuroAI
+            Sign in or subscribe to start chatting with GuroAI
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="grid grid-cols-2 mb-6">
               <TabsTrigger value="signin">Sign In</TabsTrigger>
-              <TabsTrigger value="register">Register</TabsTrigger>
+              <TabsTrigger value="register">Subscribe</TabsTrigger>
             </TabsList>
             
             <TabsContent value="signin">
@@ -127,68 +128,41 @@ export const ChatAuth = ({ onSignIn, onRegister }: ChatAuthProps) => {
             </TabsContent>
             
             <TabsContent value="register">
-              <form onSubmit={handleRegister} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="register-email">Email</Label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-500" />
-                    <Input
-                      id="register-email"
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="pl-10"
-                      placeholder="your@email.com"
-                      required
-                    />
-                  </div>
+              <div className="space-y-6">
+                <div className="bg-blue-50 p-4 rounded-lg">
+                  <h3 className="font-semibold text-[#023d54] mb-2">Subscribe to GuroAI Chat</h3>
+                  <p className="text-sm text-gray-600">
+                    Get instant access to GuroAI Chat for just ₱299/month. Your subscription includes:
+                  </p>
+                  <ul className="mt-2 space-y-1 text-sm text-gray-600">
+                    <li className="flex items-start gap-2">
+                      <span className="text-green-500 font-bold mt-0.5">✓</span>
+                      <span>Unlimited AI-powered conversations</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-green-500 font-bold mt-0.5">✓</span>
+                      <span>Teaching advice and lesson plan assistance</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-green-500 font-bold mt-0.5">✓</span>
+                      <span>24/7 access to GuroAI</span>
+                    </li>
+                  </ul>
                 </div>
                 
-                <div className="space-y-2">
-                  <Label htmlFor="register-password">Password</Label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-500" />
-                    <Input
-                      id="register-password"
-                      type="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="pl-10"
-                      placeholder="••••••••"
-                      required
-                    />
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="confirm-password">Confirm Password</Label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-500" />
-                    <Input
-                      id="confirm-password"
-                      type="password"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      className="pl-10"
-                      placeholder="••••••••"
-                      required
-                    />
-                  </div>
-                </div>
+                <Button 
+                  onClick={handleRegister}
+                  className="w-full bg-[#023d54] hover:bg-[#023d54]/90" 
+                  disabled={loading}
+                >
+                  {loading ? "Redirecting..." : "Subscribe Now - ₱299/month"}
+                  <CreditCard className="ml-2 h-4 w-4" />
+                </Button>
                 
                 {error && (
                   <div className="text-sm text-red-500 font-medium">{error}</div>
                 )}
-                
-                <Button 
-                  type="submit" 
-                  className="w-full bg-[#023d54] hover:bg-[#023d54]/90" 
-                  disabled={loading}
-                >
-                  {loading ? "Creating account..." : "Create Account"}
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </form>
+              </div>
             </TabsContent>
           </Tabs>
         </CardContent>
