@@ -4,6 +4,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 
+// Create a namespace for chat-specific authentication
+const CHAT_AUTH_KEY = "guro_chat_auth";
+
 export const useChatAuth = () => {
   const [userId, setUserId] = useState<string | null>(null);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
@@ -24,15 +27,27 @@ export const useChatAuth = () => {
 
   const checkUser = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        setUserId(user.id);
-      } else {
-        // User is not authenticated
-        setUserId(null);
+      // First check local storage for chat-specific auth
+      const chatAuthData = localStorage.getItem(CHAT_AUTH_KEY);
+      
+      if (chatAuthData) {
+        const { id, expiresAt } = JSON.parse(chatAuthData);
+        
+        // Check if token is expired
+        if (expiresAt && new Date(expiresAt) > new Date()) {
+          setUserId(id);
+          setIsCheckingAuth(false);
+          return;
+        } else {
+          // Clear expired token
+          localStorage.removeItem(CHAT_AUTH_KEY);
+        }
       }
+      
+      // If no valid chat auth in local storage, reset state
+      setUserId(null);
     } catch (error) {
-      console.error("Error checking auth:", error);
+      console.error("Error checking chat auth:", error);
       setUserId(null);
     } finally {
       setIsCheckingAuth(false);
@@ -41,15 +56,29 @@ export const useChatAuth = () => {
 
   const signInToChat = async (email: string, password: string) => {
     try {
+      // Use Supabase auth but don't store the session in browser storage
+      // This creates a temporary session just for the API call
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
-        password
+        password,
+        options: {
+          storeSession: false // Don't store in browser storage (crucial)
+        }
       });
 
       if (error) throw error;
       
       if (data.user) {
+        // Store chat-specific auth in local storage
+        const chatAuth = {
+          id: data.user.id,
+          email: data.user.email,
+          expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() // 24 hours from now
+        };
+        
+        localStorage.setItem(CHAT_AUTH_KEY, JSON.stringify(chatAuth));
         setUserId(data.user.id);
+        
         toast({
           title: "Welcome to GuroAI Chat!",
           description: "You're now signed in.",
@@ -69,15 +98,28 @@ export const useChatAuth = () => {
 
   const registerForChat = async (email: string, password: string) => {
     try {
+      // Use Supabase auth but don't store the session in browser storage
       const { data, error } = await supabase.auth.signUp({
         email,
-        password
+        password,
+        options: {
+          storeSession: false // Don't store in browser storage (crucial)
+        }
       });
 
       if (error) throw error;
       
       if (data.user) {
+        // Store chat-specific auth in local storage
+        const chatAuth = {
+          id: data.user.id,
+          email: data.user.email,
+          expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() // 24 hours from now
+        };
+        
+        localStorage.setItem(CHAT_AUTH_KEY, JSON.stringify(chatAuth));
         setUserId(data.user.id);
+        
         toast({
           title: "Account created!",
           description: "You're now registered for GuroAI Chat.",
@@ -96,13 +138,15 @@ export const useChatAuth = () => {
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    // Just remove the chat-specific auth from local storage
+    localStorage.removeItem(CHAT_AUTH_KEY);
     setUserId(null);
+    
     toast({
       title: "Signed out",
       description: "You've been signed out from GuroAI Chat."
     });
-    navigate("/"); // Changed from "/askguro" to "/" to redirect to index page
+    navigate("/"); // Redirect to index page
   };
 
   return { 

@@ -2,6 +2,7 @@
 import { supabase } from "@/integrations/supabase/client";
 
 export const checkSubscriptionStatus = async (userId: string) => {
+  // This function should only be used for chat users
   const { data: subscription, error } = await supabase
     .from('subscriptions')
     .select('*')

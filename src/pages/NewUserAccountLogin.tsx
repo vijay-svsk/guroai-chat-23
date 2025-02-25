@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,11 @@ const NewUserAccountLogin = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  // Clear any chat auth when accessing the main login page
+  useEffect(() => {
+    localStorage.removeItem("guro_chat_auth");
+  }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

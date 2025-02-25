@@ -16,9 +16,17 @@ export const useAuthHandler = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  // Ensure we're not using chat auth
+  const cleanupChatAuth = () => {
+    localStorage.removeItem("guro_chat_auth");
+  };
+
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    
+    // Make sure we're not using chat auth
+    cleanupChatAuth();
 
     try {
       if (!isLogin && password !== confirmPassword) {
