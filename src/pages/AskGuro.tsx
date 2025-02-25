@@ -1,13 +1,14 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Header } from "@/components/subscription/Header";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Bot, Send, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { LoadingState } from "@/components/subscription/LoadingState";
-import { cn } from "@/lib/utils";
-import { TypewriterEffect } from "@/components/TypewriterEffect";
+import { ChatInput } from "@/components/chat/ChatInput";
+import { ChatMessages } from "@/components/chat/ChatMessages";
+import { WelcomeScreen } from "@/components/chat/WelcomeScreen";
+import { Bot } from "lucide-react";
 
 interface ChatMessage {
   role: 'user' | 'assistant';
@@ -149,122 +150,67 @@ const AskGuro = () => {
     }
   };
 
+  if (isLoadingHistory) {
+    return (
+      <div className="flex flex-col min-h-screen bg-gradient-to-b from-white to-[#f8fafc]">
+        <Header />
+        <div className="flex-1 flex items-center justify-center">
+          <LoadingState />
+        </div>
+      </div>
+    );
+  }
+
+  if (!userId) {
+    return (
+      <div className="flex flex-col min-h-screen bg-gradient-to-b from-white to-[#f8fafc]">
+        <Header />
+        <div className="flex-1 flex flex-col items-center justify-center">
+          <div className="text-center mb-8">
+            <h1 className="text-4xl font-bold text-[#023d54] tracking-tight mb-2">
+              Please Sign In
+            </h1>
+            <p className="text-2xl text-[#023d54]/80 tracking-tight">
+              Sign in to start chatting with GuroAI
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-white to-[#f8fafc]">
       <Header />
       <div className="flex-1 flex flex-col max-w-5xl mx-auto w-full px-4">
-        {isLoadingHistory ? (
-          <div className="flex-1 flex items-center justify-center">
-            <LoadingState />
-          </div>
-        ) : !userId ? (
-          <div className="flex-1 flex flex-col items-center justify-center">
-            <div className="text-center mb-8">
-              <h1 className="text-4xl font-bold text-[#023d54] tracking-tight mb-2">
-                Please Sign In
-              </h1>
-              <p className="text-2xl text-[#023d54]/80 tracking-tight">
-                Sign in to start chatting with GuroAI
-              </p>
-            </div>
-          </div>
+        <div className="mb-4">
+          <Button
+            onClick={startNewChat}
+            className="bg-[#8cd09b] hover:bg-[#8cd09b]/90 text-[#023d54] flex items-center gap-2"
+            disabled={isLoading}
+          >
+            <Plus className="w-4 h-4" />
+            New Chat
+          </Button>
+        </div>
+        
+        {messages.length === 0 ? (
+          <WelcomeScreen />
         ) : (
-          <>
-            <div className="mb-4">
-              <Button
-                onClick={startNewChat}
-                className="bg-[#8cd09b] hover:bg-[#8cd09b]/90 text-[#023d54] flex items-center gap-2"
-                disabled={isLoading}
-              >
-                <Plus className="w-4 h-4" />
-                New Chat
-              </Button>
-            </div>
-            {messages.length === 0 ? (
-              <div className="flex-1 flex flex-col items-center justify-center">
-                <div className="text-center mb-8">
-                  <h1 className="text-4xl font-bold text-[#023d54] tracking-tight mb-2">
-                    Hi, I'm GuroAI.
-                  </h1>
-                  <p className="text-2xl text-[#023d54]/80 tracking-tight">
-                    How can I help you today?
-                  </p>
-                </div>
-              </div>
-            ) : (
-              <div className="flex-1 py-8 space-y-6 overflow-y-auto">
-                {messages.map((message, index) => (
-                  <div
-                    key={index}
-                    className={cn(
-                      "flex w-full items-start gap-4 p-6",
-                      message.role === 'assistant' ? "bg-gray-50" : "bg-white"
-                    )}
-                  >
-                    <div className="flex-shrink-0 w-8 h-8">
-                      {message.role === 'assistant' ? (
-                        <div className="flex items-center justify-center w-8 h-8 rounded-full bg-[#023d54]">
-                          <Bot className="w-5 h-5 text-white" />
-                        </div>
-                      ) : (
-                        <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-300">
-                          <div className="w-4 h-4 rounded-full bg-white" />
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex-1">
-                      {message.role === 'assistant' ? (
-                        <TypewriterEffect text={message.content} />
-                      ) : (
-                        <p className="text-[#023d54]/90 whitespace-pre-wrap leading-relaxed">
-                          {message.content}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                ))}
-                {isLoading && (
-                  <div className="flex w-full items-start gap-4 p-6 bg-gray-50">
-                    <div className="flex-shrink-0 w-8 h-8">
-                      <div className="flex items-center justify-center w-8 h-8 rounded-full bg-[#023d54]">
-                        <Bot className="w-5 h-5 text-white" />
-                      </div>
-                    </div>
-                    <LoadingState />
-                  </div>
-                )}
-                <div ref={chatEndRef} />
-              </div>
-            )}
-          </>
+          <ChatMessages
+            messages={messages}
+            isLoading={isLoading}
+            chatEndRef={chatEndRef}
+          />
         )}
 
-        <div className="sticky bottom-0 py-4 bg-gradient-to-b from-transparent to-[#f8fafc]">
-          <div className="relative max-w-3xl mx-auto">
-            <form onSubmit={handleSubmit} className="relative">
-              <Input
-                value={question}
-                onChange={(e) => setQuestion(e.target.value)}
-                placeholder="Ask anything"
-                disabled={isLoading || !userId}
-                className="w-full pl-4 pr-14 py-6 text-lg rounded-full border-2 border-[#023d54]/10 focus-visible:ring-[#023d54] text-[#023d54] shadow-lg transition-shadow duration-200 hover:shadow-xl"
-              />
-              <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                <Button
-                  type="submit"
-                  size="icon"
-                  disabled={isLoading || !question.trim() || !userId}
-                  className={cn(
-                    "h-10 w-10 rounded-full bg-[#023d54] hover:bg-[#023d54]/90 transition-all duration-200",
-                    question.trim() ? "opacity-100 scale-100" : "opacity-70 scale-95"
-                  )}
-                >
-                  <Send className="h-5 w-5" />
-                </Button>
-              </div>
-            </form>
-          </div>
-        </div>
+        <ChatInput
+          question={question}
+          setQuestion={setQuestion}
+          onSubmit={handleSubmit}
+          isLoading={isLoading}
+          disabled={!userId}
+        />
       </div>
     </div>
   );
