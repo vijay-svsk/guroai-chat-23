@@ -42,9 +42,14 @@ const AskGuro = () => {
       <Header />
       <div className="max-w-3xl mx-auto px-4">
         <div className="flex flex-col items-center justify-center min-h-[60vh]">
-          <h1 className="text-4xl font-bold text-center text-[#023d54] mb-8 tracking-tight">
-            Hi, I'm GuroAI. How can I help you today?
-          </h1>
+          <div className="text-center mb-8">
+            <h1 className="text-4xl font-bold text-[#023d54] tracking-tight mb-2">
+              Hi, I'm GuroAI.
+            </h1>
+            <p className="text-2xl text-[#023d54]/80 tracking-tight">
+              How can I help you today?
+            </p>
+          </div>
           
           <div className="relative w-full max-w-2xl">
             <form onSubmit={handleSubmit} className="relative">
