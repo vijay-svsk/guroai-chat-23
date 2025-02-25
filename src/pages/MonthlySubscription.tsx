@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Clock } from "lucide-react";
+import { Clock, FilePresentation } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -201,12 +201,21 @@ const MonthlySubscription = () => {
                 </div>
               </div>
 
-              <Button 
-                onClick={() => navigate('/dashboard')} 
-                className="w-full bg-[#8cd09b] hover:bg-[#7bc08b] text-[#023d54] font-semibold py-3 px-6 rounded-lg transition-all"
-              >
-                Generate Lesson Plan
-              </Button>
+              <div className="flex flex-col gap-4">
+                <Button 
+                  onClick={() => navigate('/dashboard')} 
+                  className="w-full bg-[#8cd09b] hover:bg-[#7bc08b] text-[#023d54] font-semibold py-3 px-6 rounded-lg transition-all"
+                >
+                  Generate Lesson Plan
+                </Button>
+                <Button 
+                  onClick={() => navigate('/slidepresentation')} 
+                  className="w-full bg-[#8cd09b] hover:bg-[#7bc08b] text-[#023d54] font-semibold py-3 px-6 rounded-lg transition-all"
+                >
+                  <FilePresentation className="mr-2" />
+                  Generate Slide Presentation
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>
