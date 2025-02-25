@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Header } from "@/components/subscription/Header";
@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Bot, Send } from "lucide-react";
 import { LoadingState } from "@/components/subscription/LoadingState";
+import { cn } from "@/lib/utils";
 
 interface ChatMessage {
   role: 'user' | 'assistant';
@@ -18,7 +19,7 @@ const AskGuro = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
-  const chatEndRef = useState<HTMLDivElement | null>(null);
+  const chatEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
