@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { Save, Download, FileText } from "lucide-react";
 import { Loader2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface LessonPlanContentProps {
   isLoading: boolean;
@@ -24,8 +25,9 @@ export const LessonPlanContent = ({
   onResponseChange,
   onSave,
   onDownloadTxt,
-  onDownloadDocx,
 }: LessonPlanContentProps) => {
+  const navigate = useNavigate();
+
   if (isLoading) {
     return (
       <div className="text-center py-12">
@@ -34,6 +36,10 @@ export const LessonPlanContent = ({
       </div>
     );
   }
+
+  const handleProceedToNextStep = () => {
+    navigate("/lesson-plan-docx", { state: { content: response } });
+  };
 
   const renderContent = () => {
     if (isEditing) {
@@ -95,12 +101,12 @@ export const LessonPlanContent = ({
           Download as TXT
         </Button>
         <Button
-          onClick={onDownloadDocx}
+          onClick={handleProceedToNextStep}
           disabled={isLoading || !response}
           className="w-full sm:w-auto flex items-center gap-2"
         >
           <FileText className="h-4 w-4" />
-          Download as DOCX
+          Proceed to Next Step
         </Button>
       </div>
     </>
