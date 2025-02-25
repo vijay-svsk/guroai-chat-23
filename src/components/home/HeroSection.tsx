@@ -34,11 +34,11 @@ export const HeroSection = ({ onStartTrial }: HeroSectionProps) => {
         </Button>
         <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
           <Button 
-            onClick={() => navigate('/learn-more')}
+            onClick={() => navigate('/ask-guro')}
             variant="outline" 
             className="border-guro-blue text-guro-blue hover:bg-guro-blue/5 px-8 py-6 rounded-lg text-lg transition-all duration-300 hover:scale-105"
           >
-            Learn More
+            Ask GuroAI
           </Button>
           <Button 
             onClick={() => navigate('/newuseraccountlogin')}
