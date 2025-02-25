@@ -27,7 +27,7 @@ const LessonPlanAI = () => {
     generateLessonPlan,
   } = useLessonPlan();
 
-  const { downloadTxt, downloadDocx } = useLessonPlanDownload();
+  const { downloadTxt } = useLessonPlanDownload();
 
   const handleSaveLessonPlan = async () => {
     try {
@@ -113,7 +113,6 @@ const LessonPlanAI = () => {
               onResponseChange={(value) => setResponse(value)}
               onSave={handleSaveLessonPlan}
               onDownloadTxt={() => downloadTxt(response, formData.subject, formData.method)}
-              onDownloadDocx={() => downloadDocx(response, formData.subject, formData.method)}
               reviewImage={reviewImage}
               motivationImage={motivationImage}
             />
