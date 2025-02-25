@@ -6,9 +6,10 @@ import { CreditCard } from "lucide-react";
 
 interface ChatAuthProps {
   onSubscribe: () => void;
+  isSubscribed?: boolean;
 }
 
-export const ChatAuth = ({ onSubscribe }: ChatAuthProps) => {
+export const ChatAuth = ({ onSubscribe, isSubscribed = false }: ChatAuthProps) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -25,6 +26,30 @@ export const ChatAuth = ({ onSubscribe }: ChatAuthProps) => {
       setLoading(false);
     }
   };
+
+  if (isSubscribed) {
+    return (
+      <div className="max-w-md w-full mx-auto p-4">
+        <Card className="shadow-lg border-[#023d54]/20">
+          <CardHeader className="text-center">
+            <CardTitle className="text-2xl font-bold text-[#023d54]">
+              Welcome to GuroAI Chat
+            </CardTitle>
+            <CardDescription className="text-[#023d54]/70 text-base">
+              You have an active subscription. Start chatting now!
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-6">
+              <p className="text-center text-green-600 font-medium">
+                Thank you for subscribing to GuroAI Chat!
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-md w-full mx-auto p-4">

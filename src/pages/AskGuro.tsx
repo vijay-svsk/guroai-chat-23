@@ -10,11 +10,14 @@ import { ChatAuth } from "@/components/chat/ChatAuth";
 import { useChat } from "@/hooks/use-chat";
 import { useChatAuth } from "@/hooks/use-chat-auth";
 import { useToast } from "@/hooks/use-toast";
+import { checkSubscriptionStatus } from "@/services/subscription-service";
 
 const AskGuro = () => {
   const { userId, isCheckingAuth, redirectToSubscribe, signOut } = useChatAuth();
   const [showPreviousChats, setShowPreviousChats] = useState(false);
   const [isPageLoading, setIsPageLoading] = useState(true);
+  const [isSubscribed, setIsSubscribed] = useState(false);
+  const [isCheckingSubscription, setIsCheckingSubscription] = useState(true);
   const { toast } = useToast();
   
   const {
@@ -41,6 +44,31 @@ const AskGuro = () => {
     return () => clearTimeout(timer);
   }, []);
 
+  // Check subscription status when user is authenticated
+  useEffect(() => {
+    const checkUserSubscription = async () => {
+      if (userId) {
+        try {
+          const hasActiveSubscription = await checkSubscriptionStatus(userId);
+          setIsSubscribed(hasActiveSubscription);
+        } catch (error) {
+          console.error("Error checking subscription:", error);
+          toast({
+            title: "Error",
+            description: "Failed to verify subscription status.",
+            variant: "destructive"
+          });
+        } finally {
+          setIsCheckingSubscription(false);
+        }
+      } else {
+        setIsCheckingSubscription(false);
+      }
+    };
+
+    checkUserSubscription();
+  }, [userId, toast]);
+
   // Show welcome toast when user successfully logs in
   useEffect(() => {
     if (userId && !isCheckingAuth && !isPageLoading) {
@@ -53,7 +81,7 @@ const AskGuro = () => {
   }, [userId, isCheckingAuth, isPageLoading, toast]);
 
   // Only show loading state if we're still checking auth AND loading is taking longer than expected
-  if ((isCheckingAuth || isLoadingHistory) && isPageLoading) {
+  if ((isCheckingAuth || isLoadingHistory || isCheckingSubscription) && isPageLoading) {
     return (
       <div className="flex flex-col min-h-screen bg-gradient-to-b from-white to-[#f8fafc]">
         <div className="flex-1 flex items-center justify-center">
@@ -76,7 +104,32 @@ const AskGuro = () => {
               Subscribe to start chatting with GuroAI
             </p>
           </div>
-          <ChatAuth onSubscribe={redirectToSubscribe} />
+          <ChatAuth 
+            onSubscribe={redirectToSubscribe} 
+            isSubscribed={isSubscribed}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  // If user is authenticated but not subscribed, show subscription screen
+  if (userId && !isCheckingAuth && !isSubscribed && !isCheckingSubscription) {
+    return (
+      <div className="flex flex-col min-h-screen bg-gradient-to-b from-white to-[#f8fafc] py-10">
+        <div className="flex-1 flex flex-col items-center justify-center">
+          <div className="text-center mb-8">
+            <h1 className="text-4xl font-bold text-[#023d54] tracking-tight mb-2">
+              GuroAI Chat
+            </h1>
+            <p className="text-xl text-[#023d54]/80 mb-8">
+              Subscribe to start chatting with GuroAI
+            </p>
+          </div>
+          <ChatAuth 
+            onSubscribe={redirectToSubscribe} 
+            isSubscribed={isSubscribed}
+          />
         </div>
       </div>
     );
