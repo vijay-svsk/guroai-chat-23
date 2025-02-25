@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Presentation, Play, Download } from "lucide-react";
@@ -32,15 +31,6 @@ export const ActionButtons = ({
   const [isDownloading, setIsDownloading] = React.useState(false);
 
   const handleGenerate = async () => {
-    if (!file) {
-      toast({
-        title: "No file uploaded",
-        description: "Please upload a file first",
-        variant: "destructive",
-      });
-      return;
-    }
-
     if (!subject || !gradeLevel || !topic) {
       toast({
         title: "Missing information",
@@ -53,7 +43,9 @@ export const ActionButtons = ({
     setIsGenerating(true);
     try {
       const formData = new FormData();
-      formData.append('file', file);
+      if (file) {
+        formData.append('file', file);
+      }
       formData.append('subject', subject);
       formData.append('gradeLevel', gradeLevel);
       formData.append('topic', topic);
@@ -171,7 +163,7 @@ export const ActionButtons = ({
       <Button
         className="flex-1 bg-[#8cd09b] hover:bg-[#8cd09b]/90 text-[#0a1d2c] font-medium"
         onClick={handleGenerate}
-        disabled={isGenerating || !file || !subject || !gradeLevel || !topic}
+        disabled={isGenerating || !subject || !gradeLevel || !topic}
       >
         {isGenerating ? (
           <>
