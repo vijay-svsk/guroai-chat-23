@@ -32,6 +32,7 @@ serve(async (req) => {
     const fileContent = await file.text();
     
     // Call SlidesGPT API to generate slides structure
+    console.log('Calling SlidesGPT API...');
     const slidesGPTResponse = await fetch('https://api.slidesgpt.com/v1/generate', {
       method: 'POST',
       headers: {
@@ -42,7 +43,7 @@ serve(async (req) => {
         content: fileContent,
         instructions: instructions,
         outputFormat: 'json',
-        slideCount: 33, // As per previous requirement
+        slideCount: 33, // Maintaining the previous requirement
         includeNotes: true,
       }),
     });
@@ -54,7 +55,7 @@ serve(async (req) => {
     }
 
     const slidesData = await slidesGPTResponse.json();
-    console.log('Successfully generated slides data from SlidesGPT');
+    console.log('Successfully generated slides data');
 
     return new Response(
       JSON.stringify(slidesData),

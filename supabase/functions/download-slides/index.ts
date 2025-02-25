@@ -9,7 +9,6 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -22,7 +21,7 @@ serve(async (req) => {
       throw new Error('Invalid slides data provided');
     }
 
-    console.log('Received slides data:', JSON.stringify(slidesData));
+    console.log(`Processing ${slidesData.slides.length} slides...`);
 
     // Create a new presentation
     const pres = new pptxgen();
@@ -32,25 +31,29 @@ serve(async (req) => {
     pres.layout = 'CUSTOM';
 
     // Generate slides based on the data structure
-    console.log('Generating slides...');
     slidesData.slides.forEach((slideData: any, index: number) => {
       console.log(`Creating slide ${index + 1} of type: ${slideData.type}`);
       const slide = pres.addSlide();
       
       try {
-        switch (slideData.type) {
+        switch (slideData.type.toLowerCase()) {
           case 'title':
             createTitleSlide(slide, slideData.content);
-            break;
-          case 'objectives':
-            createObjectivesSlide(slide, slideData.content);
             break;
           case 'content':
             createContentSlide(slide, slideData.content);
             break;
-          // Add more slide types as needed
+          case 'bullets':
+            createBulletsSlide(slide, slideData.content);
+            break;
           default:
-            console.log(`Unknown slide type: ${slideData.type}`);
+            console.log(`Using default template for slide type: ${slideData.type}`);
+            createDefaultSlide(slide, slideData.content);
+        }
+
+        // Add speaker notes if available
+        if (slideData.notes) {
+          slide.addNotes(slideData.notes);
         }
       } catch (error) {
         console.error(`Error creating slide ${index + 1}:`, error);
@@ -65,12 +68,7 @@ serve(async (req) => {
 
     return new Response(
       JSON.stringify({ pptxData: pptxBuffer }),
-      { 
-        headers: { 
-          ...corsHeaders, 
-          'Content-Type': 'application/json' 
-        } 
-      }
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 
   } catch (error) {
@@ -82,21 +80,13 @@ serve(async (req) => {
       }),
       { 
         status: 500, 
-        headers: { 
-          ...corsHeaders, 
-          'Content-Type': 'application/json' 
-        } 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
       }
     );
   }
 });
 
-function createTitleSlide(slide: any, content: { title: string; subtitle: string }) {
-  if (!content) {
-    console.warn('No content provided for title slide');
-    return;
-  }
-  
+function createTitleSlide(slide: any, content: { title: string; subtitle?: string }) {
   slide.addText(content.title || 'Untitled Presentation', {
     x: '10%',
     y: '40%',
@@ -117,39 +107,7 @@ function createTitleSlide(slide: any, content: { title: string; subtitle: string
   }
 }
 
-function createObjectivesSlide(slide: any, content: { title: string; items: string[] }) {
-  if (!content) {
-    console.warn('No content provided for objectives slide');
-    return;
-  }
-
-  slide.addText(content.title || 'Objectives', {
-    x: '10%',
-    y: '10%',
-    w: '80%',
-    fontSize: 32,
-    bold: true
-  });
-
-  if (Array.isArray(content.items)) {
-    content.items.forEach((item: string, index: number) => {
-      slide.addText(item, {
-        x: '15%',
-        y: `${30 + (index * 15)}%`,
-        w: '70%',
-        fontSize: 24,
-        bullet: true
-      });
-    });
-  }
-}
-
 function createContentSlide(slide: any, content: { title: string; text: string }) {
-  if (!content) {
-    console.warn('No content provided for content slide');
-    return;
-  }
-
   slide.addText(content.title || 'Content', {
     x: '10%',
     y: '10%',
@@ -158,13 +116,49 @@ function createContentSlide(slide: any, content: { title: string; text: string }
     bold: true
   });
 
-  if (content.text) {
-    slide.addText(content.text, {
-      x: '10%',
-      y: '30%',
-      w: '80%',
-      fontSize: 20
-    });
-  }
+  slide.addText(content.text || '', {
+    x: '10%',
+    y: '30%',
+    w: '80%',
+    fontSize: 20,
+    align: 'left'
+  });
 }
 
+function createBulletsSlide(slide: any, content: { title: string; points: string[] }) {
+  slide.addText(content.title || 'Key Points', {
+    x: '10%',
+    y: '10%',
+    w: '80%',
+    fontSize: 32,
+    bold: true
+  });
+
+  const points = Array.isArray(content.points) ? content.points : [];
+  points.forEach((point, index) => {
+    slide.addText(point, {
+      x: '15%',
+      y: `${30 + (index * 10)}%`,
+      w: '75%',
+      fontSize: 20,
+      bullet: true
+    });
+  });
+}
+
+function createDefaultSlide(slide: any, content: { title: string; body: string }) {
+  slide.addText(content.title || 'Slide', {
+    x: '10%',
+    y: '10%',
+    w: '80%',
+    fontSize: 32,
+    bold: true
+  });
+
+  slide.addText(content.body || '', {
+    x: '10%',
+    y: '30%',
+    w: '80%',
+    fontSize: 20
+  });
+}
