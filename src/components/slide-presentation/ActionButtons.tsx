@@ -7,6 +7,9 @@ import { supabase } from "@/integrations/supabase/client";
 
 interface ActionButtonsProps {
   file: File | null;
+  subject: string;
+  gradeLevel: string;
+  topic: string;
   instructions: string;
   isGenerating: boolean;
   setIsGenerating: (isGenerating: boolean) => void;
@@ -16,6 +19,9 @@ interface ActionButtonsProps {
 
 export const ActionButtons = ({
   file,
+  subject,
+  gradeLevel,
+  topic,
   instructions,
   isGenerating,
   setIsGenerating,
@@ -35,10 +41,22 @@ export const ActionButtons = ({
       return;
     }
 
+    if (!subject || !gradeLevel || !topic) {
+      toast({
+        title: "Missing information",
+        description: "Please fill in all required fields (Subject, Grade Level, and Topic)",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsGenerating(true);
     try {
       const formData = new FormData();
       formData.append('file', file);
+      formData.append('subject', subject);
+      formData.append('gradeLevel', gradeLevel);
+      formData.append('topic', topic);
       formData.append('instructions', instructions);
 
       const { data: responseData, error: functionError } = await supabase.functions.invoke(
@@ -93,7 +111,12 @@ export const ActionButtons = ({
       const { data: pptxData, error } = await supabase.functions.invoke(
         'download-slides',
         {
-          body: { slidesData: generatedSlides },
+          body: { 
+            slidesData: generatedSlides,
+            subject: subject,
+            gradeLevel: gradeLevel,
+            topic: topic
+          },
         }
       );
 
@@ -121,7 +144,7 @@ export const ActionButtons = ({
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'presentation.pptx';
+      a.download = `${subject}_${topic}_presentation.pptx`;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
@@ -148,7 +171,7 @@ export const ActionButtons = ({
       <Button
         className="flex-1 bg-[#8cd09b] hover:bg-[#8cd09b]/90 text-[#0a1d2c] font-medium"
         onClick={handleGenerate}
-        disabled={isGenerating || !file}
+        disabled={isGenerating || !file || !subject || !gradeLevel || !topic}
       >
         {isGenerating ? (
           <>
