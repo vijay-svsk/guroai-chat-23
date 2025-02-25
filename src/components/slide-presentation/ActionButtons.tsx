@@ -1,8 +1,11 @@
+
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Presentation, Play, Download } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
 
 interface ActionButtonsProps {
   file: File | null;
@@ -29,6 +32,7 @@ export const ActionButtons = ({
 }: ActionButtonsProps) => {
   const { toast } = useToast();
   const [isDownloading, setIsDownloading] = React.useState(false);
+  const [generator, setGenerator] = React.useState<'slidesgpt' | 'chatgpt'>('slidesgpt');
 
   const handleGenerate = async () => {
     if (!subject || !gradeLevel || !topic) {
@@ -51,8 +55,10 @@ export const ActionButtons = ({
       formData.append('topic', topic);
       formData.append('instructions', instructions);
 
+      const endpoint = generator === 'slidesgpt' ? 'generate-slides' : 'generate-slides-with-chatgpt';
+      
       const { data: responseData, error: functionError } = await supabase.functions.invoke(
-        'generate-slides',
+        endpoint,
         {
           body: formData,
         }
@@ -64,7 +70,7 @@ export const ActionButtons = ({
       }
 
       if (!responseData) {
-        throw new Error('No data received from the generate-slides function');
+        throw new Error(`No data received from the ${endpoint} function`);
       }
 
       console.log('Generated slides data:', responseData);
@@ -72,7 +78,7 @@ export const ActionButtons = ({
       
       toast({
         title: "Success!",
-        description: "Your slides have been generated successfully with SlidesGPT.",
+        description: `Your slides have been generated successfully with ${generator === 'slidesgpt' ? 'SlidesGPT' : 'ChatGPT'}.`,
       });
     } catch (error) {
       console.error('Error generating slides:', error);
@@ -159,35 +165,54 @@ export const ActionButtons = ({
   };
 
   return (
-    <div className="flex gap-4">
-      <Button
-        className="flex-1 bg-[#8cd09b] hover:bg-[#8cd09b]/90 text-[#0a1d2c] font-medium"
-        onClick={handleGenerate}
-        disabled={isGenerating || !subject || !gradeLevel || !topic}
-      >
-        {isGenerating ? (
-          <>
-            <Play className="w-4 h-4 mr-2 animate-spin" />
-            Generating with SlidesGPT...
-          </>
-        ) : (
-          <>
-            <Presentation className="w-4 h-4 mr-2" />
-            Generate Slides with SlidesGPT
-          </>
-        )}
-      </Button>
+    <div className="space-y-4">
+      <div className="flex items-center space-x-6">
+        <RadioGroup
+          value={generator}
+          onValueChange={(value: 'slidesgpt' | 'chatgpt') => setGenerator(value)}
+          className="flex items-center space-x-6"
+        >
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="slidesgpt" id="slidesgpt" />
+            <Label htmlFor="slidesgpt" className="text-white">SlidesGPT</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="chatgpt" id="chatgpt" />
+            <Label htmlFor="chatgpt" className="text-white">ChatGPT</Label>
+          </div>
+        </RadioGroup>
+      </div>
 
-      {generatedSlides && (
+      <div className="flex gap-4">
         <Button
           className="flex-1 bg-[#8cd09b] hover:bg-[#8cd09b]/90 text-[#0a1d2c] font-medium"
-          onClick={handleDownload}
-          disabled={isDownloading || isGenerating}
+          onClick={handleGenerate}
+          disabled={isGenerating || !subject || !gradeLevel || !topic}
         >
-          <Download className="w-4 h-4 mr-2" />
-          {isDownloading ? 'Downloading...' : 'Download PPTX'}
+          {isGenerating ? (
+            <>
+              <Play className="w-4 h-4 mr-2 animate-spin" />
+              Generating with {generator === 'slidesgpt' ? 'SlidesGPT' : 'ChatGPT'}...
+            </>
+          ) : (
+            <>
+              <Presentation className="w-4 h-4 mr-2" />
+              Generate Slides with {generator === 'slidesgpt' ? 'SlidesGPT' : 'ChatGPT'}
+            </>
+          )}
         </Button>
-      )}
+
+        {generatedSlides && (
+          <Button
+            className="flex-1 bg-[#8cd09b] hover:bg-[#8cd09b]/90 text-[#0a1d2c] font-medium"
+            onClick={handleDownload}
+            disabled={isDownloading || isGenerating}
+          >
+            <Download className="w-4 h-4 mr-2" />
+            {isDownloading ? 'Downloading...' : 'Download PPTX'}
+          </Button>
+        )}
+      </div>
     </div>
   );
 };
