@@ -20,6 +20,8 @@ serve(async (req) => {
       throw new Error('DeepSeek API key not configured')
     }
 
+    console.log('Processing question:', question)
+
     // Call DeepSeek API
     const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
       method: 'POST',
@@ -32,7 +34,7 @@ serve(async (req) => {
         messages: [
           {
             role: "system",
-            content: "You are GuroAI, a friendly and knowledgeable AI assistant focused on providing clear, accurate, and helpful responses."
+            content: "You are GuroAI, a friendly and knowledgeable AI assistant focused on providing clear, accurate, and helpful responses. Your responses should be informative yet conversational."
           },
           {
             role: "user",
@@ -40,7 +42,8 @@ serve(async (req) => {
           }
         ],
         temperature: 0.7,
-        max_tokens: 2000
+        max_tokens: 2000,
+        stream: false
       }),
     })
 
@@ -51,9 +54,10 @@ serve(async (req) => {
     }
 
     const data = await response.json()
-    console.log('DeepSeek response:', data)
+    console.log('DeepSeek response received')
 
-    if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+    if (!data.choices?.[0]?.message?.content) {
+      console.error('Invalid response format:', data)
       throw new Error('Invalid response format from DeepSeek')
     }
 
@@ -76,7 +80,7 @@ serve(async (req) => {
         status: 500,
         headers: { 
           ...corsHeaders,
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json' 
         } 
       }
     )

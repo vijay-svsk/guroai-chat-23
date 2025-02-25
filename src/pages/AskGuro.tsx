@@ -5,30 +5,53 @@ import { Input } from "@/components/ui/input";
 import { Header } from "@/components/subscription/Header";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Bot } from "lucide-react";
+import { Bot, Send } from "lucide-react";
 import { LoadingState } from "@/components/subscription/LoadingState";
+
+interface ChatMessage {
+  role: 'user' | 'assistant';
+  content: string;
+}
 
 const AskGuro = () => {
   const [question, setQuestion] = useState("");
-  const [answer, setAnswer] = useState("");
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const chatEndRef = useState<HTMLDivElement | null>(null);
+
+  const scrollToBottom = () => {
+    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!question.trim()) return;
 
+    const userMessage: ChatMessage = {
+      role: 'user',
+      content: question.trim()
+    };
+
+    setMessages(prev => [...prev, userMessage]);
+    setQuestion("");
     setIsLoading(true);
+    scrollToBottom();
+
     try {
       const { data, error } = await supabase.functions.invoke('ask-guro', {
-        body: { question: question.trim() }
+        body: { question: userMessage.content }
       });
 
       if (error) throw error;
       if (!data?.answer) throw new Error('No answer received');
       
-      setAnswer(data.answer);
-      setQuestion(""); // Clear input after successful response
+      const assistantMessage: ChatMessage = {
+        role: 'assistant',
+        content: data.answer
+      };
+
+      setMessages(prev => [...prev, assistantMessage]);
     } catch (error) {
       console.error('Error:', error);
       toast({
@@ -38,24 +61,69 @@ const AskGuro = () => {
       });
     } finally {
       setIsLoading(false);
+      scrollToBottom();
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-[#f8fafc]">
+    <div className="flex flex-col min-h-screen bg-gradient-to-b from-white to-[#f8fafc]">
       <Header />
-      <div className="max-w-3xl mx-auto px-4">
-        <div className="flex flex-col items-center justify-center min-h-[60vh]">
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-[#023d54] tracking-tight mb-2">
-              Hi, I'm GuroAI.
-            </h1>
-            <p className="text-2xl text-[#023d54]/80 tracking-tight">
-              How can I help you today?
-            </p>
+      <div className="flex-1 flex flex-col max-w-5xl mx-auto w-full px-4">
+        {messages.length === 0 ? (
+          <div className="flex-1 flex flex-col items-center justify-center">
+            <div className="text-center mb-8">
+              <h1 className="text-4xl font-bold text-[#023d54] tracking-tight mb-2">
+                Hi, I'm GuroAI.
+              </h1>
+              <p className="text-2xl text-[#023d54]/80 tracking-tight">
+                How can I help you today?
+              </p>
+            </div>
           </div>
-          
-          <div className="relative w-full max-w-2xl">
+        ) : (
+          <div className="flex-1 py-8 space-y-6 overflow-y-auto">
+            {messages.map((message, index) => (
+              <div
+                key={index}
+                className={cn(
+                  "flex w-full items-start gap-4 p-6",
+                  message.role === 'assistant' ? "bg-gray-50" : "bg-white"
+                )}
+              >
+                <div className="flex-shrink-0 w-8 h-8">
+                  {message.role === 'assistant' ? (
+                    <div className="flex items-center justify-center w-8 h-8 rounded-full bg-[#023d54]">
+                      <Bot className="w-5 h-5 text-white" />
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-300">
+                      <div className="w-4 h-4 rounded-full bg-white" />
+                    </div>
+                  )}
+                </div>
+                <div className="flex-1">
+                  <p className="text-[#023d54]/90 whitespace-pre-wrap leading-relaxed">
+                    {message.content}
+                  </p>
+                </div>
+              </div>
+            ))}
+            {isLoading && (
+              <div className="flex w-full items-start gap-4 p-6 bg-gray-50">
+                <div className="flex-shrink-0 w-8 h-8">
+                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-[#023d54]">
+                    <Bot className="w-5 h-5 text-white" />
+                  </div>
+                </div>
+                <LoadingState />
+              </div>
+            )}
+            <div ref={chatEndRef} />
+          </div>
+        )}
+
+        <div className="sticky bottom-0 py-4 bg-gradient-to-b from-transparent to-[#f8fafc]">
+          <div className="relative max-w-3xl mx-auto">
             <form onSubmit={handleSubmit} className="relative">
               <Input
                 value={question}
@@ -64,30 +132,21 @@ const AskGuro = () => {
                 disabled={isLoading}
                 className="w-full pl-4 pr-14 py-6 text-lg rounded-full border-2 border-[#023d54]/10 focus-visible:ring-[#023d54] text-[#023d54] shadow-lg transition-shadow duration-200 hover:shadow-xl"
               />
-              <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
+              <div className="absolute right-3 top-1/2 -translate-y-1/2">
                 <Button
                   type="submit"
                   size="icon"
                   disabled={isLoading || !question.trim()}
-                  className="h-10 w-10 rounded-full bg-[#023d54] hover:bg-[#023d54]/90 transition-transform duration-200 hover:scale-105"
+                  className={cn(
+                    "h-10 w-10 rounded-full bg-[#023d54] hover:bg-[#023d54]/90 transition-all duration-200",
+                    question.trim() ? "opacity-100 scale-100" : "opacity-70 scale-95"
+                  )}
                 >
-                  <Bot className="h-5 w-5" />
+                  <Send className="h-5 w-5" />
                 </Button>
               </div>
             </form>
           </div>
-
-          {isLoading && (
-            <div className="mt-8 w-full max-w-2xl">
-              <LoadingState />
-            </div>
-          )}
-
-          {answer && !isLoading && (
-            <div className="mt-8 w-full max-w-2xl p-6 bg-white rounded-lg border border-[#023d54]/10 shadow-lg">
-              <p className="text-[#023d54]/90 whitespace-pre-wrap leading-relaxed">{answer}</p>
-            </div>
-          )}
         </div>
       </div>
     </div>
