@@ -62,7 +62,7 @@ export const ActionButtons = ({
       
       toast({
         title: "Success!",
-        description: "Your slides have been generated successfully.",
+        description: "Your slides have been generated successfully with SlidesGPT.",
       });
     } catch (error) {
       console.error('Error generating slides:', error);
@@ -153,12 +153,12 @@ export const ActionButtons = ({
         {isGenerating ? (
           <>
             <Play className="w-4 h-4 mr-2 animate-spin" />
-            Generating...
+            Generating with SlidesGPT...
           </>
         ) : (
           <>
             <Presentation className="w-4 h-4 mr-2" />
-            Generate Slides
+            Generate Slides with SlidesGPT
           </>
         )}
       </Button>

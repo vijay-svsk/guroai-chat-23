@@ -1,7 +1,8 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
-import { PresentationEx } from "https://cdn.sheetjs.com/xlsx-0.19.3/package/xlsx.mjs";
+
+const slidesGPTApiKey = Deno.env.get('SLIDESGPT_API_KEY');
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -9,7 +10,6 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -17,7 +17,6 @@ serve(async (req) => {
   try {
     console.log('Starting slides generation...');
     
-    // Get the form data
     const formData = await req.formData();
     const file = formData.get('file');
     const instructions = formData.get('instructions') || '';
@@ -27,21 +26,36 @@ serve(async (req) => {
     }
 
     console.log(`Processing file: ${file.name} (${file.size} bytes)`);
-    console.log(`File type: ${file.type}`);
+    console.log(`Instructions: ${instructions}`);
 
-    // Read the file content
+    // Read file content
     const fileContent = await file.text();
-    console.log('File content loaded successfully');
+    
+    // Call SlidesGPT API to generate slides structure
+    const slidesGPTResponse = await fetch('https://api.slidesgpt.com/v1/generate', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${slidesGPTApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        content: fileContent,
+        instructions: instructions,
+        outputFormat: 'json',
+        slideCount: 33, // As per previous requirement
+        includeNotes: true,
+      }),
+    });
 
-    // Process the content to extract sections
-    const sections = processContent(fileContent);
-    console.log('Content processed into sections');
+    if (!slidesGPTResponse.ok) {
+      const errorData = await slidesGPTResponse.json();
+      console.error('SlidesGPT API Error:', errorData);
+      throw new Error(`SlidesGPT API error: ${errorData.message || 'Unknown error'}`);
+    }
 
-    // Generate slide data structure
-    const slidesData = generateSlideStructure(sections, instructions);
-    console.log('Slide structure generated');
+    const slidesData = await slidesGPTResponse.json();
+    console.log('Successfully generated slides data from SlidesGPT');
 
-    // Return the slides data
     return new Response(
       JSON.stringify(slidesData),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -61,81 +75,3 @@ serve(async (req) => {
     );
   }
 });
-
-function processContent(content: string) {
-  const sections: Record<string, any> = {
-    title: '',
-    objectives: [],
-    reviewingLesson: '',
-    motivation: {
-      instructions: '',
-      questions: []
-    },
-    examples: {
-      content: '',
-      discussion: ''
-    },
-    newConcepts1: [],
-    newConcepts2: [],
-    mastery: {
-      instructions: '',
-      criteria: []
-    },
-    practicalApplication: [],
-    generalization: '',
-    evaluation: {
-      instructions: '',
-      questions: []
-    },
-    assignment: ''
-  };
-
-  // Extract sections from content using regex patterns
-  const lines = content.split('\n');
-  let currentSection = '';
-
-  for (const line of lines) {
-    if (line.includes('TOPIC:')) {
-      sections.title = line.split('TOPIC:')[1].trim();
-    } else if (line.includes('Objectives')) {
-      currentSection = 'objectives';
-    } else if (line.includes('Reviewing previous lesson')) {
-      currentSection = 'reviewingLesson';
-    } else if (line.includes('Establishing the purpose')) {
-      currentSection = 'motivation';
-    }
-    // Add content to appropriate section
-    // ... Continue parsing other sections based on content structure
-  }
-
-  return sections;
-}
-
-function generateSlideStructure(sections: Record<string, any>, instructions: string) {
-  return {
-    slides: [
-      {
-        type: 'title',
-        content: {
-          title: sections.title,
-          subtitle: instructions || 'Lesson Presentation'
-        }
-      },
-      {
-        type: 'objectives',
-        content: {
-          title: 'Objectives',
-          items: sections.objectives.slice(0, 3)
-        }
-      },
-      // ... Generate remaining slides according to structure
-      {
-        type: 'assignment',
-        content: {
-          title: 'Assignment',
-          text: sections.assignment
-        }
-      }
-    ]
-  };
-}
