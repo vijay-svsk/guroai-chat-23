@@ -21,16 +21,40 @@ const AskGuro = () => {
   const [isLoadingHistory, setIsLoadingHistory] = useState(true);
   const { toast } = useToast();
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
-    loadChatHistory();
+    checkUser();
   }, []);
 
+  useEffect(() => {
+    if (userId) {
+      loadChatHistory();
+    }
+  }, [userId]);
+
+  const checkUser = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      setUserId(user.id);
+    } else {
+      setIsLoadingHistory(false);
+      toast({
+        title: "Authentication Required",
+        description: "Please sign in to use the chat feature.",
+        variant: "destructive"
+      });
+    }
+  };
+
   const loadChatHistory = async () => {
+    if (!userId) return;
+
     try {
       const { data, error } = await supabase
         .from('chat_messages')
         .select('*')
+        .eq('user_id', userId)
         .order('created_at', { ascending: true });
 
       if (error) throw error;
@@ -52,11 +76,14 @@ const AskGuro = () => {
   };
 
   const saveMessage = async (message: ChatMessage) => {
+    if (!userId) return;
+
     const { error } = await supabase
       .from('chat_messages')
       .insert({
         content: message.content,
-        role: message.role
+        role: message.role,
+        user_id: userId
       });
 
     if (error) {
@@ -75,7 +102,7 @@ const AskGuro = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!question.trim()) return;
+    if (!question.trim() || !userId) return;
 
     const userMessage: ChatMessage = {
       role: 'user',
@@ -124,6 +151,17 @@ const AskGuro = () => {
         {isLoadingHistory ? (
           <div className="flex-1 flex items-center justify-center">
             <LoadingState />
+          </div>
+        ) : !userId ? (
+          <div className="flex-1 flex flex-col items-center justify-center">
+            <div className="text-center mb-8">
+              <h1 className="text-4xl font-bold text-[#023d54] tracking-tight mb-2">
+                Please Sign In
+              </h1>
+              <p className="text-2xl text-[#023d54]/80 tracking-tight">
+                Sign in to start chatting with GuroAI
+              </p>
+            </div>
           </div>
         ) : messages.length === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-center">
@@ -185,14 +223,14 @@ const AskGuro = () => {
                 value={question}
                 onChange={(e) => setQuestion(e.target.value)}
                 placeholder="Ask anything"
-                disabled={isLoading}
+                disabled={isLoading || !userId}
                 className="w-full pl-4 pr-14 py-6 text-lg rounded-full border-2 border-[#023d54]/10 focus-visible:ring-[#023d54] text-[#023d54] shadow-lg transition-shadow duration-200 hover:shadow-xl"
               />
               <div className="absolute right-3 top-1/2 -translate-y-1/2">
                 <Button
                   type="submit"
                   size="icon"
-                  disabled={isLoading || !question.trim()}
+                  disabled={isLoading || !question.trim() || !userId}
                   className={cn(
                     "h-10 w-10 rounded-full bg-[#023d54] hover:bg-[#023d54]/90 transition-all duration-200",
                     question.trim() ? "opacity-100 scale-100" : "opacity-70 scale-95"
