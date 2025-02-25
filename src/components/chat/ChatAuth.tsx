@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CreditCard } from "lucide-react";
+import { CreditCard, LogIn } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -50,6 +50,10 @@ export const ChatAuth = ({ onSubscribe, isSubscribed = false }: ChatAuthProps) =
     }
   };
 
+  const handleLoginClick = () => {
+    navigate('/newuseraccountlogin');
+  };
+
   const handleStartChat = () => {
     navigate('/ask-guro');
   };
@@ -94,7 +98,7 @@ export const ChatAuth = ({ onSubscribe, isSubscribed = false }: ChatAuthProps) =
             GuroAI Chat
           </CardTitle>
           <CardDescription className="text-[#023d54]/70 text-base">
-            Subscribe to start chatting with GuroAI
+            Subscribe or login to start chatting with GuroAI
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -120,14 +124,24 @@ export const ChatAuth = ({ onSubscribe, isSubscribed = false }: ChatAuthProps) =
               </ul>
             </div>
             
-            <Button 
-              onClick={handleSubscribeClick}
-              className="w-full bg-[#023d54] hover:bg-[#023d54]/90" 
-              disabled={loading}
-            >
-              {loading ? "Redirecting..." : "Subscribe Now - ₱299/month"}
-              <CreditCard className="ml-2 h-4 w-4" />
-            </Button>
+            <div className="flex flex-col gap-3">
+              <Button 
+                onClick={handleSubscribeClick}
+                className="w-full bg-[#023d54] hover:bg-[#023d54]/90" 
+                disabled={loading}
+              >
+                {loading ? "Redirecting..." : "Subscribe Now - ₱299/month"}
+                <CreditCard className="ml-2 h-4 w-4" />
+              </Button>
+              
+              <Button 
+                onClick={handleLoginClick}
+                className="w-full bg-white text-[#023d54] border border-[#023d54] hover:bg-gray-50" 
+              >
+                Account Login
+                <LogIn className="ml-2 h-4 w-4" />
+              </Button>
+            </div>
             
             {error && (
               <div className="text-sm text-red-500 font-medium">{error}</div>
