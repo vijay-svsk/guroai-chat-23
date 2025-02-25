@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { LoadingState } from "@/components/subscription/LoadingState";
 import { ChatMessages } from "@/components/chat/ChatMessages";
 import { WelcomeScreen } from "@/components/chat/WelcomeScreen";
@@ -13,6 +13,7 @@ import { useChatAuth } from "@/hooks/use-chat-auth";
 const AskGuro = () => {
   const { userId, isCheckingAuth, signInToChat, registerForChat, signOut } = useChatAuth();
   const [showPreviousChats, setShowPreviousChats] = useState(false);
+  const [isPageLoading, setIsPageLoading] = useState(true);
   
   const {
     question,
@@ -29,7 +30,17 @@ const AskGuro = () => {
     handleImageGeneration,
   } = useChat(userId);
 
-  if (isCheckingAuth || isLoadingHistory) {
+  // Simulate faster loading for better UX
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsPageLoading(false);
+    }, 500); // Short timeout to show the welcome message faster
+    
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Only show loading state if we're still checking auth AND loading is taking longer than expected
+  if ((isCheckingAuth || isLoadingHistory) && isPageLoading) {
     return (
       <div className="flex flex-col min-h-screen bg-gradient-to-b from-white to-[#f8fafc]">
         <div className="flex-1 flex items-center justify-center">
@@ -39,7 +50,8 @@ const AskGuro = () => {
     );
   }
 
-  if (!userId) {
+  // Show welcome screen immediately if user isn't authenticated but page has loaded
+  if (!userId && !isCheckingAuth) {
     return (
       <div className="flex flex-col min-h-screen bg-gradient-to-b from-white to-[#f8fafc] py-10">
         <div className="flex-1 flex flex-col items-center justify-center">
@@ -81,6 +93,7 @@ const AskGuro = () => {
 
         {/* Main Chat Area */}
         <div className="flex-1 flex flex-col">
+          {/* Always show WelcomeScreen while no messages, even during initial loading */}
           {messages.length === 0 ? (
             <WelcomeScreen />
           ) : (

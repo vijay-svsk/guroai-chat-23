@@ -11,11 +11,18 @@ export const useChatAuth = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Start checking auth status immediately
     checkUser();
+    
+    // Add a timeout to avoid showing loading state for too long
+    const timeoutId = setTimeout(() => {
+      setIsCheckingAuth(false);
+    }, 2000); // Max 2 seconds before we stop showing loading state
+    
+    return () => clearTimeout(timeoutId);
   }, []);
 
   const checkUser = async () => {
-    setIsCheckingAuth(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
