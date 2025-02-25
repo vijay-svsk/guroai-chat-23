@@ -12,7 +12,7 @@ import { useChatAuth } from "@/hooks/use-chat-auth";
 import { useToast } from "@/hooks/use-toast";
 
 const AskGuro = () => {
-  const { userId, isCheckingAuth, signInToChat, registerForChat, signOut } = useChatAuth();
+  const { userId, isCheckingAuth, redirectToSubscribe, signOut } = useChatAuth();
   const [showPreviousChats, setShowPreviousChats] = useState(false);
   const [isPageLoading, setIsPageLoading] = useState(true);
   const { toast } = useToast();
@@ -63,7 +63,7 @@ const AskGuro = () => {
     );
   }
 
-  // Show welcome screen immediately if user isn't authenticated but page has loaded
+  // Show subscription screen if user isn't authenticated
   if (!userId && !isCheckingAuth) {
     return (
       <div className="flex flex-col min-h-screen bg-gradient-to-b from-white to-[#f8fafc] py-10">
@@ -73,10 +73,10 @@ const AskGuro = () => {
               GuroAI Chat
             </h1>
             <p className="text-xl text-[#023d54]/80 mb-8">
-              Sign in to start chatting with GuroAI
+              Subscribe to start chatting with GuroAI
             </p>
           </div>
-          <ChatAuth onSignIn={signInToChat} onRegister={registerForChat} />
+          <ChatAuth onSubscribe={redirectToSubscribe} />
         </div>
       </div>
     );
