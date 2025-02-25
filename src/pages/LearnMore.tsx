@@ -1,9 +1,14 @@
+
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
 const LearnMore = () => {
   const navigate = useNavigate();
+
+  const handleSubscribe = () => {
+    window.location.href = 'https://checkout.xendit.co/od/guroai.online';
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -191,7 +196,7 @@ const LearnMore = () => {
               ₱299<span className="text-xl text-gray-500">/month</span>
             </div>
             <Button 
-              onClick={() => navigate('/payment')}
+              onClick={handleSubscribe}
               size="lg"
               className="w-full md:w-auto md:px-8 bg-guro-blue hover:bg-guro-blue/90"
             >
