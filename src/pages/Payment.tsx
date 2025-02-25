@@ -95,13 +95,23 @@ const Payment = () => {
             <div className="text-3xl font-bold text-guro-blue">
               ₱299<span className="text-xl text-gray-500">/month</span>
             </div>
-            <Button 
-              onClick={handleSubscribe}
-              size="lg"
-              className="w-full md:w-auto md:px-8 bg-guro-blue hover:bg-guro-blue/90"
-            >
-              Subscribe to GuroAI - ₱299/month
-            </Button>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <Button 
+                onClick={() => navigate('/learn-more')}
+                variant="outline"
+                size="lg"
+                className="w-full sm:w-auto sm:px-8 border-guro-blue text-guro-blue hover:bg-guro-blue/10"
+              >
+                Learn More
+              </Button>
+              <Button 
+                onClick={handleSubscribe}
+                size="lg"
+                className="w-full sm:w-auto sm:px-8 bg-guro-blue hover:bg-guro-blue/90"
+              >
+                Subscribe to GuroAI - ₱299/month
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>
