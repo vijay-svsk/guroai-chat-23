@@ -17,12 +17,12 @@ serve(async (req) => {
     const DEEPSEEK_API_KEY = Deno.env.get('DEEPSEEK_API_KEY')
 
     if (!DEEPSEEK_API_KEY) {
+      console.error('DeepSeek API key not configured')
       throw new Error('DeepSeek API key not configured')
     }
 
-    console.log('Processing question:', question)
+    console.log('Sending question to DeepSeek:', question)
 
-    // Call DeepSeek API
     const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -42,19 +42,18 @@ serve(async (req) => {
           }
         ],
         temperature: 0.7,
-        max_tokens: 2000,
-        stream: false
+        max_tokens: 2000
       }),
     })
 
     if (!response.ok) {
-      const error = await response.json()
-      console.error('DeepSeek API error:', error)
-      throw new Error('Failed to get response from DeepSeek')
+      const errorData = await response.json().catch(() => null)
+      console.error('DeepSeek API error:', errorData || response.statusText)
+      throw new Error(errorData?.error?.message || 'Failed to get response from DeepSeek')
     }
 
     const data = await response.json()
-    console.log('DeepSeek response received')
+    console.log('Received response from DeepSeek')
 
     if (!data.choices?.[0]?.message?.content) {
       console.error('Invalid response format:', data)
@@ -73,9 +72,11 @@ serve(async (req) => {
       }
     )
   } catch (error) {
-    console.error('Error:', error)
+    console.error('Error in ask-guro function:', error)
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: error.message || 'An unexpected error occurred'
+      }),
       { 
         status: 500,
         headers: { 
