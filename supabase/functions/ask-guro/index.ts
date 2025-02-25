@@ -31,16 +31,31 @@ serve(async (req) => {
         model: "deepseek-chat",
         messages: [
           {
+            role: "system",
+            content: "You are GuroAI, a friendly and knowledgeable AI assistant focused on providing clear, accurate, and helpful responses."
+          },
+          {
             role: "user",
             content: question
           }
         ],
         temperature: 0.7,
+        max_tokens: 2000
       }),
     })
 
+    if (!response.ok) {
+      const error = await response.json()
+      console.error('DeepSeek API error:', error)
+      throw new Error('Failed to get response from DeepSeek')
+    }
+
     const data = await response.json()
     console.log('DeepSeek response:', data)
+
+    if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+      throw new Error('Invalid response format from DeepSeek')
+    }
 
     return new Response(
       JSON.stringify({ 

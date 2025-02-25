@@ -6,6 +6,7 @@ import { Header } from "@/components/subscription/Header";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Bot } from "lucide-react";
+import { LoadingState } from "@/components/subscription/LoadingState";
 
 const AskGuro = () => {
   const [question, setQuestion] = useState("");
@@ -24,7 +25,10 @@ const AskGuro = () => {
       });
 
       if (error) throw error;
+      if (!data?.answer) throw new Error('No answer received');
+      
       setAnswer(data.answer);
+      setQuestion(""); // Clear input after successful response
     } catch (error) {
       console.error('Error:', error);
       toast({
@@ -73,7 +77,13 @@ const AskGuro = () => {
             </form>
           </div>
 
-          {answer && (
+          {isLoading && (
+            <div className="mt-8 w-full max-w-2xl">
+              <LoadingState />
+            </div>
+          )}
+
+          {answer && !isLoading && (
             <div className="mt-8 w-full max-w-2xl p-6 bg-white rounded-lg border border-[#023d54]/10 shadow-lg">
               <p className="text-[#023d54]/90 whitespace-pre-wrap leading-relaxed">{answer}</p>
             </div>
