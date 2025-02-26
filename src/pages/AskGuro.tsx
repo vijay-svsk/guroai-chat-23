@@ -137,12 +137,14 @@ const AskGuro = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-white to-[#f8fafc]">
-      {/* Top bar with New Chat button */}
+      {/* Top bar with Previous Responses and New Chat buttons */}
       <ChatHeader 
         startNewChat={startNewChat} 
         isLoading={isLoading} 
         onSignOut={signOut}
         isAuthenticated={!!userId}
+        showPreviousChats={showPreviousChats}
+        setShowPreviousChats={setShowPreviousChats}
       />
 
       <div className="flex flex-1 max-w-5xl mx-auto w-full px-4 relative">

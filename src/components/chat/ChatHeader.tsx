@@ -1,5 +1,5 @@
 
-import { PlusCircle, LogOut } from "lucide-react";
+import { PlusCircle, LogOut, History } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface ChatHeaderProps {
@@ -7,13 +7,17 @@ interface ChatHeaderProps {
   isLoading: boolean;
   onSignOut?: () => void;
   isAuthenticated?: boolean;
+  showPreviousChats?: boolean;
+  setShowPreviousChats?: (show: boolean) => void;
 }
 
 export const ChatHeader = ({ 
   startNewChat, 
   isLoading, 
   onSignOut,
-  isAuthenticated 
+  isAuthenticated,
+  showPreviousChats,
+  setShowPreviousChats
 }: ChatHeaderProps) => {
   return (
     <div className="sticky top-0 z-10 bg-white/95 backdrop-blur-sm border-b border-[#023d54]/10">
@@ -22,7 +26,19 @@ export const ChatHeader = ({
           <div className="flex items-center">
             {/* Logo and text removed */}
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-3">
+            {setShowPreviousChats && (
+              <Button
+                variant="outline" 
+                size="sm" 
+                onClick={() => setShowPreviousChats(!showPreviousChats)}
+                className="flex items-center gap-1 text-[#023d54]"
+              >
+                <History className="h-4 w-4" />
+                <span>Previous Responses</span>
+              </Button>
+            )}
+            
             <Button 
               variant="outline" 
               size="sm" 
