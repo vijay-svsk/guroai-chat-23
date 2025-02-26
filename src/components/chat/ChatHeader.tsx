@@ -26,16 +26,16 @@ export const ChatHeader = ({
           <div className="flex items-center">
             {/* Logo and text removed */}
           </div>
-          <div className="flex gap-3">
+          <div className="flex flex-wrap gap-2 justify-end">
             {setShowPreviousChats && (
               <Button
                 variant="outline" 
                 size="sm" 
                 onClick={() => setShowPreviousChats(!showPreviousChats)}
-                className="flex items-center gap-1 text-[#023d54]"
+                className="flex items-center gap-1 text-white bg-[#023d54] hover:bg-[#023d54]/90 border-[#023d54]"
               >
                 <History className="h-4 w-4" />
-                <span>Previous Responses</span>
+                <span className="sm:inline">Previous</span>
               </Button>
             )}
             
@@ -44,10 +44,10 @@ export const ChatHeader = ({
               size="sm" 
               onClick={startNewChat}
               disabled={isLoading}
-              className="flex items-center gap-1 text-[#023d54]"
+              className="flex items-center gap-1 text-[#023d54] bg-[#8cd09b] hover:bg-[#8cd09b]/90 border-[#8cd09b]"
             >
               <PlusCircle className="h-4 w-4" />
-              <span>New Chat</span>
+              <span className="sm:inline">New Chat</span>
             </Button>
             
             {isAuthenticated && onSignOut && (
@@ -58,7 +58,7 @@ export const ChatHeader = ({
                 className="flex items-center gap-1 text-[#023d54]"
               >
                 <LogOut className="h-4 w-4" />
-                <span>Sign Out</span>
+                <span className="sm:inline">Sign Out</span>
               </Button>
             )}
           </div>
