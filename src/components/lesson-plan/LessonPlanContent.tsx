@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
-import { Save, Download, FileText, Presentation } from "lucide-react";
+import { Save, Download, FileText, Presentation, Edit } from "lucide-react";
 import { Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -12,6 +12,7 @@ interface LessonPlanContentProps {
   response: string;
   reviewImage?: string;
   motivationImage?: string;
+  usedFallback?: boolean;
   onResponseChange: (value: string) => void;
   onSave: () => void;
   onDownloadTxt: () => void;
@@ -24,6 +25,7 @@ export const LessonPlanContent = ({
   response,
   reviewImage,
   motivationImage,
+  usedFallback = false,
   onResponseChange,
   onSave,
   onDownloadTxt,
@@ -136,6 +138,14 @@ export const LessonPlanContent = ({
 
     return (
       <div className="whitespace-pre-wrap font-sans text-gray-800">
+        {usedFallback && (
+          <div className="bg-amber-50 border border-amber-200 rounded-md p-4 mb-6">
+            <p className="font-medium text-amber-800">
+              This is a template lesson plan. AI-generated content is currently unavailable.
+              Please edit this template to customize it for your needs.
+            </p>
+          </div>
+        )}
         {processedContent}
       </div>
     );
@@ -146,19 +156,29 @@ export const LessonPlanContent = ({
       <div className="bg-white border rounded-md p-4">
         {renderContent()}
       </div>
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-wrap gap-4 mt-6">
         <Button
           onClick={onSave}
           disabled={isLoading || !response}
-          className="w-full sm:w-auto flex items-center gap-2"
+          className="flex items-center gap-2"
         >
           <Save className="h-4 w-4" />
           Save this Lesson Plan
         </Button>
+        {usedFallback && (
+          <Button
+            variant="outline"
+            onClick={() => onResponseChange(response)}
+            className="flex items-center gap-2"
+          >
+            <Edit className="h-4 w-4" />
+            Edit Template
+          </Button>
+        )}
         <Button
           onClick={handleGenerateSlides}
           disabled={isLoading || !response || isGeneratingSlides}
-          className="w-full sm:w-auto flex items-center gap-2"
+          className="flex items-center gap-2"
         >
           <Presentation className="h-4 w-4" />
           {isGeneratingSlides ? "Generating Slides..." : "Generate Slides"}
@@ -166,7 +186,7 @@ export const LessonPlanContent = ({
         <Button
           onClick={onDownloadTxt}
           disabled={isLoading || !response}
-          className="w-full sm:w-auto flex items-center gap-2"
+          className="flex items-center gap-2"
         >
           <Download className="h-4 w-4" />
           Download as TXT
@@ -174,7 +194,7 @@ export const LessonPlanContent = ({
         <Button
           onClick={onDownloadDocx}
           disabled={isLoading || !response}
-          className="w-full sm:w-auto flex items-center gap-2"
+          className="flex items-center gap-2"
         >
           <FileText className="h-4 w-4" />
           Download as DOCX

@@ -22,6 +22,7 @@ const LessonPlanAI = () => {
     isEditing,
     reviewImage,
     motivationImage,
+    usedFallback,
     setResponse,
     setIsEditing,
     generateLessonPlan,
@@ -116,6 +117,7 @@ const LessonPlanAI = () => {
               onDownloadDocx={() => downloadDocx(response, formData.subject, formData.method)}
               reviewImage={reviewImage}
               motivationImage={motivationImage}
+              usedFallback={usedFallback}
             />
           </CardContent>
         </Card>

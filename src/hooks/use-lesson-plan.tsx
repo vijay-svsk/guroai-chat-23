@@ -4,6 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { generatePrompt, cleanResponse, extractImagePrompts } from "@/utils/prompt-utils";
 import type { FormData } from "@/types/lesson-plan-ai";
+import { generateFallbackLessonPlan } from "@/utils/fallback-utils";
 
 export const useLessonPlan = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -11,6 +12,7 @@ export const useLessonPlan = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [reviewImage, setReviewImage] = useState<string>("");
   const [motivationImage, setMotivationImage] = useState<string>("");
+  const [usedFallback, setUsedFallback] = useState(false);
   const { toast } = useToast();
 
   const generateImages = async (text: string) => {
@@ -32,15 +34,16 @@ export const useLessonPlan = () => {
     } catch (error) {
       console.error("Error generating images:", error);
       toast({
-        title: "Error",
-        description: "Failed to generate lesson images. Proceeding with text only.",
-        variant: "destructive",
+        title: "Notice",
+        description: "Unable to generate lesson images. Proceeding with text only.",
+        variant: "default",
       });
     }
   };
 
   const generateLessonPlan = async (formData: FormData) => {
     setIsLoading(true);
+    setUsedFallback(false);
 
     try {
       console.log("Generating lesson plan with prompt:", generatePrompt(formData));
@@ -72,11 +75,16 @@ export const useLessonPlan = () => {
       });
     } catch (error) {
       console.error("Error generating lesson plan:", error);
+      
+      // Use fallback mechanism
+      const fallbackLessonPlan = generateFallbackLessonPlan(formData);
+      setResponse(fallbackLessonPlan);
+      setUsedFallback(true);
+      
       toast({
-        title: "Error",
-        description: "Failed to generate lesson plan. Please try again.",
-        variant: "destructive",
-        duration: 3000,
+        title: "Using Fallback Template",
+        description: "We've generated a template for you to customize. AI generation was unavailable.",
+        duration: 5000,
       });
     } finally {
       setIsLoading(false);
@@ -89,6 +97,7 @@ export const useLessonPlan = () => {
     isEditing,
     reviewImage,
     motivationImage,
+    usedFallback,
     setResponse,
     setIsEditing,
     generateLessonPlan,
