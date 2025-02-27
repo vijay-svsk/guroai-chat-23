@@ -48,6 +48,7 @@ export const LessonPlanContent = ({
           value={response}
           onChange={(e) => onResponseChange(e.target.value)}
           className="w-full h-[500px] p-4 border rounded-md font-mono text-sm"
+          placeholder="Your lesson plan content will appear here for editing"
         />
       );
     }
@@ -116,7 +117,7 @@ export const LessonPlanContent = ({
 
   return (
     <>
-      <div className="bg-white border rounded-md p-4">
+      <div className="bg-white border rounded-md p-4 shadow-sm hover:shadow-md transition-shadow duration-200">
         {renderContent()}
       </div>
       <div className="flex flex-wrap gap-4 mt-6">
