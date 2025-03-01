@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Mail, Lock, ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { loginUser } from "@/services/auth-service";
 
 const NewUserAccountLogin = () => {
   const [email, setEmail] = useState("");
@@ -20,17 +21,24 @@ const NewUserAccountLogin = () => {
     localStorage.removeItem("guro_chat_auth");
   }, []);
 
+  // Check if already authenticated
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        navigate('/monthlysubscription');
+      }
+    };
+    
+    checkAuth();
+  }, [navigate]);
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      const { data: { user }, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) throw error;
+      const { user } = await loginUser(email, password);
 
       if (user) {
         toast({
@@ -41,9 +49,10 @@ const NewUserAccountLogin = () => {
         navigate("/monthlysubscription");
       }
     } catch (error: any) {
+      console.error("Login error:", error);
       toast({
         title: "Error",
-        description: error.message || "Invalid login credentials",
+        description: error.message || "Invalid login credentials. Please check your email and password.",
         variant: "destructive",
       });
     } finally {

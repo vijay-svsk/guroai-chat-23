@@ -4,8 +4,8 @@ import { Input } from "@/components/ui/input";
 import { Lock, Mail } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { loginUser } from "@/services/auth-service";
 
 interface AuthFormProps {
   isLogin: boolean;
@@ -75,8 +75,30 @@ export const AuthForm = ({
     }
   };
 
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const { user } = await loginUser(email, password);
+      
+      if (user) {
+        toast({
+          title: "Welcome back!",
+          description: "Successfully logged in",
+          duration: 3000,
+        });
+        navigate("/monthlysubscription");
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Invalid login credentials",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
-    <form onSubmit={isLogin ? onSubmit : handleSignUp} className="space-y-6">
+    <form onSubmit={isLogin ? handleLogin : handleSignUp} className="space-y-6">
       <div>
         <div className="flex items-center space-x-2">
           <Mail className="w-5 h-5 text-gray-500" />

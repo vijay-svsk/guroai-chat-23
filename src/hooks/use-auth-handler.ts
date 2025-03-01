@@ -35,13 +35,16 @@ export const useAuthHandler = () => {
           description: "Passwords do not match",
           variant: "destructive",
         });
+        setLoading(false);
         return;
       }
 
       if (isLogin) {
+        console.log("Attempting to login with:", email);
         const { user } = await loginUser(email, password);
         
         if (user) {
+          console.log("Login successful for user:", user.id);
           const isDeviceAuthorized = await checkDeviceAuthorization(user.id);
           if (!isDeviceAuthorized) {
             navigate('/device-restricted');
@@ -55,12 +58,16 @@ export const useAuthHandler = () => {
             duration: 3000,
           });
           navigate("/monthlysubscription");
+        } else {
+          console.log("Login returned no user data");
         }
       } else {
         // For signup, create subscription and redirect to monthlysubscription
+        console.log("Attempting to sign up with:", email);
         const { user } = await signUpUser(email, password);
 
         if (user) {
+          console.log("Signup successful for user:", user.id);
           await createInitialSubscription(user.id);
           setShowConfetti(true);
           toast({
@@ -69,12 +76,15 @@ export const useAuthHandler = () => {
             duration: 3000,
           });
           navigate("/monthlysubscription");
+        } else {
+          console.log("Signup returned no user data");
         }
       }
     } catch (error: any) {
+      console.error("Auth error:", error);
       toast({
         title: "Error",
-        description: error.message,
+        description: error.message || "Authentication failed",
         variant: "destructive",
       });
     } finally {
