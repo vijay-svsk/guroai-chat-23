@@ -1,18 +1,18 @@
 
-import { useState, useEffect, useRef } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { useChatUI } from "@/hooks/use-chat-ui";
+import { ChatMessage, ChatSession } from "@/types/chat";
+import { 
+  saveChatMessage, 
+  fetchChatSessions, 
+  fetchUserChatHistory, 
+  fetchChatSession,
+  sendChatRequest,
+  processFile
+} from "@/services/chat-service";
 
-export interface ChatMessage {
-  role: 'user' | 'assistant';
-  content: string;
-}
-
-export interface ChatSession {
-  id: string;
-  message: string;
-  date: string;
-}
+export type { ChatMessage, ChatSession };
 
 export const useChat = (userId: string | null) => {
   const [question, setQuestion] = useState("");
@@ -21,7 +21,7 @@ export const useChat = (userId: string | null) => {
   const [isLoadingHistory, setIsLoadingHistory] = useState(true);
   const [chatHistory, setChatHistory] = useState<ChatSession[]>([]);
   const { toast } = useToast();
-  const chatEndRef = useRef<HTMLDivElement>(null);
+  const { chatEndRef, scrollToBottom, focusTextarea } = useChatUI();
 
   useEffect(() => {
     // Reset messages when the component is mounted
@@ -39,27 +39,7 @@ export const useChat = (userId: string | null) => {
     if (!userId) return;
 
     try {
-      // Group chat messages by timestamps to get distinct chat sessions
-      const { data, error } = await supabase
-        .from('chat_messages')
-        .select('*')
-        .eq('user_id', userId)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-
-      // Group messages by session (simplified approach using first message of conversations)
-      const sessions = data.reduce((acc: any[], message: any, index: number) => {
-        if (message.role === 'user' && (index === 0 || data[index-1].role === 'assistant')) {
-          acc.push({
-            id: message.id,
-            message: message.content.substring(0, 40) + (message.content.length > 40 ? '...' : ''),
-            date: new Date(message.created_at).toLocaleDateString()
-          });
-        }
-        return acc;
-      }, []);
-
+      const sessions = await fetchChatSessions(userId);
       setChatHistory(sessions);
     } catch (error) {
       console.error('Error loading chat sessions:', error);
@@ -70,18 +50,8 @@ export const useChat = (userId: string | null) => {
     if (!userId) return;
 
     try {
-      const { data, error } = await supabase
-        .from('chat_messages')
-        .select('*')
-        .eq('user_id', userId)
-        .order('created_at', { ascending: true });
-
-      if (error) throw error;
-
-      setMessages(data.map((msg: any) => ({
-        role: msg.role,
-        content: msg.content
-      })));
+      const messageHistory = await fetchUserChatHistory(userId);
+      setMessages(messageHistory);
     } catch (error) {
       console.error('Error loading chat history:', error);
       toast({
@@ -97,31 +67,9 @@ export const useChat = (userId: string | null) => {
   const loadChatSession = async (sessionId: string) => {
     if (!userId) return;
 
-    // Find the session message and load all related messages
     try {
-      // First find the timestamp of the selected message
-      const { data: sessionMessage, error: sessionError } = await supabase
-        .from('chat_messages')
-        .select('created_at')
-        .eq('id', sessionId)
-        .single();
-
-      if (sessionError) throw sessionError;
-
-      // Find messages from this timestamp to the next user message
-      const { data, error } = await supabase
-        .from('chat_messages')
-        .select('*')
-        .eq('user_id', userId)
-        .gte('created_at', sessionMessage.created_at)
-        .order('created_at', { ascending: true });
-
-      if (error) throw error;
-
-      setMessages(data.map(msg => ({
-        role: msg.role,
-        content: msg.content
-      })));
+      const sessionMessages = await fetchChatSession(sessionId, userId);
+      setMessages(sessionMessages);
     } catch (error) {
       console.error('Error loading chat session:', error);
       toast({
@@ -130,31 +78,6 @@ export const useChat = (userId: string | null) => {
         variant: "destructive"
       });
     }
-  };
-
-  const saveMessage = async (message: ChatMessage) => {
-    if (!userId) return;
-
-    const { error } = await supabase
-      .from('chat_messages')
-      .insert({
-        content: message.content,
-        role: message.role,
-        user_id: userId
-      });
-
-    if (error) {
-      console.error('Error saving message:', error);
-      toast({
-        title: "Error",
-        description: "Failed to save message.",
-        variant: "destructive"
-      });
-    }
-  };
-
-  const scrollToBottom = () => {
-    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   const startNewChat = () => {
@@ -177,23 +100,17 @@ export const useChat = (userId: string | null) => {
     scrollToBottom();
 
     try {
-      await saveMessage(userMessage);
+      await saveChatMessage(userMessage, userId);
+      
+      const answer = await sendChatRequest(userMessage.content);
 
-      const { data, error } = await supabase.functions.invoke('ask-guro', {
-        body: { question: userMessage.content }
-      });
-
-      if (error) throw error;
-      if (!data?.answer) throw new Error('No answer received');
-
-      // The response should already be cleaned by the edge function
       const assistantMessage: ChatMessage = {
         role: 'assistant',
-        content: data.answer
+        content: answer
       };
 
       setMessages(prev => [...prev, assistantMessage]);
-      await saveMessage(assistantMessage);
+      await saveChatMessage(assistantMessage, userId);
       await loadChatSessions();
     } catch (error) {
       console.error('Error:', error);
@@ -212,15 +129,6 @@ export const useChat = (userId: string | null) => {
     if (!userId) return;
 
     try {
-      const formData = new FormData();
-      formData.append('file', file);
-
-      const { data, error } = await supabase.functions.invoke('process-file', {
-        body: formData,
-      });
-
-      if (error) throw error;
-
       const userMessage: ChatMessage = {
         role: 'user',
         content: `I've uploaded a file named "${file.name}". Please analyze it.`
@@ -231,15 +139,17 @@ export const useChat = (userId: string | null) => {
       setIsLoading(true);
       scrollToBottom();
 
-      await saveMessage(userMessage);
+      await saveChatMessage(userMessage, userId);
+      
+      const analysis = await processFile(file);
 
       const assistantMessage: ChatMessage = {
         role: 'assistant',
-        content: data.analysis
+        content: analysis
       };
 
       setMessages(prev => [...prev, assistantMessage]);
-      await saveMessage(assistantMessage);
+      await saveChatMessage(assistantMessage, userId);
       await loadChatSessions();
     } catch (error) {
       console.error('Error:', error);
@@ -261,13 +171,7 @@ export const useChat = (userId: string | null) => {
     setQuestion("generate an image about ");
     
     // Focus on the textarea
-    const textarea = document.querySelector('textarea');
-    if (textarea) {
-      textarea.focus();
-      // Place cursor at the end
-      const length = textarea.value.length;
-      textarea.setSelectionRange(length, length);
-    }
+    focusTextarea();
   };
 
   return {

@@ -2,9 +2,10 @@
 import { LoadingState } from "@/components/subscription/LoadingState";
 import { ChatMessage } from "./ChatMessage";
 import { GuroAvatar } from "@/components/ui/guro-avatar";
+import { ChatMessage as ChatMessageType } from "@/types/chat";
 
 interface ChatMessagesProps {
-  messages: Array<{ role: 'user' | 'assistant'; content: string }>;
+  messages: ChatMessageType[];
   isLoading: boolean;
   chatEndRef: React.RefObject<HTMLDivElement>;
 }
