@@ -186,6 +186,7 @@ export const useChat = (userId: string | null) => {
       if (error) throw error;
       if (!data?.answer) throw new Error('No answer received');
 
+      // The response should already be cleaned by the edge function
       const assistantMessage: ChatMessage = {
         role: 'assistant',
         content: data.answer

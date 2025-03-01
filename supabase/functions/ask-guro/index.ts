@@ -9,6 +9,11 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Function to clean response text by removing # and * characters
+const cleanResponse = (text: string) => {
+  return text.replace(/[#*]/g, "").trim();
+};
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -61,7 +66,7 @@ serve(async (req) => {
       );
     }
 
-    // If not an image request, proceed with regular chat completion
+    // If not an image request, proceed with regular chat completion using GPT-4o
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -69,7 +74,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'gpt-4o', // Using GPT-4o (which is the latest model replacing previous 4.5)
         messages: [
           { 
             role: 'system', 
@@ -85,8 +90,11 @@ serve(async (req) => {
       throw new Error(data.error.message);
     }
 
+    // Clean the response to remove # and * characters
+    const cleanedContent = cleanResponse(data.choices[0].message.content);
+
     return new Response(
-      JSON.stringify({ answer: data.choices[0].message.content }),
+      JSON.stringify({ answer: cleanedContent }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 
