@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useChatUI } from "@/hooks/use-chat-ui";
@@ -28,7 +29,7 @@ export const useChat = (userId: string | null) => {
     setMessages([]);
     
     // Check if API key exists in localStorage
-    const apiKey = localStorage.getItem("perplexity_api_key");
+    const apiKey = localStorage.getItem("openai_api_key");
     setHasApiKey(!!apiKey);
   }, []);
 
@@ -40,7 +41,7 @@ export const useChat = (userId: string | null) => {
   }, [userId]);
 
   const saveApiKey = (apiKey: string) => {
-    localStorage.setItem("perplexity_api_key", apiKey);
+    localStorage.setItem("openai_api_key", apiKey);
     setHasApiKey(true);
   };
 
@@ -99,11 +100,11 @@ export const useChat = (userId: string | null) => {
     if (!question.trim() || !userId) return;
     
     // Check if user has provided an API key
-    const apiKey = localStorage.getItem("perplexity_api_key");
+    const apiKey = localStorage.getItem("openai_api_key");
     if (!apiKey) {
       toast({
         title: "API Key Required",
-        description: "Please provide your Perplexity API key to use GuroAI Chat",
+        description: "Please provide your OpenAI API key to use GuroAI Chat",
         variant: "destructive"
       });
       return;
