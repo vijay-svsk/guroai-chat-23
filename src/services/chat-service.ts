@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { ChatMessage } from "@/types/chat";
 
@@ -99,9 +98,18 @@ export const fetchChatSession = async (sessionId: string, userId: string) => {
   }
 };
 
-export const sendChatRequest = async (question: string) => {
+export const sendChatRequest = async (question: string, apiKey?: string) => {
+  const headers: HeadersInit = {
+    'Content-Type': 'application/json'
+  };
+  
+  // If API key is provided, add it to the headers
+  if (apiKey) {
+    headers['X-Perplexity-API-Key'] = apiKey;
+  }
+  
   const { data, error } = await supabase.functions.invoke('ask-guro', {
-    body: { question }
+    body: { question, apiKey }
   });
 
   if (error) throw error;

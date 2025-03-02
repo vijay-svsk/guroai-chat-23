@@ -2,7 +2,7 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
-const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
+const perplexityApiKey = Deno.env.get('PERPLEXITY_API_KEY');
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -24,57 +24,25 @@ serve(async (req) => {
 
     // Check if this is an image generation request
     if (question.toLowerCase().startsWith('generate an image')) {
-      if (!openAIApiKey) {
-        throw new Error('OPENAI_API_KEY is not set');
-      }
-
-      const imagePrompt = question.replace(/^generate an image( about)?/i, '').trim();
-      
-      // Make request to OpenAI DALL-E API for image generation
-      const imageResponse = await fetch('https://api.openai.com/v1/images/generations', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${openAIApiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: "dall-e-3",
-          prompt: imagePrompt,
-          n: 1,
-          size: "1024x1024"
-        }),
-      });
-
-      const imageData = await imageResponse.json();
-      
-      if (imageData.error) {
-        throw new Error(imageData.error.message || 'Error generating image');
-      }
-
-      const imageUrl = imageData.data?.[0]?.url;
-      if (!imageUrl) {
-        throw new Error('No image was generated');
-      }
-
-      // Return both the image URL and a descriptive message
+      // For image generation, we'll use a different approach since Perplexity doesn't support image generation directly
+      // We'll use a text response that explains this limitation
       return new Response(
         JSON.stringify({
-          answer: `I've generated an image based on your prompt: "${imagePrompt}"\n\n![Generated Image](${imageUrl})`,
-          imageUrl: imageUrl
+          answer: "I'm sorry, but image generation is currently not supported in this version. Please ask me a question I can help you with instead.",
         }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // If not an image request, proceed with regular chat completion using GPT-4o
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    // If not an image request, proceed with Perplexity API
+    const response = await fetch('https://api.perplexity.ai/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${openAIApiKey}`,
+        'Authorization': `Bearer ${perplexityApiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o', // Using GPT-4o (which is the latest model replacing previous 4.5)
+        model: 'llama-3.1-sonar-small-128k-online',  // Using llama 3.1 small model (8B parameters)
         messages: [
           { 
             role: 'system', 
@@ -82,12 +50,17 @@ serve(async (req) => {
           },
           { role: 'user', content: question }
         ],
+        temperature: 0.2,
+        top_p: 0.9,
+        max_tokens: 1000,
+        stream: false,
       }),
     });
 
     const data = await response.json();
+    
     if (data.error) {
-      throw new Error(data.error.message);
+      throw new Error(data.error.message || 'Error from Perplexity API');
     }
 
     // Clean the response to remove # and * characters

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { LoadingState } from "@/components/subscription/LoadingState";
 import { ChatMessages } from "@/components/chat/ChatMessages";
@@ -7,6 +6,7 @@ import { ChatSidebar } from "@/components/chat/ChatSidebar";
 import { ChatHeader } from "@/components/chat/ChatHeader";
 import { ChatFooter } from "@/components/chat/ChatFooter";
 import { ChatAuth } from "@/components/chat/ChatAuth";
+import { ApiKeyForm } from "@/components/chat/ApiKeyForm";
 import { useChat } from "@/hooks/use-chat";
 import { useChatAuth } from "@/hooks/use-chat-auth";
 import { useToast } from "@/hooks/use-toast";
@@ -18,6 +18,7 @@ const AskGuro = () => {
   const [isPageLoading, setIsPageLoading] = useState(true);
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [isCheckingSubscription, setIsCheckingSubscription] = useState(true);
+  const [showApiKeyForm, setShowApiKeyForm] = useState(false);
   const { toast } = useToast();
   
   const {
@@ -28,6 +29,8 @@ const AskGuro = () => {
     isLoadingHistory,
     chatHistory,
     chatEndRef,
+    hasApiKey,
+    saveApiKey,
     startNewChat,
     loadChatSession,
     handleSubmit,
@@ -79,6 +82,13 @@ const AskGuro = () => {
       });
     }
   }, [userId, isCheckingAuth, isPageLoading, toast]);
+
+  // Show API key form if user doesn't have an API key
+  useEffect(() => {
+    if (userId && !isCheckingAuth && !isPageLoading && isSubscribed && !hasApiKey) {
+      setShowApiKeyForm(true);
+    }
+  }, [userId, isCheckingAuth, isPageLoading, isSubscribed, hasApiKey]);
 
   // Only show loading state if we're still checking auth AND loading is taking longer than expected
   if ((isCheckingAuth || isLoadingHistory || isCheckingSubscription) && isPageLoading) {
@@ -161,14 +171,23 @@ const AskGuro = () => {
 
         {/* Main Chat Area */}
         <div className="flex-1 flex flex-col">
-          {/* Always show WelcomeScreen while no messages, even during initial loading */}
-          {messages.length === 0 ? (
+          {showApiKeyForm ? (
+            <div className="flex-1 flex items-center justify-center px-4">
+              <ApiKeyForm 
+                onKeySaved={() => {
+                  setShowApiKeyForm(false);
+                  startNewChat();
+                }} 
+              />
+            </div>
+          ) : messages.length === 0 ? (
             <WelcomeScreen />
           ) : (
             <ChatMessages
               messages={messages}
               isLoading={isLoading}
               chatEndRef={chatEndRef}
+              apiKeyMissing={!hasApiKey}
             />
           )}
         </div>
@@ -183,7 +202,20 @@ const AskGuro = () => {
         userId={userId}
         onFileUpload={handleFileUpload}
         onImageGenerate={handleImageGeneration}
+        disabled={!hasApiKey || showApiKeyForm}
       />
+
+      {/* API Key Button */}
+      {hasApiKey && (
+        <div className="fixed bottom-4 right-4">
+          <button 
+            onClick={() => setShowApiKeyForm(true)}
+            className="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 py-1 px-2 rounded-md"
+          >
+            Change API Key
+          </button>
+        </div>
+      )}
     </div>
   );
 };
