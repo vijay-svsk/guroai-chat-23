@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Lock, Mail } from "lucide-react";
@@ -6,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { loginUser } from "@/services/auth-service";
+import { supabase } from "@/integrations/supabase/client";
 
 interface AuthFormProps {
   isLogin: boolean;
