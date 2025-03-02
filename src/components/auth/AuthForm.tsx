@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Lock, Mail } from "lucide-react";
@@ -99,6 +100,15 @@ export const AuthForm = ({
 
   return (
     <form onSubmit={isLogin ? handleLogin : handleSignUp} className="space-y-6">
+      {!isLogin && (
+        <div className="bg-blue-50 p-4 rounded-md mb-4 border border-blue-200">
+          <p className="text-sm text-blue-800">
+            <strong>Important:</strong> Please double-check your email and password before creating your account. 
+            Make sure to use a valid email address and remember your password exactly as entered.
+          </p>
+        </div>
+      )}
+      
       <div>
         <div className="flex items-center space-x-2">
           <Mail className="w-5 h-5 text-gray-500" />
