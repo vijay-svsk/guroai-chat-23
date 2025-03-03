@@ -99,18 +99,9 @@ export const fetchChatSession = async (sessionId: string, userId: string) => {
   }
 };
 
-export const sendChatRequest = async (question: string, apiKey?: string) => {
-  const headers: HeadersInit = {
-    'Content-Type': 'application/json'
-  };
-  
-  // If API key is provided, add it to the headers
-  if (apiKey) {
-    headers['Authorization'] = `Bearer ${apiKey}`;
-  }
-  
+export const sendChatRequest = async (question: string) => {
   const { data, error } = await supabase.functions.invoke('ask-guro', {
-    body: { question, apiKey }
+    body: { question }
   });
 
   if (error) throw error;

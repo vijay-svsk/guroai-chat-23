@@ -2,6 +2,8 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
+const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -18,53 +20,61 @@ serve(async (req) => {
   }
 
   try {
-    const { question, apiKey } = await req.json();
-
-    if (!apiKey) {
-      throw new Error('API key is required');
-    }
+    const { question } = await req.json();
 
     // Check if this is an image generation request
     if (question.toLowerCase().startsWith('generate an image')) {
-      // For image generation using DALL-E model
-      const response = await fetch('https://api.openai.com/v1/images/generations', {
+      if (!openAIApiKey) {
+        throw new Error('OPENAI_API_KEY is not set');
+      }
+
+      const imagePrompt = question.replace(/^generate an image( about)?/i, '').trim();
+      
+      // Make request to OpenAI DALL-E API for image generation
+      const imageResponse = await fetch('https://api.openai.com/v1/images/generations', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${apiKey}`,
+          'Authorization': `Bearer ${openAIApiKey}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           model: "dall-e-3",
-          prompt: question.replace("generate an image", "").trim(),
+          prompt: imagePrompt,
           n: 1,
-          size: "1024x1024",
+          size: "1024x1024"
         }),
       });
 
-      const data = await response.json();
+      const imageData = await imageResponse.json();
       
-      if (data.error) {
-        throw new Error(data.error.message || 'Error from OpenAI API');
+      if (imageData.error) {
+        throw new Error(imageData.error.message || 'Error generating image');
       }
 
-      // Return the image URL
+      const imageUrl = imageData.data?.[0]?.url;
+      if (!imageUrl) {
+        throw new Error('No image was generated');
+      }
+
+      // Return both the image URL and a descriptive message
       return new Response(
-        JSON.stringify({ 
-          answer: `![Generated Image](${data.data[0].url})` 
+        JSON.stringify({
+          answer: `I've generated an image based on your prompt: "${imagePrompt}"\n\n![Generated Image](${imageUrl})`,
+          imageUrl: imageUrl
         }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // Regular text request using GPT model
+    // If not an image request, proceed with regular chat completion using GPT-4o
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${apiKey}`,
+        'Authorization': `Bearer ${openAIApiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'gpt-4o', // Using GPT-4o (which is the latest model replacing previous 4.5)
         messages: [
           { 
             role: 'system', 
@@ -72,18 +82,15 @@ serve(async (req) => {
           },
           { role: 'user', content: question }
         ],
-        temperature: 0.7,
-        max_tokens: 1000,
       }),
     });
 
     const data = await response.json();
-    
     if (data.error) {
-      throw new Error(data.error.message || 'Error from OpenAI API');
+      throw new Error(data.error.message);
     }
 
-    // Clean the response
+    // Clean the response to remove # and * characters
     const cleanedContent = cleanResponse(data.choices[0].message.content);
 
     return new Response(

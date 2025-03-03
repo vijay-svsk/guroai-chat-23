@@ -20,17 +20,12 @@ export const useChat = (userId: string | null) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingHistory, setIsLoadingHistory] = useState(true);
   const [chatHistory, setChatHistory] = useState<ChatSession[]>([]);
-  const [hasApiKey, setHasApiKey] = useState(false);
   const { toast } = useToast();
   const { chatEndRef, scrollToBottom, focusTextarea } = useChatUI();
 
   useEffect(() => {
     // Reset messages when the component is mounted
     setMessages([]);
-    
-    // Check if API key exists in localStorage
-    const apiKey = localStorage.getItem("openai_api_key");
-    setHasApiKey(!!apiKey);
   }, []);
 
   useEffect(() => {
@@ -39,11 +34,6 @@ export const useChat = (userId: string | null) => {
       setIsLoadingHistory(false);
     }
   }, [userId]);
-
-  const saveApiKey = (apiKey: string) => {
-    localStorage.setItem("openai_api_key", apiKey);
-    setHasApiKey(true);
-  };
 
   const loadChatSessions = async () => {
     if (!userId) return;
@@ -98,17 +88,6 @@ export const useChat = (userId: string | null) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!question.trim() || !userId) return;
-    
-    // Check if user has provided an API key
-    const apiKey = localStorage.getItem("openai_api_key");
-    if (!apiKey) {
-      toast({
-        title: "API Key Required",
-        description: "Please provide your OpenAI API key to use GuroAI Chat",
-        variant: "destructive"
-      });
-      return;
-    }
 
     const userMessage: ChatMessage = {
       role: 'user',
@@ -123,8 +102,7 @@ export const useChat = (userId: string | null) => {
     try {
       await saveChatMessage(userMessage, userId);
       
-      // Pass the API key to the sendChatRequest function
-      const answer = await sendChatRequest(userMessage.content, apiKey);
+      const answer = await sendChatRequest(userMessage.content);
 
       const assistantMessage: ChatMessage = {
         role: 'assistant',
@@ -138,7 +116,7 @@ export const useChat = (userId: string | null) => {
       console.error('Error:', error);
       toast({
         title: "Error",
-        description: "Failed to get an answer. Please try again or check your API key.",
+        description: "Failed to get an answer. Please try again.",
         variant: "destructive"
       });
     } finally {
@@ -204,8 +182,6 @@ export const useChat = (userId: string | null) => {
     isLoadingHistory,
     chatHistory,
     chatEndRef,
-    hasApiKey,
-    saveApiKey,
     startNewChat,
     loadChatSession,
     handleSubmit,
