@@ -15,7 +15,6 @@ export const ChatBox = () => {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [showPulse, setShowPulse] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   
@@ -35,15 +34,6 @@ export const ChatBox = () => {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
-
-  // Add effect to disable pulse after a few seconds
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowPulse(false);
-    }, 5000);
-    
-    return () => clearTimeout(timer);
-  }, []);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -96,39 +86,19 @@ export const ChatBox = () => {
 
   return (
     <div className="fixed bottom-4 right-4 z-50">
-      {/* Chat icon button - Enhanced to be more noticeable */}
+      {/* Chat icon button */}
       {!isOpen && (
-        <div className="relative">
-          <Button
-            onClick={() => setIsOpen(true)}
-            className="h-16 w-16 rounded-full bg-[#023d54] hover:bg-[#03506a] shadow-lg transition-transform duration-300 hover:scale-110"
-          >
-            <div className="h-12 w-12 rounded-full flex items-center justify-center overflow-hidden bg-white">
-              <GuroAvatar className="h-10 w-10" />
-            </div>
-          </Button>
-          
-          {/* Notification bubble */}
-          <div className="absolute -top-2 -right-2 h-6 w-6 bg-[#8cd09b] rounded-full flex items-center justify-center text-white text-xs font-bold shadow-md">
-            1
-          </div>
-          
-          {/* Pulse effect */}
-          {showPulse && (
-            <div className="absolute inset-0 rounded-full animate-ping bg-[#023d54] opacity-30"></div>
-          )}
-          
-          {/* Chat indicator text */}
-          <div className="absolute -top-10 right-0 bg-white px-3 py-1 rounded-lg shadow-md text-sm font-medium text-[#023d54] whitespace-nowrap">
-            Ask GuroAI assistant
-            <div className="absolute bottom-0 right-5 transform translate-y-1/2 rotate-45 w-2 h-2 bg-white"></div>
-          </div>
-        </div>
+        <Button
+          onClick={() => setIsOpen(true)}
+          className="h-14 w-14 rounded-full bg-[#8cd09b] hover:bg-[#7bc089] shadow-lg"
+        >
+          <MessageCircle className="h-6 w-6" />
+        </Button>
       )}
 
       {/* Chat box */}
       {isOpen && (
-        <div className="flex flex-col bg-white rounded-lg shadow-xl w-[350px] h-[450px] border border-gray-200 animate-fade-in-up">
+        <div className="flex flex-col bg-white rounded-lg shadow-xl w-[350px] h-[450px] border border-gray-200">
           {/* Chat header */}
           <div className="flex items-center justify-between bg-[#023d54] text-white p-3 rounded-t-lg">
             <div className="flex items-center gap-2">
