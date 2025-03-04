@@ -7,6 +7,7 @@ import { FeaturesSection } from "@/components/home/FeaturesSection";
 import { PricingSection } from "@/components/home/PricingSection";
 import { TestimonialsSection } from "@/components/home/TestimonialsSection";
 import { ReviewsSection } from "@/components/home/ReviewsSection";
+import { ChatBox } from "@/components/home/ChatBox";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -52,6 +53,9 @@ const Index = () => {
         <TestimonialsSection />
         <ReviewsSection />
       </div>
+
+      {/* Add ChatBox component */}
+      <ChatBox />
 
       <footer className="bg-[#8cd09b] py-6 mt-12">
         <div className="container mx-auto px-4">
