@@ -14,18 +14,13 @@ export const ChatBox = () => {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [apiKey, setApiKey] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   
-  // Load API key from local storage
-  const [storedApiKey, setStoredApiKey] = useLocalStorage<string>("openai-api-key", "");
+  // Use the provided API key directly
+  const apiKey = "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";
   
   useEffect(() => {
-    if (storedApiKey) {
-      setApiKey(storedApiKey);
-    }
-    
     // Add welcome message when chat is first opened
     if (isOpen && messages.length === 0) {
       setMessages([{
@@ -33,7 +28,7 @@ export const ChatBox = () => {
         content: 'Hello! I\'m GuroAI\'s assistant. How can I help you today?'
       }]);
     }
-  }, [isOpen, storedApiKey]);
+  }, [isOpen]);
 
   useEffect(() => {
     scrollToBottom();
@@ -46,17 +41,6 @@ export const ChatBox = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!message.trim() || isLoading) return;
-    
-    // Check if API key is available
-    if (!apiKey) {
-      setIsOpen(true);
-      toast({
-        title: "API Key Required",
-        description: "Please enter your OpenAI API key to chat.",
-        variant: "destructive",
-      });
-      return;
-    }
 
     const userMessage: ChatMessage = {
       role: 'user',
@@ -95,23 +79,12 @@ export const ChatBox = () => {
       console.error("Error:", error);
       toast({
         title: "Error",
-        description: "Failed to get a response. Please check your API key and try again.",
+        description: "Failed to get a response. Please try again later.",
         variant: "destructive",
       });
     } finally {
       setIsLoading(false);
       scrollToBottom();
-    }
-  };
-
-  const handleApiKeySubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (apiKey.trim()) {
-      setStoredApiKey(apiKey.trim());
-      toast({
-        title: "Success",
-        description: "API key saved successfully!",
-      });
     }
   };
 
@@ -145,34 +118,6 @@ export const ChatBox = () => {
               <X className="h-4 w-4" />
             </Button>
           </div>
-
-          {/* API Key form (if no key is stored) */}
-          {!storedApiKey && (
-            <div className="p-4 border-b">
-              <form onSubmit={handleApiKeySubmit} className="space-y-2">
-                <p className="text-sm text-gray-600">Please enter your OpenAI API key to use the chat:</p>
-                <input
-                  type="password"
-                  value={apiKey}
-                  onChange={(e) => setApiKey(e.target.value)}
-                  className="w-full p-2 text-sm border rounded"
-                  placeholder="sk-..."
-                />
-                <div className="flex justify-end">
-                  <Button 
-                    type="submit" 
-                    size="sm"
-                    className="bg-[#023d54] hover:bg-[#03506a]"
-                  >
-                    Save Key
-                  </Button>
-                </div>
-                <p className="text-xs text-gray-500 mt-1">
-                  Your key is stored locally and never sent to our servers.
-                </p>
-              </form>
-            </div>
-          )}
 
           {/* Messages container */}
           <div className="flex-1 overflow-y-auto p-3 space-y-3">
@@ -237,13 +182,13 @@ export const ChatBox = () => {
                     handleSubmit(e);
                   }
                 }}
-                disabled={isLoading || !storedApiKey}
+                disabled={isLoading}
               />
               <Button
                 type="submit"
                 size="icon"
                 className="h-10 w-10 bg-[#023d54] hover:bg-[#03506a]"
-                disabled={isLoading || !message.trim() || !storedApiKey}
+                disabled={isLoading || !message.trim()}
               >
                 <Send className="h-4 w-4" />
               </Button>
