@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { ChatMessage } from "@/types/chat";
 import { GuroAvatar } from "@/components/ui/guro-avatar";
+import { supabase } from "@/integrations/supabase/client";
 
 export const ChatBox = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -52,22 +53,17 @@ export const ChatBox = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch("/api/chat", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ 
+      // Use Supabase Edge Function instead of direct API call
+      const { data, error } = await supabase.functions.invoke("chat", {
+        body: { 
           message: userMessage.content,
           apiKey
-        }),
+        },
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to get response");
+      if (error) {
+        throw new Error(error.message || "Failed to get response");
       }
-
-      const data = await response.json();
       
       const assistantMessage: ChatMessage = {
         role: 'assistant',
