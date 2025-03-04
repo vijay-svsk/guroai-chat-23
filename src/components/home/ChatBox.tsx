@@ -88,12 +88,17 @@ export const ChatBox = () => {
     <div className="fixed bottom-4 right-4 z-50">
       {/* Chat icon button */}
       {!isOpen && (
-        <Button
-          onClick={() => setIsOpen(true)}
-          className="h-14 w-14 rounded-full bg-[#8cd09b] hover:bg-[#7bc089] shadow-lg"
-        >
-          <MessageCircle className="h-6 w-6" />
-        </Button>
+        <div className="flex flex-col items-center">
+          <Button
+            onClick={() => setIsOpen(true)}
+            className="h-14 w-14 rounded-full bg-[#8cd09b] hover:bg-[#7bc089] shadow-lg"
+          >
+            <MessageCircle className="h-6 w-6" />
+          </Button>
+          <div className="mt-2 px-3 py-1 bg-white shadow-md rounded-md text-guro-blue font-medium text-sm">
+            Ask GuroAI assistant
+          </div>
+        </div>
       )}
 
       {/* Chat box */}
