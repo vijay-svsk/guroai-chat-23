@@ -25,7 +25,7 @@ const LearnMore = () => {
             The Future of Teaching Is Here
           </h1>
           <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-            GuroAI is revolutionizing how Filipino teachers plan lessons, create materials, and deliver outstanding education
+            GuroAI is revolutionizing how teachers worldwide plan lessons, create materials, and deliver outstanding education
           </p>
         </div>
       </header>
@@ -260,6 +260,46 @@ const LearnMore = () => {
                 Our upcoming progress tracking feature will help you monitor student achievement, identify learning gaps, and adapt your teaching approach to maximize student success.
               </p>
             </Card>
+            
+            <Card className="p-6 hover:shadow-md transition-all duration-300">
+              <h3 className="text-xl font-semibold mb-4 flex items-center">
+                <CheckCircle2 className="h-6 w-6 text-green-500 mr-2" />
+                Coming Soon: AI-Powered Rubric Generation
+              </h3>
+              <p className="text-gray-600">
+                Create comprehensive assessment rubrics tailored to your specific learning objectives. Our AI will help you design clear, consistent evaluation criteria for any assignment or project.
+              </p>
+            </Card>
+            
+            <Card className="p-6 hover:shadow-md transition-all duration-300">
+              <h3 className="text-xl font-semibold mb-4 flex items-center">
+                <CheckCircle2 className="h-6 w-6 text-green-500 mr-2" />
+                Coming Soon: Interactive Worksheet Creator
+              </h3>
+              <p className="text-gray-600">
+                Design engaging, interactive worksheets that can be used both in print and digital formats. Create materials that promote active learning and deeper engagement with content.
+              </p>
+            </Card>
+            
+            <Card className="p-6 hover:shadow-md transition-all duration-300">
+              <h3 className="text-xl font-semibold mb-4 flex items-center">
+                <CheckCircle2 className="h-6 w-6 text-green-500 mr-2" />
+                Coming Soon: Formative Assessment Tools
+              </h3>
+              <p className="text-gray-600">
+                Generate quick formative assessments to check student understanding throughout your lessons. Includes exit tickets, concept checks, and other tools to gauge learning in real-time.
+              </p>
+            </Card>
+            
+            <Card className="p-6 hover:shadow-md transition-all duration-300">
+              <h3 className="text-xl font-semibold mb-4 flex items-center">
+                <CheckCircle2 className="h-6 w-6 text-green-500 mr-2" />
+                Coming Soon: Parent Communication Templates
+              </h3>
+              <p className="text-gray-600">
+                Create professional, informative communications for parents and guardians about student progress, classroom activities, and educational goals. Build stronger school-home connections.
+              </p>
+            </Card>
           </div>
         </section>
 
@@ -268,7 +308,7 @@ const LearnMore = () => {
           <Card className="p-8 border-green-100">
             <h2 className="text-3xl font-bold text-guro-blue mb-4">Start Transforming Your Teaching Today</h2>
             <p className="text-gray-600 max-w-2xl mx-auto mb-8">
-              Join thousands of Filipino teachers who are saving time, reducing stress, and delivering higher quality education with GuroAI.
+              Join thousands of teachers worldwide who are saving time, reducing stress, and delivering higher quality education with GuroAI.
             </p>
             <div className="text-center space-y-4">
               <div className="text-3xl font-bold text-guro-blue">

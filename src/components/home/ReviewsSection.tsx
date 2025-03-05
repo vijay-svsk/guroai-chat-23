@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { ReviewCard } from "./ReviewCard";
 import { Star, ChevronLeft, ChevronRight } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -367,9 +367,12 @@ export const ReviewsSection = () => {
   const [isAnimating, setIsAnimating] = useState(false);
   const carouselRef = useRef<HTMLDivElement>(null);
   
-  const filteredReviews = activeTab === "all" 
-    ? allReviews 
-    : allReviews.filter(review => review.category === activeTab);
+  // Use useMemo to cache the filtered reviews
+  const filteredReviews = useMemo(() => {
+    return activeTab === "all" 
+      ? allReviews 
+      : allReviews.filter(review => review.category === activeTab);
+  }, [activeTab]);
   
   const itemsPerPage = 6;
   const totalPages = Math.ceil(filteredReviews.length / itemsPerPage);
@@ -384,6 +387,14 @@ export const ReviewsSection = () => {
     
     return () => clearInterval(interval);
   }, [currentPage, isAnimating, filteredReviews.length]);
+
+  // Pre-calculate current reviews for better performance
+  const currentReviews = useMemo(() => {
+    return filteredReviews.slice(
+      currentPage * itemsPerPage,
+      (currentPage + 1) * itemsPerPage
+    );
+  }, [filteredReviews, currentPage, itemsPerPage]);
 
   const nextPage = () => {
     if (isAnimating) return;
@@ -407,11 +418,21 @@ export const ReviewsSection = () => {
     }, 700);
   };
 
-  // Get current page items
-  const currentReviews = filteredReviews.slice(
-    currentPage * itemsPerPage,
-    (currentPage + 1) * itemsPerPage
-  );
+  // Reset page when tab changes
+  useEffect(() => {
+    setCurrentPage(0);
+  }, [activeTab]);
+
+  const handleTabChange = (value: string) => {
+    // Only animate if changing tabs
+    if (value !== activeTab) {
+      setIsAnimating(true);
+      setActiveTab(value);
+      setTimeout(() => {
+        setIsAnimating(false);
+      }, 300);
+    }
+  };
 
   return (
     <section className="py-20 px-4">
@@ -423,7 +444,7 @@ export const ReviewsSection = () => {
           Join educators from across the globe who are transforming their teaching process with GuroAI
         </p>
         
-        <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="mb-12">
+        <Tabs defaultValue="all" value={activeTab} onValueChange={handleTabChange} className="mb-12">
           <TabsList className="mx-auto">
             <TabsTrigger value="all">All Reviews</TabsTrigger>
             <TabsTrigger value="filipino">Filipino Teachers</TabsTrigger>
