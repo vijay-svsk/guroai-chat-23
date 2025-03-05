@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, PresentationIcon } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 export const ActionButtons = () => {
   const navigate = useNavigate();
@@ -80,7 +80,7 @@ export const ActionButtons = () => {
       >
         <span className="flex items-center justify-center">
           Generate Powerpoint Presentation
-          <PresentationIcon className={`ml-2 h-5 w-5 transition-transform duration-300 ${hoveredButton === 'powerpoint' ? 'translate-x-1' : ''}`} />
+          <ArrowRight className={`ml-2 h-5 w-5 transition-transform duration-300 ${hoveredButton === 'powerpoint' ? 'translate-x-1' : ''}`} />
         </span>
         <span className={`absolute bottom-0 left-0 h-1 bg-[#023d54] transition-all duration-300 ${hoveredButton === 'powerpoint' ? 'w-full' : 'w-0'}`}></span>
       </Button>
