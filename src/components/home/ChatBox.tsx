@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from "react";
 import { MessageCircle, Send, X } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -85,10 +84,10 @@ export const ChatBox = () => {
   };
 
   return (
-    <div className="fixed bottom-4 right-4 z-50">
-      {/* Chat icon button */}
+    <div className="md:fixed md:bottom-4 md:right-4 z-50 w-full md:w-auto">
+      {/* Chat icon button - only visible on tablet/desktop */}
       {!isOpen && (
-        <div className="flex flex-col items-center">
+        <div className="hidden md:flex flex-col items-center">
           <div className="relative">
             <Button
               onClick={() => setIsOpen(true)}
@@ -106,9 +105,28 @@ export const ChatBox = () => {
         </div>
       )}
 
+      {/* Mobile chat button - centered at bottom */}
+      {!isOpen && (
+        <div className="md:hidden fixed bottom-4 left-0 right-0 flex justify-center">
+          <div className="flex flex-col items-center">
+            <div className="relative">
+              <Button
+                onClick={() => setIsOpen(true)}
+                className="h-14 w-14 rounded-full bg-[#8cd09b] hover:bg-[#7bc089] shadow-lg animate-pulse-slow"
+              >
+                <MessageCircle className="h-6 w-6" />
+              </Button>
+              <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs text-white">
+                1
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Chat box */}
       {isOpen && (
-        <div className="flex flex-col bg-white rounded-lg shadow-xl w-[350px] h-[450px] border border-gray-200">
+        <div className="flex flex-col bg-white rounded-lg shadow-xl w-full md:w-[350px] h-[450px] border border-gray-200 mx-auto md:mx-0">
           {/* Chat header */}
           <div className="flex items-center justify-between bg-[#023d54] text-white p-3 rounded-t-lg">
             <div className="flex items-center gap-2">

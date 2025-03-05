@@ -42,7 +42,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className="min-h-screen bg-white flex flex-col w-full overflow-x-hidden">
       <LogoAnimation showContent={showContent} />
 
       <div className={`transition-opacity duration-500 flex-grow ${showContent ? 'opacity-100' : 'opacity-0'}`}>
@@ -59,7 +59,9 @@ const Index = () => {
             Unsure about how GuroAI can help you? Need clarification on features or pricing? 
             Our AI assistant is ready to answer all your questions instantly, no matter where you teach.
           </p>
-          <ChatBox />
+          <div className="md:hidden">
+            <ChatBox />
+          </div>
         </div>
       </div>
 
@@ -96,6 +98,11 @@ const Index = () => {
           </div>
         </div>
       </footer>
+
+      {/* ChatBox component at the bottom of viewport in desktop */}
+      <div className="hidden md:block">
+        <ChatBox />
+      </div>
     </div>
   );
 };

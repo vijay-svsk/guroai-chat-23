@@ -42,9 +42,11 @@
     @apply border-border;
   }
 
-  body {
+  html, body {
     @apply bg-background text-foreground;
     font-family: 'Inter', sans-serif;
+    max-width: 100%;
+    overflow-x: hidden;
   }
 
   /* Smooth scrolling */
@@ -68,6 +70,8 @@
   ::-webkit-scrollbar-thumb:hover {
     @apply bg-guro-blue/30;
   }
+
+  /* ... keep existing code (keyframes and animations) */
 
   @keyframes rotate {
     0% {
