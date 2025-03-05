@@ -59,14 +59,20 @@ const Index = () => {
           <h2 className="text-3xl md:text-4xl font-bold text-guro-blue mb-8">Have Questions? Ask Our AI Assistant</h2>
           <p className="text-lg text-gray-600 mb-8 max-w-3xl mx-auto">
             Unsure about how GuroAI can help you? Need clarification on features or pricing? 
-            Our AI assistant is ready to answer all your questions instantly.
+            Our AI assistant is ready to answer all your questions instantly, no matter where you teach.
           </p>
           <ChatBox />
         </div>
       </div>
 
-      <footer className="bg-[#8cd09b] py-6 mt-12">
+      <footer className="bg-[#8cd09b] py-8 mt-12">
         <div className="container mx-auto px-4">
+          <div className="text-center mb-6">
+            <h3 className="text-guro-blue text-xl font-semibold mb-2">Join Educators Worldwide</h3>
+            <p className="text-guro-blue/80">
+              Teachers in over 30 countries are using GuroAI to transform their teaching experience
+            </p>
+          </div>
           <div className="flex flex-col md:flex-row justify-center items-center space-y-4 md:space-y-0 md:space-x-8">
             <Link 
               to="/terms-of-service"
@@ -79,6 +85,12 @@ const Index = () => {
               className="text-guro-blue hover:underline font-medium"
             >
               Privacy Policy
+            </Link>
+            <Link 
+              to="/learn-more"
+              className="text-guro-blue hover:underline font-medium"
+            >
+              Learn More
             </Link>
           </div>
           <div className="text-center mt-4 text-guro-blue">
