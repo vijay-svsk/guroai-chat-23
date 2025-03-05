@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, PresentationIcon } from "lucide-react";
 
 export const ActionButtons = () => {
   const navigate = useNavigate();
@@ -70,6 +70,19 @@ export const ActionButtons = () => {
           <ArrowRight className={`ml-2 h-5 w-5 transition-transform duration-300 ${hoveredButton === 'quiz' ? 'translate-x-1' : ''}`} />
         </span>
         <span className={`absolute bottom-0 left-0 h-1 bg-[#023d54] transition-all duration-300 ${hoveredButton === 'quiz' ? 'w-full' : 'w-0'}`}></span>
+      </Button>
+      
+      <Button 
+        onClick={() => window.open('https://www.aidocmaker.com/g0/pptx', '_blank')} 
+        className={buttonClasses}
+        onMouseEnter={() => handleMouseEnter('powerpoint')}
+        onMouseLeave={handleMouseLeave}
+      >
+        <span className="flex items-center justify-center">
+          Generate Powerpoint Presentation
+          <PresentationIcon className={`ml-2 h-5 w-5 transition-transform duration-300 ${hoveredButton === 'powerpoint' ? 'translate-x-1' : ''}`} />
+        </span>
+        <span className={`absolute bottom-0 left-0 h-1 bg-[#023d54] transition-all duration-300 ${hoveredButton === 'powerpoint' ? 'w-full' : 'w-0'}`}></span>
       </Button>
     </div>
   );
