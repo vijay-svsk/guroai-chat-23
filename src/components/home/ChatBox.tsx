@@ -179,13 +179,13 @@ export const ChatBox = () => {
                 )}
                 <div
                   className={cn(
-                    "rounded-lg p-3 max-w-[80%]",
+                    "rounded-lg p-3 max-w-[80%] text-left",
                     msg.role === "user"
                       ? "bg-[#023d54] text-white"
                       : "bg-gray-100 text-gray-800"
                   )}
                 >
-                  <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                  <p className="text-sm whitespace-pre-wrap text-left">{msg.content}</p>
                 </div>
                 {msg.role === "user" && (
                   <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-gray-300 rounded-full">
