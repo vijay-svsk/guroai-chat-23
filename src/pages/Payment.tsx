@@ -4,7 +4,7 @@ import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { CheckCircle2, Sparkles } from "lucide-react";
+import { CheckCircle2, Check } from "lucide-react";
 
 const Payment = () => {
   const navigate = useNavigate();
@@ -38,29 +38,40 @@ const Payment = () => {
     }
   ];
 
+  const exclusiveBenefits = [
+    "Generate lesson plans 6x faster than with other AI tools",
+    "DepEd PMES-compliant content guaranteed",
+    "Designed for international curriculum standards",
+    "Priority access to all future features",
+    "Responsive and intuitive user interface",
+    "Accessible on all devices 24/7",
+    "Regular updates and improvements",
+    "Personalized teaching resources"
+  ];
+
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
       <Card className="max-w-4xl w-full">
         <CardHeader className="text-center pb-2">
-          <CardTitle className="text-3xl font-bold text-guro-blue">
+          <CardTitle className="text-2xl sm:text-3xl font-bold text-guro-blue">
             Unlock Full Access to GuroAI
           </CardTitle>
-          <p className="text-xl text-gray-600 mt-2">
+          <p className="text-lg sm:text-xl text-gray-600 mt-2">
             Your All-in-One AI-Powered Teaching Assistant
           </p>
         </CardHeader>
         <CardContent className="space-y-6">
-          <div className="grid md:grid-cols-2 gap-6 mt-6">
+          <div className="grid sm:grid-cols-2 gap-6 mt-4">
             {features.map((format, idx) => (
-              <div key={idx} className="space-y-4">
-                <h3 className="text-xl font-semibold text-guro-blue flex items-center gap-2">
-                  <CheckCircle2 className="h-6 w-6 text-green-500" />
+              <div key={idx} className="space-y-3">
+                <h3 className="text-lg font-semibold text-guro-blue flex items-center gap-2">
+                  <CheckCircle2 className="h-5 w-5 text-green-500 flex-shrink-0" />
                   {format.title}
                 </h3>
                 <ul className="space-y-2">
                   {format.details.map((detail, i) => (
-                    <li key={i} className="flex items-start gap-2 text-gray-600">
-                      <span className="text-green-500 font-bold">✓</span>
+                    <li key={i} className="flex items-start gap-2 text-gray-600 text-sm sm:text-base">
+                      <span className="text-green-500 font-bold mt-0.5">✓</span>
                       {detail}
                     </li>
                   ))}
@@ -69,58 +80,46 @@ const Payment = () => {
             ))}
           </div>
 
-          <div className="bg-[#f0faff] p-6 rounded-lg space-y-4 border border-blue-100">
-            <h3 className="text-xl font-semibold text-center text-guro-blue flex items-center justify-center gap-2">
-              <Sparkles className="h-5 w-5 text-yellow-500" />
+          <div className="bg-[#f0faff] p-4 sm:p-6 rounded-lg space-y-3 border border-blue-100">
+            <h3 className="text-lg font-semibold text-center text-guro-blue">
               Exclusive Benefits
-              <Sparkles className="h-5 w-5 text-yellow-500" />
             </h3>
-            <ul className="grid md:grid-cols-2 gap-4">
-              <li className="flex items-start gap-2 text-gray-600">
-                <span className="text-yellow-500 font-bold">★</span>
-                <span>Generate lesson plans 6x faster than with other AI tools</span>
-              </li>
-              <li className="flex items-start gap-2 text-gray-600">
-                <span className="text-yellow-500 font-bold">★</span>
-                <span>DepEd PMES-compliant content guaranteed</span>
-              </li>
-              <li className="flex items-start gap-2 text-gray-600">
-                <span className="text-yellow-500 font-bold">★</span>
-                <span>Designed specifically for Philippine curriculum</span>
-              </li>
-              <li className="flex items-start gap-2 text-gray-600">
-                <span className="text-yellow-500 font-bold">★</span>
-                <span>Priority access to all future features</span>
-              </li>
+            <ul className="grid sm:grid-cols-2 gap-2 sm:gap-3">
+              {exclusiveBenefits.map((benefit, i) => (
+                <li key={i} className="flex items-start gap-2 text-gray-600 text-sm sm:text-base">
+                  <Check className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span>{benefit}</span>
+                </li>
+              ))}
             </ul>
           </div>
 
-          <div className="bg-gray-50 p-6 rounded-lg space-y-4">
-            <h3 className="text-xl font-semibold text-center text-guro-blue">
+          <div className="bg-gray-50 p-4 sm:p-6 rounded-lg space-y-3">
+            <h3 className="text-lg font-semibold text-center text-guro-blue">
               Easy 3-Step Process
             </h3>
-            <div className="grid md:grid-cols-3 gap-4 text-center">
-              <div className="p-4">
-                <div className="font-bold text-guro-blue mb-2">1. Input Details</div>
-                <p className="text-gray-600">Enter subject, grade level, topic, language, and any custom instructions</p>
+            <div className="grid sm:grid-cols-3 gap-3 text-center">
+              <div className="p-3 bg-white rounded-lg shadow-sm">
+                <div className="font-bold text-guro-blue mb-1">1. Input Details</div>
+                <p className="text-gray-600 text-sm">Enter subject, grade level, topic, and custom instructions</p>
               </div>
-              <div className="p-4">
-                <div className="font-bold text-guro-blue mb-2">2. Choose Format</div>
-                <p className="text-gray-600">Select either 7Es or 4As teaching methodology</p>
+              <div className="p-3 bg-white rounded-lg shadow-sm">
+                <div className="font-bold text-guro-blue mb-1">2. Choose Format</div>
+                <p className="text-gray-600 text-sm">Select either 7Es or 4As teaching methodology</p>
               </div>
-              <div className="p-4">
-                <div className="font-bold text-guro-blue mb-2">3. Generate & Download</div>
-                <p className="text-gray-600">Get your complete lesson plan in seconds</p>
+              <div className="p-3 bg-white rounded-lg shadow-sm">
+                <div className="font-bold text-guro-blue mb-1">3. Generate & Download</div>
+                <p className="text-gray-600 text-sm">Get your complete lesson plan in seconds</p>
               </div>
             </div>
           </div>
 
-          <div className="text-center space-y-4">
-            <div className="text-3xl font-bold text-guro-blue">
-              ₱299<span className="text-xl text-gray-500">/month</span>
+          <div className="text-center space-y-3 mt-2">
+            <div className="text-2xl sm:text-3xl font-bold text-guro-blue">
+              ₱299<span className="text-lg text-gray-500">/month</span>
             </div>
-            <p className="text-gray-600 max-w-2xl mx-auto">
-              Subscribe today and join thousands of teachers saving 5+ hours every week on lesson planning and materials creation.
+            <p className="text-gray-600 max-w-2xl mx-auto text-sm sm:text-base">
+              Subscribe today and join thousands of teachers saving 5+ hours every week on lesson planning.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Button 
@@ -136,7 +135,7 @@ const Payment = () => {
                 size="lg"
                 className="w-full sm:w-auto sm:px-8 bg-guro-blue hover:bg-guro-blue/90"
               >
-                Subscribe to GuroAI - ₱299/month
+                Subscribe Now
               </Button>
             </div>
           </div>
