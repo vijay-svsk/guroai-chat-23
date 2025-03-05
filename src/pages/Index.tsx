@@ -5,7 +5,6 @@ import { LogoAnimation } from "@/components/home/LogoAnimation";
 import { HeroSection } from "@/components/home/HeroSection";
 import { FeaturesSection } from "@/components/home/FeaturesSection";
 import { PricingSection } from "@/components/home/PricingSection";
-import { TestimonialsSection } from "@/components/home/TestimonialsSection";
 import { ReviewsSection } from "@/components/home/ReviewsSection";
 import { ChatBox } from "@/components/home/ChatBox";
 import { supabase } from "@/integrations/supabase/client";
@@ -50,7 +49,6 @@ const Index = () => {
         <HeroSection onStartTrial={handleStartSubscription} />
         <FeaturesSection />
         <PricingSection onStartTrial={handleStartSubscription} />
-        <TestimonialsSection />
         <ReviewsSection />
       </div>
 
