@@ -34,8 +34,8 @@ const GenerateQuizzes = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a1d2c]">
-      <header className="bg-[#0a1d2c] border-b border-white/10">
+    <div className="min-h-screen bg-white">
+      <header className="bg-[#023d54] border-b border-white/10">
         <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
@@ -62,7 +62,7 @@ const GenerateQuizzes = () => {
         <div className="grid grid-cols-1 gap-8">
           {/* Quiz Generator Form */}
           <div>
-            <h2 className="text-xl text-white font-semibold mb-4">
+            <h2 className="text-xl text-[#023d54] font-semibold mb-4">
               Quiz Input
             </h2>
             <QuizForm onSubmit={handleSubmit} isLoading={isLoading} />
@@ -70,10 +70,10 @@ const GenerateQuizzes = () => {
 
           {/* Loading State */}
           {isLoading && (
-            <Card className="bg-white/5 backdrop-blur">
+            <Card className="bg-white shadow-md border border-gray-100">
               <CardContent className="flex flex-col items-center justify-center p-8">
                 <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-[#8cd09b] mb-4"></div>
-                <p className="text-lg text-white text-center">
+                <p className="text-lg text-[#023d54] text-center">
                   Generating Quizzes, Please Wait for a While...
                 </p>
               </CardContent>
@@ -99,10 +99,10 @@ const GenerateQuizzes = () => {
 
           {/* TOS Loading State */}
           {isTosLoading && (
-            <Card className="bg-white/5 backdrop-blur">
+            <Card className="bg-white shadow-md border border-gray-100">
               <CardContent className="flex flex-col items-center justify-center p-8">
                 <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-[#8cd09b] mb-4"></div>
-                <p className="text-lg text-white text-center">
+                <p className="text-lg text-[#023d54] text-center">
                   Generating Table of Specification...
                 </p>
               </CardContent>
