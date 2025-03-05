@@ -54,8 +54,16 @@ const Index = () => {
         <ReviewsSection />
       </div>
 
-      {/* Add ChatBox component */}
-      <ChatBox />
+      <div className="bg-[#f7fbff] py-12 px-4">
+        <div className="max-w-6xl mx-auto text-center">
+          <h2 className="text-3xl md:text-4xl font-bold text-guro-blue mb-8">Have Questions? Ask Our AI Assistant</h2>
+          <p className="text-lg text-gray-600 mb-8 max-w-3xl mx-auto">
+            Unsure about how GuroAI can help you? Need clarification on features or pricing? 
+            Our AI assistant is ready to answer all your questions instantly.
+          </p>
+          <ChatBox />
+        </div>
+      </div>
 
       <footer className="bg-[#8cd09b] py-6 mt-12">
         <div className="container mx-auto px-4">

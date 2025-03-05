@@ -4,7 +4,7 @@ import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, Sparkles } from "lucide-react";
 
 const Payment = () => {
   const navigate = useNavigate();
@@ -17,25 +17,23 @@ const Payment = () => {
 
   const features = [
     {
-      title: "7Es Format Lesson Plans",
+      title: "Comprehensive Lesson Plans",
       details: [
-        "Content & Performance Standards",
-        "Learning Competencies & MELC",
-        "Comprehensive Objectives (Cognitive, Psychomotor, Affective)",
-        "Detailed Subject Matter & References",
-        "7-step Procedure (Preliminaries to Generalization)",
-        "Evaluation & Assignment sections"
+        "Choose between 7Es or 4As teaching methodologies",
+        "DepEd PMES-compliant content",
+        "Customizable to your teaching style",
+        "Download as Word documents in seconds",
+        "Includes objectives, activities, and assessments"
       ]
     },
     {
-      title: "4As Format Lesson Plans",
+      title: "Educational Resources & Tools",
       details: [
-        "Content & Performance Standards",
-        "Learning Competencies & MELC",
-        "Clear Learning Objectives",
-        "Activity-Based Learning Structure",
-        "Analysis & Abstraction Components",
-        "Application & Assessment"
+        "Generate professional PowerPoint presentations",
+        "Create comprehensive quizzes with answer keys",
+        "Generate PMES Annotations instantly",
+        "AI-powered lesson customization",
+        "Save hours of preparation time weekly"
       ]
     }
   ];
@@ -48,7 +46,7 @@ const Payment = () => {
             Unlock Full Access to GuroAI
           </CardTitle>
           <p className="text-xl text-gray-600 mt-2">
-            Your AI-Powered Lesson Planning Assistant
+            Your All-in-One AI-Powered Teaching Assistant
           </p>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -69,6 +67,32 @@ const Payment = () => {
                 </ul>
               </div>
             ))}
+          </div>
+
+          <div className="bg-[#f0faff] p-6 rounded-lg space-y-4 border border-blue-100">
+            <h3 className="text-xl font-semibold text-center text-guro-blue flex items-center justify-center gap-2">
+              <Sparkles className="h-5 w-5 text-yellow-500" />
+              Exclusive Benefits
+              <Sparkles className="h-5 w-5 text-yellow-500" />
+            </h3>
+            <ul className="grid md:grid-cols-2 gap-4">
+              <li className="flex items-start gap-2 text-gray-600">
+                <span className="text-yellow-500 font-bold">★</span>
+                <span>Generate lesson plans 6x faster than with other AI tools</span>
+              </li>
+              <li className="flex items-start gap-2 text-gray-600">
+                <span className="text-yellow-500 font-bold">★</span>
+                <span>DepEd PMES-compliant content guaranteed</span>
+              </li>
+              <li className="flex items-start gap-2 text-gray-600">
+                <span className="text-yellow-500 font-bold">★</span>
+                <span>Designed specifically for Philippine curriculum</span>
+              </li>
+              <li className="flex items-start gap-2 text-gray-600">
+                <span className="text-yellow-500 font-bold">★</span>
+                <span>Priority access to all future features</span>
+              </li>
+            </ul>
           </div>
 
           <div className="bg-gray-50 p-6 rounded-lg space-y-4">
@@ -95,6 +119,9 @@ const Payment = () => {
             <div className="text-3xl font-bold text-guro-blue">
               ₱299<span className="text-xl text-gray-500">/month</span>
             </div>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              Subscribe today and join thousands of teachers saving 5+ hours every week on lesson planning and materials creation.
+            </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Button 
                 onClick={() => navigate('/learn-more')}
