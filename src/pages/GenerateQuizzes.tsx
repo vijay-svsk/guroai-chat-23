@@ -1,13 +1,15 @@
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FilePlus, Table, ArrowLeft } from "lucide-react";
+import { FilePlus, Table, ArrowLeft, Download, Save } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { QuizForm } from "@/components/quiz/QuizForm";
 import { QuizDisplay } from "@/components/quiz/QuizDisplay";
 import { TableOfSpecificationDisplay } from "@/components/quiz/TableOfSpecification";
 import { useQuizGeneration } from "@/hooks/use-quiz-generation";
+import { useQuizDownload } from "@/hooks/use-quiz-download";
+import { useSaveQuiz } from "@/hooks/use-save-quiz";
+import { useToast } from "@/hooks/use-toast";
 import type { QuizFormData } from "@/types/quiz-types";
 
 const GenerateQuizzes = () => {
@@ -20,7 +22,10 @@ const GenerateQuizzes = () => {
     generateQuiz, 
     generateTOS 
   } = useQuizGeneration();
+  const { downloadQuizDocx } = useQuizDownload();
+  const { saveQuiz, isSaving } = useSaveQuiz();
   const [lastFormData, setLastFormData] = useState<QuizFormData | null>(null);
+  const { toast } = useToast();
 
   const handleSubmit = (data: QuizFormData) => {
     setLastFormData(data);
@@ -33,6 +38,30 @@ const GenerateQuizzes = () => {
     }
   };
 
+  const handleDownloadQuiz = () => {
+    if (lastFormData && quiz) {
+      downloadQuizDocx(quiz, lastFormData.subject, lastFormData.topic);
+    }
+  };
+
+  const handleSaveQuiz = async () => {
+    if (lastFormData && quiz) {
+      await saveQuiz({
+        gradeLevel: lastFormData.gradeLevel,
+        subject: lastFormData.subject,
+        topic: lastFormData.topic,
+        examType: lastFormData.examType,
+        quizData: JSON.stringify(quiz),
+        tosData: tableOfSpecification ? JSON.stringify(tableOfSpecification) : null
+      });
+      toast({
+        title: "Success!",
+        description: "Quiz saved to your account. View it in My Account.",
+        duration: 3000,
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white">
       <header className="bg-[#023d54] border-b border-white/10">
@@ -40,16 +69,16 @@ const GenerateQuizzes = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <img
-                src="/lovable-uploads/24e7e402-845e-4126-b717-af2167b4ef23.png"
+                src="/lovable-uploads/cedd3880-b258-4398-af1c-f973e092aac4.png"
                 alt="GuroAI Logo"
-                className="h-12 w-12 rounded-md"
+                className="h-12 w-12"
                 loading="eager"
               />
               <h1 className="text-2xl font-semibold text-white">Generate Quizzes</h1>
             </div>
             <Button
               variant="outline"
-              className="text-white border-white hover:bg-white/10"
+              className="text-white border-[#8cd09b] bg-[#8cd09b] hover:bg-[#7bc08b] hover:text-white"
               onClick={() => navigate("/monthlysubscription")}
             >
               <ArrowLeft className="mr-2 h-4 w-4" /> Back
@@ -81,7 +110,31 @@ const GenerateQuizzes = () => {
           )}
 
           {/* Quiz Display */}
-          {quiz && <QuizDisplay quiz={quiz} />}
+          {quiz && (
+            <>
+              <QuizDisplay quiz={quiz} />
+              
+              {/* Action Buttons */}
+              <div className="flex flex-wrap gap-4 justify-center">
+                <Button
+                  onClick={handleDownloadQuiz}
+                  className="bg-[#8cd09b] hover:bg-[#7bc08b] text-[#023d54] font-semibold px-6 py-3 rounded-lg transition-all"
+                >
+                  <Download className="mr-2 h-5 w-5" />
+                  Download Quiz as DOCX
+                </Button>
+                
+                <Button
+                  onClick={handleSaveQuiz}
+                  className="bg-[#023d54] hover:bg-[#01283a] text-white font-semibold px-6 py-3 rounded-lg transition-all"
+                  disabled={isSaving}
+                >
+                  <Save className="mr-2 h-5 w-5" />
+                  {isSaving ? "Saving..." : "Save this Quiz"}
+                </Button>
+              </div>
+            </>
+          )}
 
           {/* Generate TOS Button */}
           {quiz && !tableOfSpecification && (

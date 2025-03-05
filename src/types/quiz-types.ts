@@ -36,3 +36,15 @@ export interface Quiz {
   instructions: string;
   questions: QuizQuestion[];
 }
+
+export interface SavedQuiz {
+  id: string;
+  user_id: string;
+  grade_level: string;
+  subject: string;
+  topic: string;
+  exam_type: ExamType;
+  quiz_data: string;
+  tos_data: string | null;
+  created_at: string;
+}
