@@ -73,7 +73,8 @@ export const PricingSection = ({ onStartTrial }: PricingSectionProps) => {
               onMouseLeave={() => setIsHovered(false)}
             >
               <span className="flex items-center justify-center">
-                Subscribe Now - Start Creating in Minutes
+                <span className="hidden md:inline">Subscribe Now - Start Creating in Minutes</span>
+                <span className="md:hidden">Subscribe Now</span>
                 <ArrowRight className={`ml-2 h-5 w-5 transition-transform duration-300 ${isHovered ? 'translate-x-1' : ''}`} />
               </span>
               <span className={`absolute bottom-0 left-0 h-1 bg-[#8cd09b] transition-all duration-300 ${isHovered ? 'w-full' : 'w-0'}`}></span>
@@ -96,3 +97,4 @@ export const PricingSection = ({ onStartTrial }: PricingSectionProps) => {
     </section>
   );
 };
+
