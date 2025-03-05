@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from "react";
 import { MessageCircle, Send, X } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -15,6 +16,7 @@ export const ChatBox = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const chatBoxRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   
   // Use the provided API key directly
@@ -34,8 +36,25 @@ export const ChatBox = () => {
     scrollToBottom();
   }, [messages]);
 
+  // Prevent body scrolling when chat is open on mobile
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'auto';
+    }
+    
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
+  }, [isOpen]);
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const handleToggleChat = () => {
+    setIsOpen(!isOpen);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -84,13 +103,13 @@ export const ChatBox = () => {
   };
 
   return (
-    <div className="md:fixed md:bottom-4 md:right-4 z-50 w-full md:w-auto">
+    <div ref={chatBoxRef} className="fixed z-50 bottom-4 w-full md:w-auto md:right-4">
       {/* Chat icon button - only visible on tablet/desktop */}
       {!isOpen && (
         <div className="hidden md:flex flex-col items-center">
           <div className="relative">
             <Button
-              onClick={() => setIsOpen(true)}
+              onClick={handleToggleChat}
               className="h-16 w-16 rounded-full bg-[#8cd09b] hover:bg-[#7bc089] shadow-lg animate-pulse-slow"
             >
               <MessageCircle className="h-7 w-7" />
@@ -111,7 +130,7 @@ export const ChatBox = () => {
           <div className="flex flex-col items-center">
             <div className="relative">
               <Button
-                onClick={() => setIsOpen(true)}
+                onClick={handleToggleChat}
                 className="h-14 w-14 rounded-full bg-[#8cd09b] hover:bg-[#7bc089] shadow-lg animate-pulse-slow"
               >
                 <MessageCircle className="h-6 w-6" />
@@ -126,7 +145,7 @@ export const ChatBox = () => {
 
       {/* Chat box */}
       {isOpen && (
-        <div className="flex flex-col bg-white rounded-lg shadow-xl w-full md:w-[350px] h-[450px] border border-gray-200 mx-auto md:mx-0">
+        <div className="flex flex-col bg-white rounded-lg shadow-xl max-w-full w-full md:w-[350px] h-[550px] md:h-[450px] border border-gray-200 mx-auto md:mx-0 fixed bottom-0 left-0 right-0 md:bottom-4 md:right-4 md:left-auto">
           {/* Chat header */}
           <div className="flex items-center justify-between bg-[#023d54] text-white p-3 rounded-t-lg">
             <div className="flex items-center gap-2">
@@ -136,7 +155,7 @@ export const ChatBox = () => {
             <Button 
               variant="ghost" 
               size="icon" 
-              onClick={() => setIsOpen(false)}
+              onClick={handleToggleChat}
               className="h-8 w-8 text-white hover:bg-[#03506a]"
             >
               <X className="h-4 w-4" />
