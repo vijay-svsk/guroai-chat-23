@@ -25,6 +25,12 @@ export const ActionButtons = () => {
       >
         Generate PMES Annotation
       </Button>
+      <Button 
+        onClick={() => navigate('/generate-quizzes')} 
+        className="w-full bg-[#8cd09b] hover:bg-[#7bc08b] text-[#023d54] font-semibold py-3 px-6 rounded-lg transition-all"
+      >
+        Generate Quizzes
+      </Button>
     </div>
   );
 };
