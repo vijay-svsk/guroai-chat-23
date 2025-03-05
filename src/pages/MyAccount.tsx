@@ -51,7 +51,7 @@ const MyAccount = () => {
           .order('created_at', { ascending: false });
 
         if (quizzesError) throw quizzesError;
-        setQuizzes(quizzesData || []);
+        setQuizzes(quizzesData as SavedQuiz[] || []);
       } catch (error) {
         console.error('Error fetching user data:', error);
         toast({

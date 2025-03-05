@@ -90,6 +90,42 @@ export type Database = {
         }
         Relationships: []
       }
+      quizzes: {
+        Row: {
+          created_at: string
+          exam_type: string
+          grade_level: string
+          id: string
+          quiz_data: string
+          subject: string
+          topic: string
+          tos_data: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          exam_type: string
+          grade_level: string
+          id?: string
+          quiz_data: string
+          subject: string
+          topic: string
+          tos_data?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          exam_type?: string
+          grade_level?: string
+          id?: string
+          quiz_data?: string
+          subject?: string
+          topic?: string
+          tos_data?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       subscriptions: {
         Row: {
           created_at: string | null
