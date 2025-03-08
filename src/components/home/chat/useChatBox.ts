@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { ChatMessage } from "@/types/chat";
 import { getWelcomeMessage, getSpecialResponse } from "./chat-utils";
-import { supabase } from "@/integrations/supabase/client";
+import { sendChatMessage } from "@/services/chat-service";
 
 export const useChatBox = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -75,30 +75,35 @@ export const useChatBox = () => {
         
         setMessages(prev => [...prev, assistantMessage]);
       } else {
-        // Use Supabase Edge Function for regular responses
-        const { data, error } = await supabase.functions.invoke("chat", {
-          body: { 
-            message: userMessage.content,
-            apiKey
-          },
-        });
-
-        if (error) {
-          throw new Error(error.message || "Failed to get response");
-        }
+        // Use the extracted service function for API calls
+        const answer = await sendChatMessage(userMessage.content, apiKey);
         
         const assistantMessage: ChatMessage = {
           role: 'assistant',
-          content: data.answer
+          content: answer
         };
 
         setMessages(prev => [...prev, assistantMessage]);
       }
     } catch (error) {
-      console.error("Error:", error);
+      console.error("Chat error:", error);
+      
+      // Improved error handling with more specific error messages
+      let errorMessage = "Failed to get a response. Please try again later.";
+      
+      if (error instanceof Error) {
+        if (error.message.includes("network") || error.message.includes("connection")) {
+          errorMessage = "Network error. Please check your internet connection and try again.";
+        } else if (error.message.includes("timeout")) {
+          errorMessage = "Request timed out. The server took too long to respond. Please try again.";
+        } else if (error.message.includes("key") || error.message.includes("authenticate")) {
+          errorMessage = "API authentication error. Please contact support.";
+        }
+      }
+      
       toast({
         title: "Error",
-        description: "Failed to get a response. Please try again later.",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
