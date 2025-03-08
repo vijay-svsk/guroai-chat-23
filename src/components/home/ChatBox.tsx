@@ -27,10 +27,10 @@ export const ChatBox = () => {
     if (isOpen && messages.length === 0) {
       setMessages([{
         role: 'assistant',
-        content: `Hello! I'm GuroAI's assistant. How can I help you today?
+        content: `Hello! I'm GuroAI's assistant. How can I help you today? 😊
 
 Need assistance with:
-• Lesson planning with GuroAI
+• Creating lesson plans with GuroAI
 • Subscription information
 • Payment verification
 • Our newest upcoming features`
@@ -90,7 +90,12 @@ Need assistance with:
     const paidClaim = /paid|subscribed|payment|reference number|ref number|subscription/i.test(userMessage.toLowerCase());
     
     if (paidClaim) {
-      // Check if message contains what looks like a reference number
+      // First, check if they're just saying they paid without providing a reference
+      if (!userMessage.match(/([A-Za-z0-9_-]{5,})/)) {
+        return `I see you're mentioning a payment. Could you please share your payment reference number so I can verify your account? 😊 This helps me provide you with the right access to your GuroAI subscription.`;
+      }
+      
+      // If they included what looks like a reference number
       const refNumberMatch = userMessage.match(/([A-Za-z0-9_-]{5,})/);
       
       if (refNumberMatch) {
@@ -98,14 +103,16 @@ Need assistance with:
         const isValid = await verifyPaymentReference(refNumber);
         
         if (isValid) {
-          return `I've verified your payment with reference number "${refNumber}". You can now access your full account at: https://guroai.lovable.app/auth
+          return `Great news! I've verified your payment with reference number "${refNumber}". ✅ 
 
-Please log in with the email you used during registration. If you have any issues accessing your account, please contact support at guroai.online@gmail.com.`;
+You can now access your full account at: https://guroai.lovable.app/auth
+
+Please log in with the email you used during registration. If you have any issues accessing your account, feel free to contact our support team at guroai.online@gmail.com.`;
         } else {
-          return `I couldn't verify your payment with the provided reference. Please provide your complete payment reference number, or contact support at guroai.online@gmail.com for assistance.`;
+          return `I couldn't verify the payment reference "${refNumber}" in our system. 🤔
+
+Could you please double-check and provide your complete payment reference number? If you continue to have issues, our support team is ready to help at guroai.online@gmail.com.`;
         }
-      } else {
-        return `I see you're mentioning payment. If you've already paid, please provide your payment reference number so I can verify your account.`;
       }
     }
     
@@ -117,18 +124,18 @@ Please log in with the email you used during registration. If you have any issue
     const featuresKeywords = /features|coming soon|new tools|interactive|games|upcoming|what's new/i.test(userMessage.toLowerCase());
     
     if (featuresKeywords) {
-      return `I'm excited to tell you about our upcoming features at GuroAI:
+      return `I'm excited to tell you about our upcoming features at GuroAI! 🎮✨
 
 📱 **Create Interactive Games**:
-✅ Teachers can create engaging games like matching, quizzes, and spin-the-wheel activities.
-✅ Fully customizable to adapt to your lesson content.
-✅ Designed to increase student engagement and participation.
+✅ Teachers can create engaging games like matching, quizzes, and spin-the-wheel activities
+✅ Fully customizable to adapt to your specific lesson content
+✅ Designed to increase student engagement and participation
 
 🚀 **And Many More Features Coming Soon!**
-✅ GuroAI is constantly evolving with new tools to simplify teaching tasks.
-✅ All new features will be included in your regular subscription of ₱299/month.
+✅ GuroAI is constantly evolving with new tools to simplify your teaching tasks
+✅ All new features will be included in your regular subscription of ₱299/month
 
-Would you like to learn more about our subscription plans?`;
+Would you like to know more about our subscription plans or have questions about any specific feature? I'm here to help! 😊`;
     }
     
     return null;
