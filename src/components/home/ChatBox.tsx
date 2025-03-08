@@ -27,7 +27,13 @@ export const ChatBox = () => {
     if (isOpen && messages.length === 0) {
       setMessages([{
         role: 'assistant',
-        content: 'Hello! I\'m GuroAI\'s assistant. How can I help you today?'
+        content: `Hello! I'm GuroAI's assistant. How can I help you today?
+
+Need assistance with:
+• Lesson planning with GuroAI
+• Subscription information
+• Payment verification
+• Our newest upcoming features`
       }]);
     }
   }, [isOpen]);
@@ -57,6 +63,77 @@ export const ChatBox = () => {
     setIsOpen(!isOpen);
   };
 
+  // Verify payment reference number in Supabase
+  const verifyPaymentReference = async (refNumber: string) => {
+    if (refNumber && refNumber.length >= 5) {
+      try {
+        // Check if this is a valid payment reference
+        const { data, error } = await supabase
+          .from('subscriptions')
+          .select('*')
+          .eq('stripe_subscription_id', refNumber)
+          .maybeSingle();
+          
+        if (data) {
+          return true;
+        }
+      } catch (error) {
+        console.error("Error verifying payment:", error);
+      }
+    }
+    return false;
+  };
+
+  // Check if message contains payment reference claim
+  const handlePaidUserClaim = async (userMessage: string) => {
+    // Check if user is claiming they've paid
+    const paidClaim = /paid|subscribed|payment|reference number|ref number|subscription/i.test(userMessage.toLowerCase());
+    
+    if (paidClaim) {
+      // Check if message contains what looks like a reference number
+      const refNumberMatch = userMessage.match(/([A-Za-z0-9_-]{5,})/);
+      
+      if (refNumberMatch) {
+        const refNumber = refNumberMatch[0];
+        const isValid = await verifyPaymentReference(refNumber);
+        
+        if (isValid) {
+          return `I've verified your payment with reference number "${refNumber}". You can now access your full account at: https://guroai.lovable.app/auth
+
+Please log in with the email you used during registration. If you have any issues accessing your account, please contact support at guroai.online@gmail.com.`;
+        } else {
+          return `I couldn't verify your payment with the provided reference. Please provide your complete payment reference number, or contact support at guroai.online@gmail.com for assistance.`;
+        }
+      } else {
+        return `I see you're mentioning payment. If you've already paid, please provide your payment reference number so I can verify your account.`;
+      }
+    }
+    
+    return null;
+  };
+
+  // Check if message is about upcoming features
+  const handleFeaturesInquiry = (userMessage: string) => {
+    const featuresKeywords = /features|coming soon|new tools|interactive|games|upcoming|what's new/i.test(userMessage.toLowerCase());
+    
+    if (featuresKeywords) {
+      return `I'm excited to tell you about our upcoming features at GuroAI:
+
+📱 **Create Interactive Games**:
+✅ Teachers can create engaging games like matching, quizzes, and spin-the-wheel activities.
+✅ Fully customizable to adapt to your lesson content.
+✅ Designed to increase student engagement and participation.
+
+🚀 **And Many More Features Coming Soon!**
+✅ GuroAI is constantly evolving with new tools to simplify teaching tasks.
+✅ All new features will be included in your regular subscription of ₱299/month.
+
+Would you like to learn more about our subscription plans?`;
+    }
+    
+    return null;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!message.trim() || isLoading) return;
@@ -71,24 +148,38 @@ export const ChatBox = () => {
     setIsLoading(true);
 
     try {
-      // Use Supabase Edge Function instead of direct API call
-      const { data, error } = await supabase.functions.invoke("chat", {
-        body: { 
-          message: userMessage.content,
-          apiKey
-        },
-      });
-
-      if (error) {
-        throw new Error(error.message || "Failed to get response");
-      }
+      // Check for special message handling cases
+      const paidUserResponse = await handlePaidUserClaim(userMessage.content);
+      const featuresInquiryResponse = handleFeaturesInquiry(userMessage.content);
       
-      const assistantMessage: ChatMessage = {
-        role: 'assistant',
-        content: data.answer
-      };
+      // If we have a special response, use it instead of calling the API
+      if (paidUserResponse || featuresInquiryResponse) {
+        const assistantMessage: ChatMessage = {
+          role: 'assistant',
+          content: paidUserResponse || featuresInquiryResponse || ''
+        };
+        
+        setMessages(prev => [...prev, assistantMessage]);
+      } else {
+        // Use Supabase Edge Function for regular responses
+        const { data, error } = await supabase.functions.invoke("chat", {
+          body: { 
+            message: userMessage.content,
+            apiKey
+          },
+        });
 
-      setMessages(prev => [...prev, assistantMessage]);
+        if (error) {
+          throw new Error(error.message || "Failed to get response");
+        }
+        
+        const assistantMessage: ChatMessage = {
+          role: 'assistant',
+          content: data.answer
+        };
+
+        setMessages(prev => [...prev, assistantMessage]);
+      }
     } catch (error) {
       console.error("Error:", error);
       toast({
