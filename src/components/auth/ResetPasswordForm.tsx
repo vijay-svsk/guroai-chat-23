@@ -23,7 +23,10 @@ export const ResetPasswordForm = ({
   if (resetSent) {
     return (
       <div className="text-center py-4">
-        <p className="text-green-600 mb-4">Reset link sent to your email!</p>
+        <p className="text-green-600 mb-4">
+          If your email is registered, you'll receive a reset link shortly.
+          Please check your inbox and spam folder.
+        </p>
         <Button 
           onClick={onBackToLogin}
           className="mt-4 w-full"
