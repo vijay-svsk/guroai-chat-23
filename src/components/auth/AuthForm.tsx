@@ -36,6 +36,10 @@ export const AuthForm = ({
   const navigate = useNavigate();
   const { toast } = useToast();
   const [signingUp, setSigningUp] = useState(false);
+  const [isResetMode, setIsResetMode] = useState(false);
+  const [resetPasswordEmail, setResetPasswordEmail] = useState("");
+  const [resetSent, setResetSent] = useState(false);
+  const [resetLoading, setResetLoading] = useState(false);
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -98,6 +102,97 @@ export const AuthForm = ({
     }
   };
 
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!resetPasswordEmail.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter your email address",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setResetLoading(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(resetPasswordEmail, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+
+      if (error) throw error;
+
+      setResetSent(true);
+      toast({
+        title: "Reset link sent",
+        description: "Check your email for password reset instructions",
+        duration: 5000,
+      });
+    } catch (error: any) {
+      console.error("Reset password error:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to send reset link. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setResetLoading(false);
+    }
+  };
+
+  if (isResetMode) {
+    return (
+      <div className="space-y-6">
+        {resetSent ? (
+          <div className="text-center py-4">
+            <p className="text-green-600 mb-4">Reset link sent to your email!</p>
+            <Button 
+              onClick={() => {
+                setIsResetMode(false);
+                setResetSent(false);
+              }}
+              className="mt-4 w-full"
+            >
+              Back to Login
+            </Button>
+          </div>
+        ) : (
+          <form onSubmit={handleResetPassword} className="space-y-6">
+            <div>
+              <div className="flex items-center space-x-2">
+                <Mail className="w-5 h-5 text-gray-500" />
+                <Input
+                  type="email"
+                  value={resetPasswordEmail}
+                  onChange={(e) => setResetPasswordEmail(e.target.value)}
+                  placeholder="Email address"
+                  required
+                />
+              </div>
+            </div>
+
+            <Button
+              type="submit"
+              className="w-full bg-guro-blue hover:bg-guro-blue/90"
+              disabled={resetLoading}
+            >
+              {resetLoading ? "Sending..." : "Send Reset Link"}
+            </Button>
+
+            <div className="text-center mt-4">
+              <button
+                type="button"
+                onClick={() => setIsResetMode(false)}
+                className="text-sm text-guro-blue hover:underline"
+              >
+                Back to login
+              </button>
+            </div>
+          </form>
+        )}
+      </div>
+    );
+  }
+
   return (
     <form onSubmit={isLogin ? handleLogin : handleSignUp} className="space-y-6">
       {!isLogin && (
@@ -157,6 +252,18 @@ export const AuthForm = ({
       >
         {loading || signingUp ? "Processing..." : isLogin ? "Sign In" : "Create Account"}
       </Button>
+
+      {isLogin && (
+        <div className="text-center mt-2">
+          <button
+            type="button"
+            onClick={() => setIsResetMode(true)}
+            className="text-sm text-guro-blue hover:underline"
+          >
+            Forgot Password?
+          </button>
+        </div>
+      )}
 
       <div className="mt-4 text-center">
         <button
