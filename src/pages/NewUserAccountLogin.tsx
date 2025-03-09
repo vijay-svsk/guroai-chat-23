@@ -76,6 +76,28 @@ const NewUserAccountLogin = () => {
 
     setLoading(true);
     try {
+      // First, check if the email exists in the auth system
+      const { data, error: signInError } = await supabase.auth.signInWithOtp({
+        email: resetPasswordEmail,
+        options: {
+          shouldCreateUser: false, // This will fail if user doesn't exist
+        }
+      });
+
+      if (signInError) {
+        if (signInError.message.includes("does not exist")) {
+          toast({
+            title: "Account not found",
+            description: "This email is not registered in our system. Please sign up to create a new account.",
+            variant: "destructive",
+            duration: 5000,
+          });
+          return;
+        }
+        throw signInError;
+      }
+
+      // If we get here, the user exists, so send the reset email
       const { error } = await supabase.auth.resetPasswordForEmail(resetPasswordEmail, {
         redirectTo: `${window.location.origin}/reset-password`,
       });
@@ -153,7 +175,7 @@ const NewUserAccountLogin = () => {
                     className="w-full bg-guro-blue hover:bg-guro-blue/90"
                     disabled={loading}
                   >
-                    {loading ? "Sending..." : "Send Reset Link"}
+                    {loading ? "Checking..." : "Send Reset Link"}
                   </Button>
 
                   <div className="text-center mt-4">
