@@ -82,23 +82,29 @@ export const saveChatMessage = async (message: ChatMessage, userId?: string): Pr
   }
 };
 
-// Get chat sessions for a user
+// Get chat sessions for a user - Since there's no chat_sessions table,
+// we'll fetch the most recent chat messages and format them as chat sessions
 export const fetchChatSessions = async (userId: string): Promise<ChatSession[]> => {
   try {
+    // Get the most recent messages from chat_messages table
     const { data, error } = await supabase
-      .from('chat_sessions')
+      .from('chat_messages')
       .select('*')
       .eq('user_id', userId)
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: false })
+      .limit(10);
       
     if (error) throw error;
     
-    return data.map((session: any) => ({
-      id: session.id,
-      title: session.title || 'Untitled Chat',
-      created_at: session.created_at,
-      preview: session.preview || 'No preview available'
+    // Process data to create chat sessions
+    // Group messages or just use individual messages as session previews
+    const sessions: ChatSession[] = data.map((message: any) => ({
+      id: message.id,
+      message: message.content.substring(0, 30) + (message.content.length > 30 ? '...' : ''),
+      date: new Date(message.created_at).toLocaleDateString()
     }));
+    
+    return sessions;
   } catch (error) {
     console.error("Error fetching chat sessions:", error);
     // Return empty array instead of throwing to handle more gracefully
@@ -107,13 +113,31 @@ export const fetchChatSessions = async (userId: string): Promise<ChatSession[]> 
 };
 
 // Get messages for a specific chat session
+// Since we don't have a dedicated chat_sessions table, 
+// we'll use the message ID as session ID and return related messages
 export const fetchChatSession = async (sessionId: string, userId: string): Promise<ChatMessage[]> => {
   try {
+    // Get the specific message
+    const { data: messageData, error: messageError } = await supabase
+      .from('chat_messages')
+      .select('*')
+      .eq('id', sessionId)
+      .eq('user_id', userId)
+      .single();
+      
+    if (messageError) throw messageError;
+    
+    // Get messages from the same approximate time (within 1 hour)
+    // This is a simple way to group related messages without a session table
+    const messageTime = new Date(messageData.created_at);
+    const oneHourLater = new Date(messageTime.getTime() + 60 * 60 * 1000);
+    
     const { data, error } = await supabase
       .from('chat_messages')
       .select('*')
-      .eq('session_id', sessionId)
       .eq('user_id', userId)
+      .gte('created_at', messageTime.toISOString())
+      .lte('created_at', oneHourLater.toISOString())
       .order('created_at', { ascending: true });
       
     if (error) throw error;
@@ -124,7 +148,11 @@ export const fetchChatSession = async (sessionId: string, userId: string): Promi
     }));
   } catch (error) {
     console.error("Error fetching chat session:", error);
-    throw error;
+    // If we can't get the session, just return the single message
+    return [{ 
+      role: 'assistant', 
+      content: 'Unable to retrieve the complete conversation.' 
+    }];
   }
 };
 
