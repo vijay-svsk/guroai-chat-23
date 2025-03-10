@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowRight, Check, Star } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface PricingSectionProps {
   onStartTrial: () => void;
@@ -10,6 +11,24 @@ interface PricingSectionProps {
 
 export const PricingSection = ({ onStartTrial }: PricingSectionProps) => {
   const [isHovered, setIsHovered] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const { toast } = useToast();
+
+  const handleSubscribeClick = async () => {
+    try {
+      setIsProcessing(true);
+      window.location.href = 'https://checkout.xendit.co/od/guroai.online';
+    } catch (error) {
+      console.error("Subscription error:", error);
+      toast({
+        title: "Error",
+        description: "Failed to redirect to payment page. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
   
   return (
     <section className="py-20 px-4">
@@ -67,14 +86,15 @@ export const PricingSection = ({ onStartTrial }: PricingSectionProps) => {
             </div>
 
             <Button
-              onClick={onStartTrial}
+              onClick={handleSubscribeClick}
               className="group relative overflow-hidden w-full md:w-2/3 mx-auto bg-guro-blue hover:bg-guro-blue/90 text-white py-6 rounded-lg text-lg transition-all duration-300 hover:shadow-lg mt-8"
               onMouseEnter={() => setIsHovered(true)}
               onMouseLeave={() => setIsHovered(false)}
+              disabled={isProcessing}
             >
               <span className="flex items-center justify-center">
-                <span className="hidden md:inline">Subscribe Now - Start Creating in Minutes</span>
-                <span className="md:hidden">Subscribe Now</span>
+                <span className="hidden md:inline">{isProcessing ? "Redirecting to Payment..." : "Subscribe Now - Start Creating in Minutes"}</span>
+                <span className="md:hidden">{isProcessing ? "Redirecting..." : "Subscribe Now"}</span>
                 <ArrowRight className={`ml-2 h-5 w-5 transition-transform duration-300 ${isHovered ? 'translate-x-1' : ''}`} />
               </span>
               <span className={`absolute bottom-0 left-0 h-1 bg-[#8cd09b] transition-all duration-300 ${isHovered ? 'w-full' : 'w-0'}`}></span>
@@ -97,4 +117,3 @@ export const PricingSection = ({ onStartTrial }: PricingSectionProps) => {
     </section>
   );
 };
-

@@ -1,4 +1,5 @@
 
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -10,10 +11,33 @@ const Payment = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
+  const [isProcessing, setIsProcessing] = useState(false);
 
-  const handleSubscribe = () => {
-    window.location.href = 'https://checkout.xendit.co/od/guroai.online';
+  const handleSubscribe = async () => {
+    try {
+      setIsProcessing(true);
+      window.location.href = 'https://checkout.xendit.co/od/guroai.online';
+    } catch (error) {
+      console.error("Payment error:", error);
+      toast({
+        title: "Payment Error",
+        description: "There was a problem initiating the payment. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsProcessing(false);
+    }
   };
+
+  // Check if user was redirected after a canceled payment
+  const paymentCanceled = new URLSearchParams(location.search).get('canceled') === 'true';
+  if (paymentCanceled) {
+    toast({
+      title: "Payment Canceled",
+      description: "Your payment was not completed. You can try again whenever you're ready.",
+      variant: "destructive",
+    });
+  }
 
   const features = [
     {
@@ -127,6 +151,7 @@ const Payment = () => {
                 variant="outline"
                 size="lg"
                 className="w-full sm:w-auto sm:px-8 border-guro-blue text-guro-blue hover:bg-guro-blue/10"
+                disabled={isProcessing}
               >
                 Learn More
               </Button>
@@ -134,10 +159,17 @@ const Payment = () => {
                 onClick={handleSubscribe}
                 size="lg"
                 className="w-full sm:w-auto sm:px-8 bg-guro-blue hover:bg-guro-blue/90"
+                disabled={isProcessing}
               >
-                Subscribe Now
+                {isProcessing ? "Redirecting to Payment..." : "Subscribe Now"}
               </Button>
             </div>
+            
+            {isProcessing && (
+              <p className="text-sm text-blue-600 animate-pulse">
+                You're being redirected to our secure payment page...
+              </p>
+            )}
           </div>
         </CardContent>
       </Card>

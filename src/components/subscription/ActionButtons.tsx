@@ -3,10 +3,13 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 export const ActionButtons = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [hoveredButton, setHoveredButton] = useState<string | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const handleMouseEnter = (buttonName: string) => {
     setHoveredButton(buttonName);
@@ -14,6 +17,22 @@ export const ActionButtons = () => {
 
   const handleMouseLeave = () => {
     setHoveredButton(null);
+  };
+
+  const handleXenditPayment = async () => {
+    try {
+      setIsProcessing(true);
+      window.location.href = 'https://checkout.xendit.co/od/guroai.online';
+    } catch (error) {
+      console.error("Payment error:", error);
+      toast({
+        title: "Payment Error",
+        description: "There was a problem initiating the payment. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   const buttonClasses = "w-full group relative overflow-hidden bg-[#8cd09b] hover:bg-[#7bc08b] text-[#023d54] font-semibold py-3 px-6 rounded-lg transition-all duration-300 hover:shadow-lg";
@@ -25,6 +44,7 @@ export const ActionButtons = () => {
         className={buttonClasses}
         onMouseEnter={() => handleMouseEnter('lesson')}
         onMouseLeave={handleMouseLeave}
+        disabled={isProcessing}
       >
         <span className="flex items-center justify-center">
           Generate Lesson Plan
@@ -38,6 +58,7 @@ export const ActionButtons = () => {
         className={buttonClasses}
         onMouseEnter={() => handleMouseEnter('ask')}
         onMouseLeave={handleMouseLeave}
+        disabled={isProcessing}
       >
         <span className="flex items-center justify-center">
           Ask GuroAI
@@ -51,6 +72,7 @@ export const ActionButtons = () => {
         className={buttonClasses}
         onMouseEnter={() => handleMouseEnter('pmes')}
         onMouseLeave={handleMouseLeave}
+        disabled={isProcessing}
       >
         <span className="flex items-center justify-center">
           Generate PMES Annotation
@@ -64,6 +86,7 @@ export const ActionButtons = () => {
         className={buttonClasses}
         onMouseEnter={() => handleMouseEnter('quiz')}
         onMouseLeave={handleMouseLeave}
+        disabled={isProcessing}
       >
         <span className="flex items-center justify-center">
           Generate Quizzes
@@ -77,6 +100,7 @@ export const ActionButtons = () => {
         className={buttonClasses}
         onMouseEnter={() => handleMouseEnter('powerpoint')}
         onMouseLeave={handleMouseLeave}
+        disabled={isProcessing}
       >
         <span className="flex items-center justify-center">
           Generate Powerpoint Presentation

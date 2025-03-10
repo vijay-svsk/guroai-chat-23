@@ -1,7 +1,6 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.4'
-import Stripe from 'https://esm.sh/stripe@12.18.0'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -15,62 +14,99 @@ serve(async (req) => {
   }
 
   try {
-    const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
-      apiVersion: '2023-10-16',
-    })
+    // Initialize Supabase client
+    const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
+    const supabaseKey = Deno.env.get('SUPABASE_ANON_KEY') ?? '';
+    const supabase = createClient(supabaseUrl, supabaseKey);
+    
+    const { email, user_id } = await req.json();
 
-    const { email } = await req.json()
-
-    // Create or get customer
-    const customers = await stripe.customers.list({ email })
-    let customer
-    if (customers.data.length > 0) {
-      customer = customers.data[0]
-    } else {
-      customer = await stripe.customers.create({ email })
+    if (!email && !user_id) {
+      throw new Error('Email or user_id is required');
     }
 
-    // Create a checkout session for subscription with trial
-    const session = await stripe.checkout.sessions.create({
-      customer: customer.id,
-      payment_method_types: ['card'],
-      line_items: [
-        {
-          price_data: {
-            currency: 'usd',
-            unit_amount: 499, // $4.99 in cents
-            product_data: {
-              name: 'GuroAI Premium Subscription',
-              description: '7-day free trial then $4.99/month',
-            },
-            recurring: {
-              interval: 'month',
-            },
-          },
-          quantity: 1,
-        },
-      ],
-      mode: 'subscription',
-      subscription_data: {
-        trial_period_days: 7,
-      },
-      success_url: `${req.headers.get('origin')}/dashboard?success=true`,
-      cancel_url: `${req.headers.get('origin')}/payment?canceled=true`,
-    })
+    // Create a subscription record for callback verification
+    let userId = user_id;
+    
+    // If we only have email, check if user exists
+    if (!userId && email) {
+      // Check if user exists
+      const { data: userData, error: userError } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('email', email)
+        .maybeSingle();
+      
+      if (userError) {
+        throw userError;
+      }
+      
+      if (userData) {
+        userId = userData.id;
+      }
+    }
+    
+    if (userId) {
+      // Check if subscription already exists
+      const { data: existingSubscription } = await supabase
+        .from('subscriptions')
+        .select('*')
+        .eq('user_id', userId)
+        .maybeSingle();
+      
+      const startDate = new Date();
+      const endDate = new Date();
+      endDate.setDate(endDate.getDate() + 30); // 30 days subscription
+      
+      if (existingSubscription) {
+        // Update existing subscription
+        await supabase
+          .from('subscriptions')
+          .update({
+            status: 'active',
+            start_date: startDate.toISOString(),
+            end_date: endDate.toISOString(),
+          })
+          .eq('user_id', userId);
+      } else {
+        // Create new subscription
+        await supabase
+          .from('subscriptions')
+          .insert({
+            user_id: userId,
+            status: 'active',
+            start_date: startDate.toISOString(),
+            end_date: endDate.toISOString(),
+          });
+      }
+    }
 
+    // Generate a redirect URL to Xendit checkout
+    // In production, this should be generated securely with Xendit API
+    const xenditCheckoutUrl = 'https://checkout.xendit.co/od/guroai.online';
+    
     return new Response(
-      JSON.stringify({ sessionId: session.id }),
+      JSON.stringify({ 
+        success: true, 
+        checkoutUrl: xenditCheckoutUrl
+      }),
       {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { 
+          ...corsHeaders, 
+          'Content-Type': 'application/json' 
+        },
         status: 200,
       },
     )
   } catch (error) {
-    console.error('Error:', error)
+    console.error('Error:', error);
     return new Response(
       JSON.stringify({ error: error.message }),
       {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { 
+          ...corsHeaders, 
+          'Content-Type': 'application/json' 
+        },
         status: 500,
       },
     )
