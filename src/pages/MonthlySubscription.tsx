@@ -125,37 +125,23 @@ const MonthlySubscription = () => {
   const progressPercentage = (totalSeconds / maxSeconds) * 100;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-[#f5f8f9]">
+    <div className="min-h-screen bg-white">
       <Header />
-      <div className="max-w-3xl mx-auto mt-8 px-4">
-        <Card className="shadow-xl overflow-hidden animate-fade-in border-[#e0e9ed] hover:border-[#8cd09b] transition-all duration-300">
-          <div className="bg-[#023d54]/5 px-6 py-4 border-b border-[#e0e9ed]">
-            <h2 className="text-xl font-medium text-[#023d54] flex items-center justify-center">
-              <span className="bg-[#023d54] text-white p-2 rounded-full mr-2 inline-flex items-center justify-center w-8 h-8">
-                {email.charAt(0).toUpperCase()}
-              </span>
-              <span className="truncate">{email}</span>
-            </h2>
-          </div>
-          <CardContent className="pt-8 pb-10 px-8">
-            <div className="text-center space-y-10">
-              <div className="mb-12">
-                <Timer 
-                  timeRemaining={timeRemaining} 
-                  progressPercentage={progressPercentage} 
-                />
-                <div className="mt-6 text-sm text-gray-600 max-w-md mx-auto">
-                  Your GuroAI subscription gives you full access to all features. Enjoy creating lesson plans, quizzes, and more!
-                </div>
-              </div>
+      <div className="max-w-3xl mx-auto mt-12 px-4">
+        <Card className="shadow-xl">
+          <CardContent className="pt-6">
+            <div className="text-center space-y-8">
+              <h2 className="text-lg font-medium text-[#023d54] truncate">
+                {email}
+              </h2>
+              <Timer 
+                timeRemaining={timeRemaining} 
+                progressPercentage={progressPercentage} 
+              />
               <ActionButtons />
             </div>
           </CardContent>
         </Card>
-        
-        <div className="mt-8 text-center text-sm text-gray-500">
-          <p>Need help? Contact us at <a href="mailto:support@guroai.com" className="text-[#023d54] hover:underline">support@guroai.com</a></p>
-        </div>
       </div>
     </div>
   );

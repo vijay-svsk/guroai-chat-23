@@ -1,5 +1,12 @@
 
-import { TimeRemaining } from "@/utils/time-utils";
+import { Clock } from "lucide-react";
+
+interface TimeRemaining {
+  days: number;
+  hours: number;
+  minutes: number;
+  seconds: number;
+}
 
 interface TimerProps {
   timeRemaining: TimeRemaining;
@@ -7,61 +14,26 @@ interface TimerProps {
 }
 
 export const Timer = ({ timeRemaining, progressPercentage }: TimerProps) => {
-  const { days, hours, minutes, seconds } = timeRemaining;
-  
-  // Function to determine color based on days remaining
-  const getTimeColor = () => {
-    if (days <= 5) return "text-red-500";
-    if (days <= 10) return "text-orange-500";
-    return "text-[#023d54]";
-  };
-
-  // Background gradient logic
-  const gradientStyle = {
-    background: `conic-gradient(#8cd09b ${progressPercentage}%, #e0e9ed ${progressPercentage}%)`,
-  };
-
   return (
-    <div className="flex flex-col items-center justify-center">
-      <div className="text-center mb-6">
-        <h3 className="text-xl font-semibold text-[#023d54]">Subscription Time Remaining</h3>
-      </div>
-      
-      <div className="relative flex items-center justify-center">
-        <div 
-          className="subscription-timer w-52 h-52 rounded-full flex items-center justify-center"
-          style={gradientStyle}
-        >
-          <div className="bg-white w-44 h-44 rounded-full flex items-center justify-center shadow-inner">
-            <div className="text-center group hover:scale-105 transition-transform duration-300">
-              <div className={`text-5xl font-bold ${getTimeColor()}`}>
-                {days}
-              </div>
-              <div className="text-gray-500 font-medium mt-1">
-                {days === 1 ? "Day" : "Days"}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="flex justify-center gap-6 mt-8">
-        <div className="text-center w-16">
-          <div className="bg-[#023d54]/5 rounded-lg p-2">
-            <div className="text-xl font-bold text-[#023d54]">{hours}</div>
-            <div className="text-xs text-gray-500">Hours</div>
-          </div>
-        </div>
-        <div className="text-center w-16">
-          <div className="bg-[#023d54]/5 rounded-lg p-2">
-            <div className="text-xl font-bold text-[#023d54]">{minutes}</div>
-            <div className="text-xs text-gray-500">Minutes</div>
-          </div>
-        </div>
-        <div className="text-center w-16">
-          <div className="bg-[#023d54]/5 rounded-lg p-2">
-            <div className="text-xl font-bold text-[#023d54]">{seconds}</div>
-            <div className="text-xs text-gray-500">Seconds</div>
+    <div className="relative mx-auto w-48 h-48">
+      <div 
+        className="absolute inset-0 rounded-full transition-all duration-1000 ease-in-out"
+        style={{
+          background: `conic-gradient(#8cd09b ${progressPercentage}%, #e5e7eb ${progressPercentage}%)`,
+          transform: 'rotate(-90deg)',
+          transition: 'all 1s linear'
+        }}
+      />
+      <div className="absolute inset-2 bg-white rounded-full flex items-center justify-center">
+        <div className="text-center">
+          <Clock className="w-8 h-8 mx-auto mb-1 text-[#8cd09b] animate-pulse" />
+          <div className="space-y-1">
+            <p className="text-xl font-bold text-[#023d54]">
+              {timeRemaining.days}d {timeRemaining.hours}h
+            </p>
+            <p className="text-sm text-[#023d54]">
+              {timeRemaining.minutes}m {timeRemaining.seconds}s
+            </p>
           </div>
         </div>
       </div>

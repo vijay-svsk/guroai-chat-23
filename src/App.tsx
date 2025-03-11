@@ -21,7 +21,6 @@ import DeleteAccount from "./pages/DeleteAccount";
 import SlidePresentation from "./pages/SlidePresentation";
 import AskGuro from "./pages/AskGuro";
 import PMESAnnotation from "./pages/PMESAnnotation";
-import GenerateQuizzes from "./pages/GenerateQuizzes";
 import { Toaster } from "@/components/ui/toaster";
 
 console.log("App component rendering");
@@ -50,7 +49,6 @@ function App() {
           <Route path="/slidepresentation" element={<SlidePresentation />} />
           <Route path="/ask-guro" element={<AskGuro />} />
           <Route path="/pmes-annotation" element={<PMESAnnotation />} />
-          <Route path="/generate-quizzes" element={<GenerateQuizzes />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         <Toaster />

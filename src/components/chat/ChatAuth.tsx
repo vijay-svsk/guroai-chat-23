@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { CreditCard, LogIn } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
 
 interface ChatAuthProps {
   onSubscribe: () => void;
@@ -17,7 +16,6 @@ export const ChatAuth = ({ onSubscribe, isSubscribed = false }: ChatAuthProps) =
   const [error, setError] = useState<string | null>(null);
   const [session, setSession] = useState<any>(null);
   const navigate = useNavigate();
-  const { toast } = useToast();
 
   // Check if user is already authenticated with Supabase
   useEffect(() => {

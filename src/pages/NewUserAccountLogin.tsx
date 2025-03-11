@@ -1,31 +1,20 @@
 
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Mail, Lock, ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { LoginForm } from "@/components/auth/LoginForm";
-import { ResetPasswordForm } from "@/components/auth/ResetPasswordForm";
-import { useLoginAuth } from "@/hooks/use-login-auth";
+import { useToast } from "@/hooks/use-toast";
+import { loginUser } from "@/services/auth-service";
 
 const NewUserAccountLogin = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const {
-    email,
-    setEmail,
-    password,
-    setPassword,
-    loading,
-    resetPasswordEmail,
-    setResetPasswordEmail,
-    isResetMode,
-    setIsResetMode,
-    resetSent,
-    setResetSent,
-    handleLogin,
-    handleResetPassword,
-  } = useLoginAuth();
+  const { toast } = useToast();
 
   // Clear any chat auth when accessing the main login page
   useEffect(() => {
@@ -44,48 +33,81 @@ const NewUserAccountLogin = () => {
     checkAuth();
   }, [navigate]);
 
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const { user } = await loginUser(email, password);
+
+      if (user) {
+        toast({
+          title: "Welcome back!",
+          description: "Successfully logged in",
+          duration: 3000,
+        });
+        navigate("/monthlysubscription");
+      }
+    } catch (error: any) {
+      console.error("Login error:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Invalid login credentials. Please check your email and password.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
-          <h2 className="text-3xl font-bold text-guro-blue">
-            {isResetMode ? "Reset Your Password" : "Welcome Back!"}
-          </h2>
-          <p className="mt-2 text-gray-600">
-            {isResetMode 
-              ? "Enter your email to receive a password reset link" 
-              : "Please sign in to your account"}
-          </p>
+          <h2 className="text-3xl font-bold text-guro-blue">Welcome Back!</h2>
+          <p className="mt-2 text-gray-600">Please sign in to your account</p>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle>{isResetMode ? "Reset Password" : "Sign In"}</CardTitle>
+            <CardTitle>Sign In</CardTitle>
           </CardHeader>
           <CardContent>
-            {isResetMode ? (
-              <ResetPasswordForm 
-                email={resetPasswordEmail}
-                setEmail={setResetPasswordEmail}
-                loading={loading}
-                resetSent={resetSent}
-                onSubmit={handleResetPassword}
-                onBackToLogin={() => {
-                  setIsResetMode(false);
-                  setResetSent(false);
-                }}
-              />
-            ) : (
-              <LoginForm 
-                email={email}
-                setEmail={setEmail}
-                password={password}
-                setPassword={setPassword}
-                loading={loading}
-                onSubmit={handleLogin}
-                onForgotPassword={() => setIsResetMode(true)}
-              />
-            )}
+            <form onSubmit={handleLogin} className="space-y-6">
+              <div>
+                <div className="flex items-center space-x-2">
+                  <Mail className="w-5 h-5 text-gray-500" />
+                  <Input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Email address"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div>
+                <div className="flex items-center space-x-2">
+                  <Lock className="w-5 h-5 text-gray-500" />
+                  <Input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Password"
+                    required
+                  />
+                </div>
+              </div>
+
+              <Button
+                type="submit"
+                className="w-full bg-guro-blue hover:bg-guro-blue/90"
+                disabled={loading}
+              >
+                {loading ? "Signing in..." : "Sign In"}
+              </Button>
+            </form>
           </CardContent>
         </Card>
 

@@ -9,3 +9,8 @@ export interface ChatSession {
   message: string;
   date: string;
 }
+
+export interface ApiKeyStorage {
+  key: string;
+  expiresAt: number;
+}
