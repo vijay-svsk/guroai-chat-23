@@ -23,7 +23,7 @@ export const verifyPaymentReference = async (refNumber: string): Promise<boolean
   return false;
 };
 
-// Get special responses based on user message content
+// Get special responses based on user message content - only for the homepage chat assistant
 export const getSpecialResponse = async (userMessage: string): Promise<string | null> => {
   const paidUserResponse = await handlePaidUserClaim(userMessage);
   const loginAssistanceResponse = handleLoginAssistance(userMessage);
