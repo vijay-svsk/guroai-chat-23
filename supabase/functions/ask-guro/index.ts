@@ -3,7 +3,7 @@ import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
-const llamaApiKey = Deno.env.get('LLAMA_API_KEY');
+const togetherApiKey = Deno.env.get('TOGETHER_API_KEY');
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -88,19 +88,19 @@ serve(async (req) => {
 
     console.log("Processing standard chat request:", question);
 
-    // Use Llama API for text generation instead of OpenAI
-    if (!llamaApiKey) {
-      throw new Error('LLAMA_API_KEY is not set');
+    // Use Together API for text generation
+    if (!togetherApiKey) {
+      throw new Error('TOGETHER_API_KEY is not set');
     }
 
-    const llamaResponse = await fetch('https://api.llama-api.com/chat/completions', {
+    const togetherResponse = await fetch('https://api.together.xyz/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${llamaApiKey}`,
+        'Authorization': `Bearer ${togetherApiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'llama-3-8b-chat', // Using Llama 3 8B model which is faster
+        model: 'mistralai/Mistral-7B-Instruct-v0.2', // Using Mistral 7B which is fast and high quality
         messages: [
           { 
             role: 'system', 
@@ -118,24 +118,24 @@ Remember that you are a fully functional AI assistant with no limitations on wha
           },
           { role: 'user', content: question }
         ],
-        temperature: 0.5, // Lower temperature for more focused responses
-        max_tokens: 1500, // Reduced token count for faster responses
+        temperature: 0.7,
+        max_tokens: 1000, // Sufficient tokens for comprehensive answers while keeping responses fast
       }),
     });
 
     let textResponse;
     try {
-      const data = await llamaResponse.json();
+      const data = await togetherResponse.json();
       if (data.error) {
-        console.error("Llama API error:", data.error);
-        throw new Error(data.error.message || "Error from Llama API");
+        console.error("Together API error:", data.error);
+        throw new Error(data.error.message || "Error from Together API");
       }
       
-      // Get content from Llama API response
+      // Get content from Together API response
       textResponse = data.choices?.[0]?.message?.content || "";
     } catch (error) {
-      console.error("Error parsing Llama API response:", error);
-      throw new Error("Failed to parse Llama API response");
+      console.error("Error parsing Together API response:", error);
+      throw new Error("Failed to parse Together API response");
     }
     
     // Clean the response to remove # and * characters

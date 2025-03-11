@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { ChatMessage } from "@/types/chat";
@@ -88,7 +87,6 @@ export const useChatBox = () => {
       // Call the ask-guro function without the signal in the options
       const { data, error } = await supabase.functions.invoke("ask-guro", {
         body: { question: userMessage.content }
-        // Removed the signal property which was causing the TypeScript error
       });
 
       clearTimeout(timeoutId);
