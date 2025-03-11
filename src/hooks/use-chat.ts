@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useChatUI } from "@/hooks/use-chat-ui";
@@ -20,17 +19,14 @@ export const useChat = (userId: string | null) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingHistory, setIsLoadingHistory] = useState(true);
   const [chatHistory, setChatHistory] = useState<ChatSession[]>([]);
-  const [hasApiKey, setHasApiKey] = useState(false);
+  const [hasApiKey, setHasApiKey] = useState(true);
   const { toast } = useToast();
   const { chatEndRef, scrollToBottom, focusTextarea } = useChatUI();
 
   useEffect(() => {
-    // Reset messages when the component is mounted
     setMessages([]);
-    
-    // Check if API key exists in localStorage (now using Together API key)
-    const apiKey = localStorage.getItem("together_api_key");
-    setHasApiKey(!!apiKey);
+    localStorage.setItem("together_api_key", "aaba53e54192b3dd8454bff28451d27c4f8e23de88600cce9d074f4db1dc0066");
+    setHasApiKey(true);
   }, []);
 
   useEffect(() => {
@@ -97,18 +93,9 @@ export const useChat = (userId: string | null) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!question.trim() || !userId) return;
+    if (!question.trim()) return;
     
-    // Check if user has provided an API key (now using Together API key)
-    const apiKey = localStorage.getItem("together_api_key");
-    if (!apiKey) {
-      toast({
-        title: "API Key Required",
-        description: "Please provide your Together AI API key to use GuroAI Chat",
-        variant: "destructive"
-      });
-      return;
-    }
+    const apiKey = localStorage.getItem("together_api_key") || "aaba53e54192b3dd8454bff28451d27c4f8e23de88600cce9d074f4db1dc0066";
 
     const userMessage: ChatMessage = {
       role: 'user',
@@ -121,9 +108,10 @@ export const useChat = (userId: string | null) => {
     scrollToBottom();
 
     try {
-      await saveChatMessage(userMessage, userId);
+      if (userId) {
+        await saveChatMessage(userMessage, userId);
+      }
       
-      // Pass the API key to the sendChatRequest function
       const answer = await sendChatRequest(userMessage.content, apiKey);
 
       const assistantMessage: ChatMessage = {
@@ -132,13 +120,16 @@ export const useChat = (userId: string | null) => {
       };
 
       setMessages(prev => [...prev, assistantMessage]);
-      await saveChatMessage(assistantMessage, userId);
-      await loadChatSessions();
+      
+      if (userId) {
+        await saveChatMessage(assistantMessage, userId);
+        await loadChatSessions();
+      }
     } catch (error) {
       console.error('Error:', error);
       toast({
         title: "Error",
-        description: "Failed to get an answer. Please try again or check your API key.",
+        description: "Failed to get an answer. Please try again.",
         variant: "destructive"
       });
     } finally {
@@ -204,7 +195,7 @@ export const useChat = (userId: string | null) => {
     isLoadingHistory,
     chatHistory,
     chatEndRef,
-    hasApiKey,
+    hasApiKey: true,
     saveApiKey,
     startNewChat,
     loadChatSession,

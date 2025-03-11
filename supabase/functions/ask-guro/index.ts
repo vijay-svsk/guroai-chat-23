@@ -7,7 +7,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Function to clean response text by removing # and * characters
+// No cleanup to preserve formatting
 const cleanResponse = (text: string) => {
   return text.trim();
 };
@@ -18,16 +18,8 @@ serve(async (req) => {
   }
 
   try {
-    const { question, apiKey } = await req.json();
-
-    if (!apiKey) {
-      throw new Error('API key is required');
-    }
-
-    // Check if this is an image generation request
-    if (question.toLowerCase().startsWith('generate an image')) {
-      throw new Error('Image generation is not supported with Together API. Please use text-based queries only.');
-    }
+    // Default to the provided API key if none is sent
+    const { question, apiKey = "aaba53e54192b3dd8454bff28451d27c4f8e23de88600cce9d074f4db1dc0066" } = await req.json();
 
     // Use Together API for text generation
     const response = await fetch('https://api.together.xyz/v1/completions', {
@@ -38,7 +30,7 @@ serve(async (req) => {
       },
       body: JSON.stringify({
         model: 'mistralai/Mixtral-8x7B-Instruct-v0.1',
-        prompt: `<s>[INST] You are GuroAI, a helpful AI teaching assistant that helps create lesson plans and educational content. Answer this question directly without asking for subscriptions: ${question} [/INST]</s>`,
+        prompt: `<s>[INST] You are GuroAI, a helpful AI teaching assistant that helps create lesson plans and educational content. Answer this question without asking for subscriptions or adding any extra marketing: ${question} [/INST]</s>`,
         max_tokens: 1000,
         temperature: 0.7,
       }),

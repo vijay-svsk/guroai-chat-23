@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { LoadingState } from "@/components/subscription/LoadingState";
 import { ChatMessages } from "@/components/chat/ChatMessages";
@@ -16,10 +17,15 @@ const AskGuro = () => {
   const { userId, isCheckingAuth, redirectToSubscribe, signOut } = useChatAuth();
   const [showPreviousChats, setShowPreviousChats] = useState(false);
   const [isPageLoading, setIsPageLoading] = useState(true);
-  const [isSubscribed, setIsSubscribed] = useState(false);
-  const [isCheckingSubscription, setIsCheckingSubscription] = useState(true);
+  const [isSubscribed, setIsSubscribed] = useState(true); // Default to true
+  const [isCheckingSubscription, setIsCheckingSubscription] = useState(false);
   const [showApiKeyForm, setShowApiKeyForm] = useState(false);
   const { toast } = useToast();
+  
+  // Set default API key on component mount
+  useEffect(() => {
+    localStorage.setItem("together_api_key", "aaba53e54192b3dd8454bff28451d27c4f8e23de88600cce9d074f4db1dc0066");
+  }, []);
   
   const {
     question,
@@ -49,97 +55,16 @@ const AskGuro = () => {
 
   // Check subscription status when user is authenticated
   useEffect(() => {
-    const checkUserSubscription = async () => {
-      if (userId) {
-        try {
-          const hasActiveSubscription = await checkSubscriptionStatus(userId);
-          setIsSubscribed(hasActiveSubscription);
-        } catch (error) {
-          console.error("Error checking subscription:", error);
-          toast({
-            title: "Error",
-            description: "Failed to verify subscription status.",
-            variant: "destructive"
-          });
-        } finally {
-          setIsCheckingSubscription(false);
-        }
-      } else {
-        setIsCheckingSubscription(false);
-      }
-    };
-
-    checkUserSubscription();
-  }, [userId, toast]);
-
-  // Show welcome toast when user successfully logs in
-  useEffect(() => {
-    if (userId && !isCheckingAuth && !isPageLoading) {
-      toast({
-        title: "Welcome to GuroAI Chat",
-        description: "Ask any question to get started",
-        duration: 3000,
-      });
-    }
-  }, [userId, isCheckingAuth, isPageLoading, toast]);
-
-  // Show API key form if user doesn't have an API key
-  useEffect(() => {
-    if (userId && !isCheckingAuth && !isPageLoading && isSubscribed && !hasApiKey) {
-      setShowApiKeyForm(true);
-    }
-  }, [userId, isCheckingAuth, isPageLoading, isSubscribed, hasApiKey]);
+    setIsSubscribed(true); // Always set to true to bypass subscription check
+    setIsCheckingSubscription(false);
+  }, [userId]);
 
   // Only show loading state if we're still checking auth AND loading is taking longer than expected
-  if ((isCheckingAuth || isLoadingHistory || isCheckingSubscription) && isPageLoading) {
+  if ((isCheckingAuth || isLoadingHistory) && isPageLoading) {
     return (
       <div className="flex flex-col min-h-screen bg-gradient-to-b from-white to-[#f8fafc]">
         <div className="flex-1 flex items-center justify-center">
           <LoadingState />
-        </div>
-      </div>
-    );
-  }
-
-  // Show subscription screen if user isn't authenticated
-  if (!userId && !isCheckingAuth) {
-    return (
-      <div className="flex flex-col min-h-screen bg-gradient-to-b from-white to-[#f8fafc] py-10">
-        <div className="flex-1 flex flex-col items-center justify-center">
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-[#023d54] tracking-tight mb-2">
-              GuroAI Chat
-            </h1>
-            <p className="text-xl text-[#023d54]/80 mb-8">
-              Subscribe to start chatting with GuroAI
-            </p>
-          </div>
-          <ChatAuth 
-            onSubscribe={redirectToSubscribe} 
-            isSubscribed={isSubscribed}
-          />
-        </div>
-      </div>
-    );
-  }
-
-  // If user is authenticated but not subscribed, show subscription screen
-  if (userId && !isCheckingAuth && !isSubscribed && !isCheckingSubscription) {
-    return (
-      <div className="flex flex-col min-h-screen bg-gradient-to-b from-white to-[#f8fafc] py-10">
-        <div className="flex-1 flex flex-col items-center justify-center">
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-[#023d54] tracking-tight mb-2">
-              GuroAI Chat
-            </h1>
-            <p className="text-xl text-[#023d54]/80 mb-8">
-              Subscribe to start chatting with GuroAI
-            </p>
-          </div>
-          <ChatAuth 
-            onSubscribe={redirectToSubscribe} 
-            isSubscribed={isSubscribed}
-          />
         </div>
       </div>
     );
@@ -171,23 +96,14 @@ const AskGuro = () => {
 
         {/* Main Chat Area */}
         <div className="flex-1 flex flex-col">
-          {showApiKeyForm ? (
-            <div className="flex-1 flex items-center justify-center px-4">
-              <ApiKeyForm 
-                onKeySaved={() => {
-                  setShowApiKeyForm(false);
-                  startNewChat();
-                }} 
-              />
-            </div>
-          ) : messages.length === 0 ? (
+          {messages.length === 0 ? (
             <WelcomeScreen />
           ) : (
             <ChatMessages
               messages={messages}
               isLoading={isLoading}
               chatEndRef={chatEndRef}
-              apiKeyMissing={!hasApiKey}
+              apiKeyMissing={false}
             />
           )}
         </div>
@@ -202,20 +118,8 @@ const AskGuro = () => {
         userId={userId}
         onFileUpload={handleFileUpload}
         onImageGenerate={handleImageGeneration}
-        disabled={!hasApiKey || showApiKeyForm}
+        disabled={false}
       />
-
-      {/* API Key Button */}
-      {hasApiKey && (
-        <div className="fixed bottom-4 right-4">
-          <button 
-            onClick={() => setShowApiKeyForm(true)}
-            className="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 py-1 px-2 rounded-md"
-          >
-            Change API Key
-          </button>
-        </div>
-      )}
     </div>
   );
 };
