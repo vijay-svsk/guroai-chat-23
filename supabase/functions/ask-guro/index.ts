@@ -25,7 +25,7 @@ serve(async (req) => {
   }
 
   try {
-    const { question } = await req.json();
+    const { question, togetherApiKey: clientApiKey } = await req.json();
 
     // Check cache first for faster responses
     const cacheKey = question.trim().toLowerCase();
@@ -88,15 +88,18 @@ serve(async (req) => {
 
     console.log("Processing standard chat request:", question);
 
+    // Use the API key provided by the client or fall back to environment variable
+    const apiKey = clientApiKey || togetherApiKey;
+    
     // Use Together API for text generation
-    if (!togetherApiKey) {
-      throw new Error('TOGETHER_API_KEY is not set');
+    if (!apiKey) {
+      throw new Error('Together API key is not available. Please provide your API key.');
     }
 
     const togetherResponse = await fetch('https://api.together.xyz/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${togetherApiKey}`,
+        'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({

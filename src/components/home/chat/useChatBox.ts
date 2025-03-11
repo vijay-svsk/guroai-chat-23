@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { ChatMessage } from "@/types/chat";
@@ -84,9 +85,12 @@ export const useChatBox = () => {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 10000); // 10-second timeout
       
-      // Call the ask-guro function without the signal in the options
+      // Call the ask-guro function with apiKey parameter
       const { data, error } = await supabase.functions.invoke("ask-guro", {
-        body: { question: userMessage.content }
+        body: { 
+          question: userMessage.content,
+          togetherApiKey: localStorage.getItem('togetherApiKey') || undefined
+        }
       });
 
       clearTimeout(timeoutId);

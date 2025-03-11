@@ -5,6 +5,7 @@ import { ChatToggleButton, MobileChatToggleButton } from "./chat/ChatToggleButto
 import { ChatHeader } from "./chat/ChatHeader";
 import { ChatMessages } from "./chat/ChatMessages";
 import { ChatInput } from "./chat/ChatInput";
+import { ApiKeyInput } from "./chat/ApiKeyInput";
 
 export const ChatBox = () => {
   const {
@@ -55,6 +56,9 @@ export const ChatBox = () => {
             onSubmit={handleSubmit}
             isLoading={isLoading}
           />
+          
+          {/* API Key Input */}
+          <ApiKeyInput />
         </div>
       )}
     </div>

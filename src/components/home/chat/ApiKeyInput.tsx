@@ -1,0 +1,92 @@
+
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
+
+export const ApiKeyInput = () => {
+  const [showInput, setShowInput] = useState(false);
+  const [apiKey, setApiKey] = useState("");
+  const { toast } = useToast();
+
+  useEffect(() => {
+    // Load the API key from localStorage when component mounts
+    const savedKey = localStorage.getItem("togetherApiKey");
+    if (savedKey) {
+      setApiKey(savedKey);
+    }
+  }, []);
+
+  const handleSaveKey = () => {
+    if (apiKey.trim()) {
+      localStorage.setItem("togetherApiKey", apiKey.trim());
+      toast({
+        title: "API Key Saved",
+        description: "Your Together API key has been saved successfully.",
+      });
+      setShowInput(false);
+    } else {
+      toast({
+        title: "Error",
+        description: "Please enter a valid API key.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleClearKey = () => {
+    localStorage.removeItem("togetherApiKey");
+    setApiKey("");
+    toast({
+      title: "API Key Removed",
+      description: "Your Together API key has been removed.",
+    });
+  };
+
+  return (
+    <div className="px-4 py-2 border-t border-gray-200">
+      {showInput ? (
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <Input
+              type="password"
+              placeholder="Enter Together API Key"
+              value={apiKey}
+              onChange={(e) => setApiKey(e.target.value)}
+              className="flex-1"
+            />
+            <Button size="sm" onClick={handleSaveKey}>Save</Button>
+          </div>
+          <div className="flex justify-between items-center">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => setShowInput(false)}
+            >
+              Cancel
+            </Button>
+            {apiKey && (
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleClearKey}
+                className="text-red-500 hover:text-red-700"
+              >
+                Remove Key
+              </Button>
+            )}
+          </div>
+        </div>
+      ) : (
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          className="w-full text-xs"
+          onClick={() => setShowInput(true)}
+        >
+          {localStorage.getItem("togetherApiKey") ? "Change Together API Key" : "Set Together API Key"}
+        </Button>
+      )}
+    </div>
+  );
+};
