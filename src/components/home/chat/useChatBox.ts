@@ -85,10 +85,10 @@ export const useChatBox = () => {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 10000); // 10-second timeout
       
-      // Call the ask-guro function with abort controller
+      // Call the ask-guro function without the signal in the options
       const { data, error } = await supabase.functions.invoke("ask-guro", {
-        body: { question: userMessage.content },
-        signal: controller.signal,
+        body: { question: userMessage.content }
+        // Removed the signal property which was causing the TypeScript error
       });
 
       clearTimeout(timeoutId);
