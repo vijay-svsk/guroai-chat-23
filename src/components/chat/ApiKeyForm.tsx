@@ -27,7 +27,7 @@ export const ApiKeyForm = ({ onKeySaved }: ApiKeyFormProps) => {
     
     try {
       // Store the API key in localStorage for this session
-      localStorage.setItem("openai_api_key", apiKey);
+      localStorage.setItem("together_api_key", apiKey);
       
       toast({
         title: "Success",
@@ -52,14 +52,14 @@ export const ApiKeyForm = ({ onKeySaved }: ApiKeyFormProps) => {
       <div className="space-y-2">
         <h2 className="text-xl font-semibold text-[#023d54]">Connect Your AI</h2>
         <p className="text-gray-600 text-sm">
-          GuroAI requires an OpenAI API key to function. You can get an API key from{" "}
+          GuroAI requires a Together AI API key to function. You can get an API key from{" "}
           <a 
-            href="https://platform.openai.com/api-keys" 
+            href="https://www.together.ai/api" 
             target="_blank" 
             rel="noopener noreferrer"
             className="text-blue-500 hover:underline"
           >
-            OpenAI
+            Together AI
           </a>.
         </p>
       </div>
@@ -67,12 +67,12 @@ export const ApiKeyForm = ({ onKeySaved }: ApiKeyFormProps) => {
       <div className="space-y-4">
         <div className="space-y-2">
           <label htmlFor="api-key" className="block text-sm font-medium text-gray-700">
-            Enter your OpenAI API key
+            Enter your Together AI API key
           </label>
           <Input
             id="api-key"
             type="password"
-            placeholder="sk-xxxxxxx..."
+            placeholder="togetherapi-xxxxxxx..."
             value={apiKey}
             onChange={(e) => setApiKey(e.target.value)}
           />
@@ -91,7 +91,7 @@ export const ApiKeyForm = ({ onKeySaved }: ApiKeyFormProps) => {
       
       <div className="mt-4 bg-gray-50 p-3 rounded-md text-xs text-gray-500">
         <p>
-          Your API key is stored securely in your browser and is only used to make requests to OpenAI. 
+          Your API key is stored securely in your browser and is only used to make requests to Together AI. 
           We never store your API key on our servers.
         </p>
       </div>

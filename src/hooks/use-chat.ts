@@ -28,8 +28,8 @@ export const useChat = (userId: string | null) => {
     // Reset messages when the component is mounted
     setMessages([]);
     
-    // Check if API key exists in localStorage
-    const apiKey = localStorage.getItem("openai_api_key");
+    // Check if API key exists in localStorage (now using Together API key)
+    const apiKey = localStorage.getItem("together_api_key");
     setHasApiKey(!!apiKey);
   }, []);
 
@@ -41,7 +41,7 @@ export const useChat = (userId: string | null) => {
   }, [userId]);
 
   const saveApiKey = (apiKey: string) => {
-    localStorage.setItem("openai_api_key", apiKey);
+    localStorage.setItem("together_api_key", apiKey);
     setHasApiKey(true);
   };
 
@@ -99,12 +99,12 @@ export const useChat = (userId: string | null) => {
     e.preventDefault();
     if (!question.trim() || !userId) return;
     
-    // Check if user has provided an API key
-    const apiKey = localStorage.getItem("openai_api_key");
+    // Check if user has provided an API key (now using Together API key)
+    const apiKey = localStorage.getItem("together_api_key");
     if (!apiKey) {
       toast({
         title: "API Key Required",
-        description: "Please provide your OpenAI API key to use GuroAI Chat",
+        description: "Please provide your Together AI API key to use GuroAI Chat",
         variant: "destructive"
       });
       return;
@@ -189,11 +189,11 @@ export const useChat = (userId: string | null) => {
   const handleImageGeneration = () => {
     if (!userId) return;
     
-    // Set a prompt for OpenAI DALL-E image generation
-    setQuestion("generate an image about ");
-    
-    // Focus on the textarea
-    focusTextarea();
+    toast({
+      title: "Not Supported",
+      description: "Image generation is not supported with Together AI. Please use text-based queries only.",
+      variant: "destructive"
+    });
   };
 
   return {

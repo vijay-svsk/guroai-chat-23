@@ -32,7 +32,8 @@ export const ChatFooter = ({
           isLoading={isLoading}
           disabled={isLoading || disabled}
           onFileUpload={onFileUpload}
-          onImageGenerate={onImageGenerate}
+          // Hide image generation functionality since Together API doesn't support it
+          onImageGenerate={null}
         />
         
         {/* Disclaimer Footer */}

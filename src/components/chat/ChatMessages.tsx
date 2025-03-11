@@ -21,7 +21,7 @@ export const ChatMessages = ({ messages, isLoading, chatEndRef, apiKeyMissing = 
           </div>
           <div>
             <p className="text-yellow-800">
-              To use GuroAI Chat, please provide your OpenAI API key. You can get an API key from the OpenAI website.
+              To use GuroAI Chat, please provide your Together AI API key. You can get an API key from the Together AI website.
             </p>
           </div>
         </div>

@@ -9,7 +9,7 @@ const corsHeaders = {
 
 // Function to clean response text by removing # and * characters
 const cleanResponse = (text: string) => {
-  return text.replace(/[#*]/g, "").trim();
+  return text.trim();
 };
 
 serve(async (req) => {
@@ -26,65 +26,32 @@ serve(async (req) => {
 
     // Check if this is an image generation request
     if (question.toLowerCase().startsWith('generate an image')) {
-      // For image generation using DALL-E model
-      const response = await fetch('https://api.openai.com/v1/images/generations', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${apiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: "dall-e-3",
-          prompt: question.replace("generate an image", "").trim(),
-          n: 1,
-          size: "1024x1024",
-        }),
-      });
-
-      const data = await response.json();
-      
-      if (data.error) {
-        throw new Error(data.error.message || 'Error from OpenAI API');
-      }
-
-      // Return the image URL
-      return new Response(
-        JSON.stringify({ 
-          answer: `![Generated Image](${data.data[0].url})` 
-        }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      throw new Error('Image generation is not supported with Together API. Please use text-based queries only.');
     }
 
-    // Regular text request using GPT model
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    // Use Together API for text generation
+    const response = await fetch('https://api.together.xyz/v1/completions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [
-          { 
-            role: 'system', 
-            content: 'You are GuroAI, a helpful AI teaching assistant that helps create lesson plans and educational content.' 
-          },
-          { role: 'user', content: question }
-        ],
-        temperature: 0.7,
+        model: 'mistralai/Mixtral-8x7B-Instruct-v0.1',
+        prompt: `<s>[INST] You are GuroAI, a helpful AI teaching assistant that helps create lesson plans and educational content. Answer this question directly without asking for subscriptions: ${question} [/INST]</s>`,
         max_tokens: 1000,
+        temperature: 0.7,
       }),
     });
 
     const data = await response.json();
     
     if (data.error) {
-      throw new Error(data.error.message || 'Error from OpenAI API');
+      throw new Error(data.error.message || 'Error from Together API');
     }
 
     // Clean the response
-    const cleanedContent = cleanResponse(data.choices[0].message.content);
+    const cleanedContent = cleanResponse(data.choices[0].text);
 
     return new Response(
       JSON.stringify({ answer: cleanedContent }),
