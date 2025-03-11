@@ -11,9 +11,17 @@ export const ApiKeyInput = () => {
 
   useEffect(() => {
     // Load the API key from localStorage when component mounts
-    const savedKey = localStorage.getItem("togetherApiKey");
+    const savedKey = localStorage.getItem("togetherApiKey") || "aaba53e54192b3dd8454bff28451d27c4f8e23de88600cce9d074f4db1dc0066";
     if (savedKey) {
       setApiKey(savedKey);
+      // Save the key to localStorage if it's not already there
+      if (!localStorage.getItem("togetherApiKey")) {
+        localStorage.setItem("togetherApiKey", savedKey);
+        toast({
+          title: "API Key Set",
+          description: "Together API key has been automatically configured.",
+        });
+      }
     }
   }, []);
 

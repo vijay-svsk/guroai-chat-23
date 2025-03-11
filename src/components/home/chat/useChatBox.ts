@@ -85,11 +85,14 @@ export const useChatBox = () => {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 10000); // 10-second timeout
       
+      // Get the API key from localStorage with the new default
+      const apiKey = localStorage.getItem('togetherApiKey') || "aaba53e54192b3dd8454bff28451d27c4f8e23de88600cce9d074f4db1dc0066";
+      
       // Call the ask-guro function with apiKey parameter
       const { data, error } = await supabase.functions.invoke("ask-guro", {
         body: { 
           question: userMessage.content,
-          togetherApiKey: localStorage.getItem('togetherApiKey') || undefined
+          togetherApiKey: apiKey
         }
       });
 
