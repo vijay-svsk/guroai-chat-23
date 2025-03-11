@@ -5,6 +5,9 @@ import { ChatMessage } from "@/types/chat";
 import { getWelcomeMessage } from "./chat-utils";
 import { supabase } from "@/integrations/supabase/client";
 
+// Simple client-side cache to improve responsiveness
+const messageCache = new Map<string, string>();
+
 export const useChatBox = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [message, setMessage] = useState("");
@@ -55,15 +58,40 @@ export const useChatBox = () => {
       content: message.trim()
     };
 
+    // Show optimistic user message immediately
     setMessages(prev => [...prev, userMessage]);
     setMessage("");
     setIsLoading(true);
 
+    // Check cache first for faster responses
+    const cacheKey = userMessage.content.toLowerCase();
+    if (messageCache.has(cacheKey)) {
+      // Slight delay to make it feel more natural
+      setTimeout(() => {
+        const cachedResponse = messageCache.get(cacheKey) || "";
+        const assistantMessage: ChatMessage = {
+          role: 'assistant',
+          content: cachedResponse
+        };
+        setMessages(prev => [...prev, assistantMessage]);
+        setIsLoading(false);
+        scrollToBottom();
+      }, 300);
+      return;
+    }
+
     try {
-      // Call the ask-guro function directly instead of using special responses
+      // Add a timeout to ensure the request doesn't hang indefinitely
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10-second timeout
+      
+      // Call the ask-guro function with abort controller
       const { data, error } = await supabase.functions.invoke("ask-guro", {
-        body: { question: userMessage.content }
+        body: { question: userMessage.content },
+        signal: controller.signal,
       });
+
+      clearTimeout(timeoutId);
 
       if (error) {
         throw new Error(error.message || "Failed to get response");
@@ -72,6 +100,9 @@ export const useChatBox = () => {
       if (!data?.answer) {
         throw new Error("No answer received from the assistant");
       }
+      
+      // Store in cache for future use
+      messageCache.set(cacheKey, data.answer);
       
       const assistantMessage: ChatMessage = {
         role: 'assistant',
@@ -88,7 +119,7 @@ export const useChatBox = () => {
       if (error instanceof Error) {
         if (error.message.includes("network") || error.message.includes("connection")) {
           errorMessage = "Network error. Please check your internet connection and try again.";
-        } else if (error.message.includes("timeout")) {
+        } else if (error.message.includes("timeout") || error.message.includes("abort")) {
           errorMessage = "Request timed out. The server took too long to respond. Please try again.";
         }
       }
