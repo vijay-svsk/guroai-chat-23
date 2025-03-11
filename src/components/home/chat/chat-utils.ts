@@ -114,13 +114,6 @@ Would you like to know more about our subscription plans or have questions about
 export const getWelcomeMessage = (): ChatMessage => {
   return {
     role: 'assistant',
-    content: `Hello! I'm GuroAI's assistant. How can I help you today? 😊
-
-Need assistance with:
-• Creating lesson plans with GuroAI
-• Subscription information
-• Payment verification
-• Login or account access
-• Our newest upcoming features`
+    content: `Hello! I'm here to help you with information about GuroAI. How can I assist you today?`
   };
 };

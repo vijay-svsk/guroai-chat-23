@@ -13,7 +13,7 @@ export const ChatHeader = ({ onClose }: ChatHeaderProps) => {
     <div className="flex items-center justify-between bg-[#023d54] text-white p-3 rounded-t-lg">
       <div className="flex items-center gap-2">
         <GuroAvatar className="h-6 w-6" />
-        <span className="font-semibold">GuroAI Assistant</span>
+        <span className="font-semibold">GuroAI</span>
       </div>
       <Button 
         variant="ghost" 
