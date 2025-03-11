@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { ChatMessage } from "@/types/chat";
 
@@ -105,7 +106,7 @@ export const sendChatRequest = async (question: string, apiKey?: string) => {
   
   // If API key is provided, add it to the headers
   if (apiKey) {
-    headers['X-Perplexity-API-Key'] = apiKey;
+    headers['Authorization'] = `Bearer ${apiKey}`;
   }
   
   const { data, error } = await supabase.functions.invoke('ask-guro', {

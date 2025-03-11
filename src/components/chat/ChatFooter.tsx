@@ -9,6 +9,7 @@ interface ChatFooterProps {
   userId: string | null;
   onFileUpload: (file: File) => void;
   onImageGenerate: () => void;
+  disabled?: boolean;
 }
 
 export const ChatFooter = ({
@@ -18,7 +19,8 @@ export const ChatFooter = ({
   isLoading,
   userId,
   onFileUpload,
-  onImageGenerate
+  onImageGenerate,
+  disabled = false
 }: ChatFooterProps) => {
   return (
     <div className="sticky bottom-0 bg-gradient-to-b from-transparent to-[#f8fafc]">
@@ -28,7 +30,7 @@ export const ChatFooter = ({
           setQuestion={setQuestion}
           onSubmit={onSubmit}
           isLoading={isLoading}
-          disabled={isLoading} // Only disable when loading, not based on userId
+          disabled={isLoading || disabled}
           onFileUpload={onFileUpload}
           onImageGenerate={onImageGenerate}
         />
