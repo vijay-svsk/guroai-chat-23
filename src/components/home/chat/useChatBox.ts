@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { ChatMessage } from "@/types/chat";
 import { getWelcomeMessage } from "./chat-utils";
+import { supabase } from "@/integrations/supabase/client";
 
 export const useChatBox = () => {
   const [isOpen, setIsOpen] = useState(false);
