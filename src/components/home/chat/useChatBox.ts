@@ -2,8 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { ChatMessage } from "@/types/chat";
-import { getWelcomeMessage, getSpecialResponse } from "./chat-utils";
-import { sendChatMessage } from "@/services/chat-service";
+import { getWelcomeMessage } from "./chat-utils";
 
 export const useChatBox = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -14,9 +13,6 @@ export const useChatBox = () => {
   const chatBoxRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   
-  // Use the provided API key directly
-  const apiKey = "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";
-
   useEffect(() => {
     // Add welcome message when chat is first opened
     if (isOpen && messages.length === 0) {
@@ -63,28 +59,25 @@ export const useChatBox = () => {
     setIsLoading(true);
 
     try {
-      // Check for special message handling cases
-      const specialResponse = await getSpecialResponse(userMessage.content);
-      
-      // If we have a special response, use it instead of calling the API
-      if (specialResponse) {
-        const assistantMessage: ChatMessage = {
-          role: 'assistant',
-          content: specialResponse
-        };
-        
-        setMessages(prev => [...prev, assistantMessage]);
-      } else {
-        // Use the extracted service function for API calls
-        const answer = await sendChatMessage(userMessage.content, apiKey);
-        
-        const assistantMessage: ChatMessage = {
-          role: 'assistant',
-          content: answer
-        };
+      // Call the ask-guro function directly instead of using special responses
+      const { data, error } = await supabase.functions.invoke("ask-guro", {
+        body: { question: userMessage.content }
+      });
 
-        setMessages(prev => [...prev, assistantMessage]);
+      if (error) {
+        throw new Error(error.message || "Failed to get response");
       }
+      
+      if (!data?.answer) {
+        throw new Error("No answer received from the assistant");
+      }
+      
+      const assistantMessage: ChatMessage = {
+        role: 'assistant',
+        content: data.answer
+      };
+
+      setMessages(prev => [...prev, assistantMessage]);
     } catch (error) {
       console.error("Chat error:", error);
       
@@ -96,8 +89,6 @@ export const useChatBox = () => {
           errorMessage = "Network error. Please check your internet connection and try again.";
         } else if (error.message.includes("timeout")) {
           errorMessage = "Request timed out. The server took too long to respond. Please try again.";
-        } else if (error.message.includes("key") || error.message.includes("authenticate")) {
-          errorMessage = "API authentication error. Please contact support.";
         }
       }
       
