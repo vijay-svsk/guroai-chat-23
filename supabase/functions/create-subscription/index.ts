@@ -5,7 +5,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.4'
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
+};
 
 serve(async (req) => {
   // Handle CORS preflight requests
@@ -82,7 +82,7 @@ serve(async (req) => {
     }
 
     // Generate a redirect URL to Xendit checkout
-    // In production, this should be generated securely with Xendit API
+    // Use the actual Xendit checkout URL
     const xenditCheckoutUrl = 'https://checkout.xendit.co/od/guroai.online';
     
     return new Response(
