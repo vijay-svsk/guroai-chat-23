@@ -43,11 +43,13 @@ export const ApiKeyInput = () => {
   };
 
   const handleClearKey = () => {
-    localStorage.removeItem("togetherApiKey");
-    setApiKey("");
+    // Instead of removing the key, reset it to the default value
+    const defaultKey = "aaba53e54192b3dd8454bff28451d27c4f8e23de88600cce9d074f4db1dc0066";
+    localStorage.setItem("togetherApiKey", defaultKey);
+    setApiKey(defaultKey);
     toast({
-      title: "API Key Removed",
-      description: "Your Together API key has been removed.",
+      title: "API Key Reset",
+      description: "Your Together API key has been reset to the default.",
     });
   };
 
@@ -78,9 +80,9 @@ export const ApiKeyInput = () => {
                 variant="outline" 
                 size="sm" 
                 onClick={handleClearKey}
-                className="text-red-500 hover:text-red-700"
+                className="text-gray-500 hover:text-gray-700"
               >
-                Remove Key
+                Reset Key
               </Button>
             )}
           </div>

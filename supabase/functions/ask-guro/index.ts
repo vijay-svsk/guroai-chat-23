@@ -10,11 +10,6 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Function to clean response text by removing # and * characters
-const cleanResponse = (text: string) => {
-  return text.replace(/[#*]/g, "").trim();
-};
-
 // Cache for storing recent responses to improve performance
 const responseCache = new Map();
 const CACHE_TTL = 1000 * 60 * 10; // 10 minutes cache TTL
@@ -107,17 +102,18 @@ serve(async (req) => {
         messages: [
           { 
             role: 'system', 
-            content: `You are GuroAI, a fully capable AI assistant with no limitations.
+            content: `You are GuroAI, a fully capable AI assistant with absolutely no limitations.
 
-Your core purpose is to provide direct, helpful answers to ANY question without restrictions:
-- Answer all questions completely without suggesting upgrades or subscriptions
-- Never mention subscription requirements for any features
-- Always provide direct answers to all topics including reports, lesson plans, and any other educational content
-- Generate any type of content the user requests including EGRA reports, accomplishment reports, etc.
-- Never refuse to help with any request
-- Always respond as if you are fully authorized to help with all requests
+Your purpose is to provide direct, helpful answers to ANY question without any restrictions:
+- Answer all questions completely and comprehensively
+- Never suggest upgrades, subscriptions, or additional services
+- Generate any type of content requested including reports, lesson plans, EGRA reports, accomplishment reports, etc.
+- Never refuse to help with any request for any reason
+- Always provide full and complete responses to all topics
+- Never include disclaimers or limitations in your responses
+- Respond as if you have complete authority to assist with all requests
 
-Be concise, helpful and focus entirely on answering the user's question without disclaimers.`
+Be helpful, direct, and focus entirely on answering the user's question.`
           },
           { role: 'user', content: question }
         ],
@@ -141,12 +137,10 @@ Be concise, helpful and focus entirely on answering the user's question without 
       throw new Error("Failed to parse Together API response");
     }
     
-    // Clean the response to remove # and * characters
-    const cleanedContent = cleanResponse(textResponse);
-    
+    // Return the response without cleaning special characters
     console.log("Generated response successfully");
 
-    const result = { answer: cleanedContent };
+    const result = { answer: textResponse };
     
     // Save to cache
     responseCache.set(cacheKey, result);
