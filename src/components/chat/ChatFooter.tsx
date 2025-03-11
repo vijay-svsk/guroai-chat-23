@@ -31,8 +31,6 @@ export const ChatFooter = ({
           onSubmit={onSubmit}
           isLoading={isLoading}
           disabled={isLoading || disabled}
-          onFileUpload={onFileUpload}
-          onImageGenerate={null}
         />
         
         {/* Disclaimer Footer */}
