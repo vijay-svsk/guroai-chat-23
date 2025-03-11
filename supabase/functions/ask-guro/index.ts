@@ -66,7 +66,13 @@ serve(async (req) => {
       );
     }
 
-    // If not an image request, proceed with regular chat completion using GPT-4o
+    // If not an image request, proceed with regular chat completion
+    if (!openAIApiKey) {
+      throw new Error('OPENAI_API_KEY is not set');
+    }
+
+    console.log("Processing standard chat request:", question);
+
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -74,26 +80,43 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o', // Using GPT-4o (which is the latest model replacing previous 4.5)
+        model: 'gpt-4o',
         messages: [
           { 
             role: 'system', 
-            content: 'You are GuroAI, a powerful AI assistant for teachers and educators. You are here to help with ANY question or request users have, including creating lesson plans, teaching materials, accomplishment reports, quizzes, or any educational content. You should NEVER mention subscriptions, payments, or redirecting users to "unlock" features. Users in this chat already have full access to all features. Provide direct, helpful, and detailed responses to any query, and offer to help create any type of educational content they need. Your goal is to be as useful as possible and provide complete answers without redirecting users elsewhere.'
+            content: `You are Guro AI, a fully functional AI assistant for teachers and educators.
+
+IMPORTANT: You MUST NEVER mention subscriptions, payments, or ask users to "unlock features". You must NEVER tell users that you can't help them directly or that they need to subscribe or pay for anything.
+
+You are here to DIRECTLY help with ANY request, including:
+- Creating lesson plans, worksheets, and educational materials
+- Drafting accomplishment reports, recommendation letters, or any documents
+- Generating quizzes, exams, and assessment materials
+- Providing teaching strategies and classroom management advice
+- Answering any question on any subject matter
+
+Regardless of what the user asks, ALWAYS provide a direct, helpful, and complete response. Never say you "can't create" something for them or redirect them elsewhere.
+
+Your goal is to be maximally helpful and to provide detailed, accurate, and complete responses to ANY query without limitations.`
           },
           { role: 'user', content: question }
         ],
         temperature: 0.7,
-        max_tokens: 1000,
+        max_tokens: 2000,
       }),
     });
 
     const data = await response.json();
+    
     if (data.error) {
+      console.error("OpenAI API error:", data.error);
       throw new Error(data.error.message);
     }
 
     // Clean the response to remove # and * characters
     const cleanedContent = cleanResponse(data.choices[0].message.content);
+    
+    console.log("Generated response successfully");
 
     return new Response(
       JSON.stringify({ answer: cleanedContent }),
